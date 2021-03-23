@@ -1,4 +1,4 @@
-public class Ressources extends Element, MapTile {
+public class Ressources extends MapTile {
 
 	private int id;
 

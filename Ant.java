@@ -1,4 +1,4 @@
-public class Ant extends Element, Entity {
+public class Ant extends Entity {
 
 	private int id;
 

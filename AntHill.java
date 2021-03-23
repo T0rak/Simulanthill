@@ -1,4 +1,4 @@
-public class AntHill extends Element, MapTile {
+public class AntHill extends MapTile {
 
 	private int id;
 
