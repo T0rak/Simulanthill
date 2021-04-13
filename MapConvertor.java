@@ -168,7 +168,6 @@ public class MapConvertor
 	 */
 	public void random() 
 	{
-
 	}
 
 }
