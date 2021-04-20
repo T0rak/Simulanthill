@@ -22,6 +22,9 @@ public class MapConvertor
     private Label statusLabel;
     private Panel controlPanel;
 
+	//The scalers
+	private int scale;
+
 	private List<Character> acceptedCharList;
 
 	private List<List<Character>> mapCharList;
@@ -48,6 +51,8 @@ public class MapConvertor
 		acceptedCharList.add(Character.toUpperCase('\r')); //Carriage return
 		acceptedCharList.add(Character.toUpperCase('O'));
 		acceptedCharList.add(Character.toUpperCase('\n')); //New line
+
+		scale = 3;
 
 		prepareGUI();
 	}
@@ -109,7 +114,10 @@ public class MapConvertor
 
 			  if (fileDialog.getFile().length()!=0)
 			  {
-				validate(fileDialog.getDirectory()+fileDialog.getFile());
+				if (validate(fileDialog.getDirectory()+fileDialog.getFile()))
+				{
+					convert();
+				}
 			  }
 
 			  statusLabel.setText("File Selected :"  + fileDialog.getDirectory() + fileDialog.getFile()); //Outputs the file selected.
@@ -138,7 +146,7 @@ public class MapConvertor
 	  * The map is selected through a fileDialog.
 	  * @param _fileName //absolute path fileName
 	  */
-	private void validate(String _fileName) 
+	private boolean validate(String _fileName) 
 	{
 		this.fileName = _fileName;
 
@@ -160,6 +168,7 @@ public class MapConvertor
 				{
 						 
 					character = Character.toUpperCase((char) c);           //converting integer to char
+
 					System.out.print(character);        //Display the Character
 
 					if (!acceptedCharList.contains(character))
@@ -168,7 +177,7 @@ public class MapConvertor
 						//TODO : Throw a character message error
 						br.close();
 						fr.close();
-						return;
+						return false;
 					}
 					else
 					{
@@ -180,6 +189,7 @@ public class MapConvertor
 
 				br.close();
 				fr.close();
+				return true;
 
 			} 
 			catch (IOException e)	//Unuseful but needed...
@@ -195,7 +205,74 @@ public class MapConvertor
 			System.out.println("The file does NOT exists");
 			//TODO : Throw a no file message or extension error
 		}
+		return false;
 	}
+
+	private void convert()
+	{
+		int line = 0;
+		int column = 0;
+
+		File f = new File(fileName);
+	
+		System.out.println("Converting...");
+
+		try 
+		{
+			FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr);
+
+			Character character = ' ';
+
+			int c = 0;             
+			while((c = br.read()) != -1)         //Read char by Char
+			{
+					 
+				character = Character.toUpperCase((char) c);           //converting integer to char
+
+				System.out.print(character);        //Display the Character
+
+				if(character == '\n')
+				{
+					line++;
+				}
+
+				switch (character) 
+				{
+					case 'R':
+						new Ressources(line*scale, column*scale);
+						break;
+
+					case '#':
+						new Obstacle(line*scale, column*scale);
+						break;
+
+					case 'O':
+						new AntHill(line*scale, column*scale);
+						break;
+				
+					default:
+						break;
+				}
+
+				column++;
+
+			}
+
+			br.close();
+			fr.close();
+			System.out.println("Map Converted !!");
+
+		} 
+		catch (IOException e)	//Unuseful but needed...
+		{
+			//TODO : Throw a IO error message
+			e.printStackTrace();
+			System.out.println("Unable to read the file");
+		}   
+
+	}
+	
 
 	/**
 	 * Generates a valid random map 

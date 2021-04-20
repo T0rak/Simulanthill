@@ -1,4 +1,9 @@
-public class Ecosystem {
+package ch.hearc.simulanthill;
+
+import java.util.List;
+
+public class Ecosystem 
+{
 
 	private double frequency;
 
@@ -8,7 +13,8 @@ public class Ecosystem {
 
 	private List<Obstacle> obstacleList;
 
-	public Ecosystem() {
+	public Ecosystem() 
+	{
 
 	}
 
