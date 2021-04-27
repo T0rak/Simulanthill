@@ -1,189 +1,139 @@
 package ch.hearc.simulanthill;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.layout.HorizontalFlowGroup;
-import com.kotcrab.vis.ui.layout.VerticalFlowGroup;
-import com.kotcrab.vis.ui.widget.Separator;
-import com.kotcrab.vis.ui.widget.VisImageButton;
-import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisSlider;
-import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel;
-import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
-import com.kotcrab.vis.ui.widget.spinner.Spinner;
-import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-public class Simulanthill extends ApplicationAdapter 
-{
+public class Simulanthill extends ApplicationAdapter {
 
-	private Stage stage;
+	private SimInterface stage;
+	private Texture antImage;
+	private OrthographicCamera camera;
+   	private SpriteBatch batch;
+	private Array<Rectangle> raindrops;
+	private Rectangle bucket;
 
-	private VisTable lytMain;
-	private VisTable lytSimulation;
-	private VisTable lytSpeedParameters;
-	private VisTable lytParameters;
-	private VisTable lytMapButtons;
-	private VisTable lytPheromonesParameters;
-	private VisTable lytAntParameters;
-	private VisTable lytInteractibles;
+	private float windowWidth;
+	private float windowHeight;
 
-	private Texture simulationText;
+	private long lastDropTime;
 	
 	@Override
-	public void create () {
+	public void create() {
+
 		VisUI.load();
-
-		stage = new Stage();
+		stage = new SimInterface();
 		Gdx.input.setInputProcessor(stage);
-		
-		// Create All layout
-		lytMain = new VisTable();
-		lytSimulation = new VisTable();
-		lytSpeedParameters = new VisTable();
-		lytParameters = new VisTable();
-		lytMapButtons = new VisTable();
-		lytPheromonesParameters = new VisTable();
-		lytAntParameters = new VisTable();
-		lytInteractibles = new VisTable();
 
-		// Fill main layout
-		lytMain.add(lytSimulation);
-		lytMain.add(lytParameters);
+		windowWidth = 800;
+		windowHeight = 480;	
 
-		// Fill simulation layout
-		simulationText = new Texture("badlogic.jpg");
-		Image simulationImage = new Image(simulationText);
-		lytSimulation.add(simulationImage).colspan(3);
-		lytSimulation.row();
-		VisTextButton btnReset = new VisTextButton("Reset");
-		VisTextButton btnPlay = new VisTextButton("Play");
-		VisSlider sliSpeed = new VisSlider(0.1f, 10f, 0.1f, false);
-		lytSimulation.add(btnReset);
-		lytSimulation.add(btnPlay);
-		lytSimulation.add(sliSpeed);
-		
-		//Fill parameters layout
+		antImage = new Texture("ant.png");
 
-		lytParameters.add(lytMapButtons);
-		lytParameters.row();
-		lytParameters.add(lytPheromonesParameters);
-		lytParameters.row();
-		lytParameters.add(lytAntParameters);
-		lytParameters.row();
-		VisTextButton btnResetParameters = new VisTextButton("Reset Parameters");
-		lytParameters.add(btnResetParameters);
-		lytParameters.row();
-		lytParameters.add(lytInteractibles);
-		
-		//Fill buttons layout
-		VisTextButton btnLoadMap = new VisTextButton("Load Map");
-		lytMapButtons.add(btnLoadMap);
-		VisTextButton btnGenerateMap = new VisTextButton("Generate Map");
-		lytMapButtons.add(btnGenerateMap);
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, windowWidth, windowHeight);
 
-		//Fill Pheromone layout
-		lytPheromonesParameters.defaults().left().width(200);
-		VisLabel lblPheromone = new VisLabel("Phéromones");
-		
-		Spinner spinLifeTime = new Spinner("Temps de vie", new IntSpinnerModel(5, 0, 5));
-		Spinner spinRadius = new Spinner("Rayon", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		Spinner spinFrequence = new Spinner("Fréquence", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		lytPheromonesParameters.add(lblPheromone);
-		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinLifeTime);
-		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinRadius);
-		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinFrequence);
+		batch = new SpriteBatch();
 
-		//Fill ant layout
-		lytParameters.defaults().left();
-		VisLabel lblAnt = new VisLabel("Fourmis");
-		
-		Spinner spinAntNumber = new Spinner("Nombre", new IntSpinnerModel(5, 0, 5));
-		Spinner spinAntIndependence = new Spinner("Indépendance", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		Spinner spinAntSpeed = new Spinner("Vitesse", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		lytAntParameters.add(lblAnt);
-		lytAntParameters.row();
-		lytAntParameters.add(spinAntNumber);
-		lytAntParameters.row();
-		lytAntParameters.add(spinAntIndependence);
-		lytAntParameters.row();
-		lytAntParameters.add(spinAntSpeed);
-		
-		// Fill interactible layout
+		bucket = new Rectangle(windowWidth/2-50,0,100,100);
 
-		Drawable imageUp = simulationImage.getDrawable();
-		VisImageButton btnFood = new VisImageButton(imageUp);
-		lytInteractibles.add(btnFood).size(100,100);
-		VisImageButton btnObstacle = new VisImageButton(imageUp);
-		lytInteractibles.add(btnObstacle).size(100,100);
-		VisImageButton btnAnt = new VisImageButton(imageUp);
-		lytInteractibles.add(btnAnt).size(100,100);
-		lytInteractibles.row();
-		VisImageButton btnAnthill = new VisImageButton(imageUp);
-		lytInteractibles.add(btnAnthill).size(100,100);
-		
+		raindrops = new Array<Rectangle>();
+   		spawnRaindrop();
 
-		lytMain.setFillParent(true);
-
-		stage.addActor(lytMain);
-
-
-		lytMain.setDebug(true); // This is optional, but enables debug lines for tables.
-
-		
-
-		/*Skin skin = new Skin();
-
-		// Generate a 1x1 white texture and store it in the skin named "white".
-		Pixmap pixmap = new Pixmap(1, 1, Format.RGBA8888);
-		pixmap.setColor(Color.WHITE);
-		pixmap.fill();
-		skin.add("white", new Texture(pixmap));
-
-		// Store the default libgdx font under the name "default".
-		skin.add("default", new BitmapFont());
-
-		// Configure a TextButtonStyle and name it "default". Skin resources are stored by type, so this doesn't overwrite the font.
-		TextButtonStyle textButtonStyle = new TextButtonStyle();
-		textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-		textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-		textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
-		textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-		textButtonStyle.font = skin.getFont("default");
-		skin.add("default", textButtonStyle);*/
-
-		
-
-		
-
-		
-
-		
 	}
 
 	@Override
-	public void render () {
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	public void render() {
+		ScreenUtils.clear(250, 250, 250, 1);
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		batch.draw(antImage, bucket.x, bucket.y, bucket.width, bucket.height);
+		for (Rectangle drop : raindrops) {
+			batch.draw(antImage, drop.x, drop.y, drop.width, drop.height);
+		}
+		batch.end();
+
+		if(Gdx.input.isTouched())
+		{
+			Vector3 touchPos = new Vector3();
+			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			camera.unproject(touchPos);
+			bucket.x = touchPos.x - 64 / 2;
+		}
+
+		if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+		{
+			bucket.x -= 400 * Gdx.graphics.getDeltaTime();
+		}
+
+		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+		{
+			bucket.x += 400 * Gdx.graphics.getDeltaTime();
+		}
+
+		if(bucket.x < 0)
+		{
+			bucket.x = 0;
+		}
+
+		if(bucket.x > windowWidth - bucket.width)
+		{
+			bucket.x = windowWidth - bucket.width;
+		}
+
+		for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) 
+		{
+			Rectangle drop = iter.next();
+			drop.y -= 100 * Gdx.graphics.getDeltaTime();
+			if(drop.y < - drop.height/2 || (bucket.overlaps(drop) && drop.y < bucket.y + bucket.height * 2/3))
+			{
+				iter.remove();
+			}
+		}
+
+		if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+
+
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
+		
+
 	}
+
+	private void spawnRaindrop() {
+		Rectangle raindrop = new Rectangle();
+		raindrop.x = MathUtils.random(0, 800-64);
+		raindrop.y = 480;
+		raindrop.width = 64;
+		raindrop.height = 64;
+		raindrops.add(raindrop);
+		lastDropTime = TimeUtils.nanoTime();
+	 }
 	
 	@Override
-	public void dispose () {
+	public void dispose() {
+		antImage.dispose();
+		antImage.dispose();
+		batch.dispose();
 		stage.dispose();
 		VisUI.dispose();
 	}
