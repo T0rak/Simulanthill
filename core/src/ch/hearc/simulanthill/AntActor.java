@@ -16,7 +16,7 @@ public class AntActor extends ElementActor {
 
     public AntActor() {
         super(Asset.ant(), "ant");
-        this.position = new Vector2(MathUtils.random(1600), MathUtils.random(900));
+        this.position = new Vector2(MathUtils.random(50, 1550), MathUtils.random(50, 850));
         setSize(15, 15);
         this.id = 1;
         this.capacity = 0;
@@ -30,8 +30,7 @@ public class AntActor extends ElementActor {
     public void act(float delta) {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
         if (this.position.x > 1600 || this.position.x < 0 || this.position.y > 900 || this.position.y < 0) {
-
-            deltaDirection -= 180;
+            deltaDirection -= 100.25;
         }
         this.direction = (float)(this.direction + deltaDirection) % 360f;
         
