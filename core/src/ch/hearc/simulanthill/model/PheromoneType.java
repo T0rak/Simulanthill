@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.model;
 
 public enum PheromoneType 
 {

@@ -1,10 +1,16 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.model.ant;
+
+import ch.hearc.simulanthill.model.Pheromone;
+
+import ch.hearc.simulanthill.model.Entity;
 
 public class Ant extends Entity {
 
 	private int id;
 
 	private int capacity;
+
+	private State state;
 
 	private static double speed = 10;
 

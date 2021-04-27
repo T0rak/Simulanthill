@@ -1,4 +1,6 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.model;
+
+import ch.hearc.simulanthill.model.ant.Ant;
 
 import java.util.List;
 
