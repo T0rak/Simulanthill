@@ -27,6 +27,7 @@ import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class SimInterface extends Stage
 {
@@ -68,12 +69,14 @@ public class SimInterface extends Stage
 	private Spinner spinAntIndependence;
 	private Spinner spinAntSpeed;
 
+	public Actor simulation;
+
     
-	public SimInterface () {
+	public SimInterface (Viewport vp) {
+		super(vp);
 		
 		
-		
-		
+		simulation = new Actor();
 		
 		//Create All layout
 		lytMain = 					new VisTable();
@@ -125,7 +128,7 @@ public class SimInterface extends Stage
 		//Fill simulation layout
 		//lytSimulation.add(simulationImage).colspan(4);
 	
-		lytSimulation.add(new Actor()).colspan(4).size(300,200);
+		lytSimulation.add(simulation).colspan(4).size(300,200);
 		lytSimulation.row();
 		lytSimulation.add(btnReset);
 		lytSimulation.add(btnPlay);

@@ -22,10 +22,10 @@ public class AntBehaviour
 
     public void check()
     {
-        switch(this.state)
+        /*switch(this.state)
         {
             
-        }
+        }*/
     }
 
 
