@@ -13,27 +13,28 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.Gdx;
 
-public class ElementActor extends Actor
-{
+public class ElementActor extends Actor {
     Sprite sprite;
-    private Vector2 position;
+    protected Vector2 position;
 
-    public ElementActor(Texture texture, final String actorName/*, Element element*/) 
-    {
+    public ElementActor(float x, float y, Texture texture, final String actorName/*, Element element*/) {
       sprite = new Sprite(texture);
-      //setPos(element.getX(), element.getY());
-      this.position = new Vector2(0, 0);
-      setPos(this.position.x, this.position.y);
+      this.position = new Vector2(x, y);
+      setPos(x, y);
+
       setTouchable(Touchable.enabled);
-      addListener(new InputListener() 
-      {
+      
+      addListener(new InputListener() {
         @Override
-        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) 
-        {
-          Gdx.app.log("Touch down asset with name ", actorName);
+        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+          Gdx.app.log("Object at position: ", ElementActor.this.toString());
           return true;
         }
       });
+    }
+
+    public ElementActor(Texture texture, final String actorName) {
+      this(0, 0, texture, actorName);
     }
    
     public void setPos(float x, float y){
@@ -41,14 +42,12 @@ public class ElementActor extends Actor
       boundFromSprite();
     }
 
-    public void setSize(float w, float h)
-    {
+    public void setSize(float w, float h) {
       sprite.setSize(w, h);
       boundFromSprite();
     }
 
-    private void boundFromSprite()
-    {
+    private void boundFromSprite() {
       setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
     }
    
@@ -60,5 +59,10 @@ public class ElementActor extends Actor
     @Override
     public void draw(Batch batch, float parentAlpha) {
       sprite.draw(batch);
+    }
+
+    @Override
+    public String toString() {
+      return "";
     }
   }

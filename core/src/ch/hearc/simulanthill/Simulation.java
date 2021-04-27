@@ -5,22 +5,18 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 
-import ch.hearc.simulanthill.model.ant.Ant;
-
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-
+import com.badlogic.gdx.math.MathUtils;
 
 public class Simulation implements Screen {
  
 	private final Game game;
 	private Stage stage;
 	private Viewport viewport;
-	//private final AssetManager manager;
-	private AntActor antActor;
    
 	public Simulation(Game game) {
 		this.game = game;
@@ -31,31 +27,24 @@ public class Simulation implements Screen {
 	public void show() {
 		VisUI.load();
 		viewport = new FitViewport(1600, 900);
-		
-		//stage = new SimInterface(viewport);
+	
 		stage = new Stage(viewport);
    
 		Gdx.input.setInputProcessor(stage);
    
 		//loadAssets();
 		Asset.loadAssets();
-		//Ant ant = new Ant(200,0);
-		//antActor = new AntActor();
-		//ant.spritePos(0, 0);
-		//ElementActor myActor2 = new ElementActor(new Texture("badlogic.jpg") , "bad");
-		//myActor2.spritePos(0, 0);
+
+		int nbAnts = 5000;
+		AntActor tab[] = new AntActor[nbAnts];
 		
-		AntActor tab[] = new AntActor[20000];
-		for (int i = 0; i < 20000; i++) {
-			tab[i] = new AntActor();
+		for (int i = 0; i < nbAnts; i++) {
+			tab[i] = new AntActor(MathUtils.random((float)Gdx.graphics.getWidth()), MathUtils.random((float)Gdx.graphics.getHeight()), 12, 12);
 		}
 
-
-		for (int i = 0; i < 20000; i++) {
+		for (int i = 0; i < nbAnts; i++) {
 			stage.addActor(tab[i]);
 		}
-		//stage.addActor(antActor);
-		//stage.addActor(myActor2);
 	}
    
 	@Override

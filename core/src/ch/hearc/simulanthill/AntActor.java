@@ -2,49 +2,58 @@ package ch.hearc.simulanthill;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-
-import ch.hearc.simulanthill.model.ant.Ant;
 
 public class AntActor extends ElementActor {
     private float direction;
     private int viewSpanAngle;
-    private int id;
 	private int capacity;
 	private static double speed = 1;
-    private Vector2 position;
+    
+    /**
+     * 0 -> food exploration (look for food or food pheromones to follow)
+     * 1 -> follow food pheromones 
+     * 2 -> home exploration (explore to go back home or home pheromones to follow)
+     * 3 -> follow home pheromones
+     */
+    private int state;
+
+    public AntActor(float x, float y, int width, int height) {
+        super(x, y, Asset.ant(), "ant");
+
+        setSize(width, height);
+        this.sprite.setOrigin(width/2, height/2);
+        
+        this.capacity = 0;
+        this.viewSpanAngle = 15;
+        this.state = 0;
+        this.direction = MathUtils.random(360f);
+        this.sprite.rotate(this.direction);
+    }
 
     public AntActor() {
-        super(Asset.ant(), "ant");
-        this.position = new Vector2(MathUtils.random(50, 1550), MathUtils.random(50, 850));
-        setSize(15, 15);
-        this.id = 1;
-        this.capacity = 0;
-        this.direction = MathUtils.random(720) - 360;
-        this.sprite.rotate(this.direction);
-        this.viewSpanAngle = 15;
-        this.sprite.setOrigin(getWidth()/2, getHeight()/2);
+        this(0, 0, 15, 15);
     }
 
     @Override
     public void act(float delta) {
+        super.act(delta);
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
-        if (this.position.x > 1600 || this.position.x < 0 || this.position.y > 900 || this.position.y < 0) {
-            deltaDirection -= 100.25;
+        if (this.position.x > Gdx.graphics.getWidth() || this.position.x < 0 || this.position.y > Gdx.graphics.getHeight() || this.position.y < 0) {
+            deltaDirection -= 128.25;
         }
         this.direction = (float)(this.direction + deltaDirection) % 360f;
-        
-        //Gdx.app.log("TEST", String.valueOf(this.position));
 
-        super.act(delta);
         this.sprite.rotate(deltaDirection);
         
         float directionRad = (float) Math.toRadians(this.direction);
         this.position.x += MathUtils.cos(directionRad) * AntActor.speed;
         this.position.y += MathUtils.sin(directionRad) * AntActor.speed;
 
-        //this.sprite.rotate(this.direction);
         setPos(this.position.x, this.position.y);
     }
     
+    @Override
+    public String toString() {
+        return this.position.toString();
+    }
 }
