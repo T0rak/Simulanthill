@@ -3,10 +3,11 @@ package ch.hearc.simulanthill;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 
-import ch.hearc.simulanthill.model.Element;
+//import ch.hearc.simulanthill.model.Element;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -15,15 +16,15 @@ import com.badlogic.gdx.Gdx;
 public class ElementActor extends Actor
 {
     Sprite sprite;
-   
-    public ElementActor(Texture texture, final String actorName, Element element) 
+    private Vector2 position;
+
+    public ElementActor(Texture texture, final String actorName/*, Element element*/) 
     {
       sprite = new Sprite(texture);
-   
-      setPos(element.getX(), element.getY());
-      
+      //setPos(element.getX(), element.getY());
+      this.position = new Vector2(0, 0);
+      setPos(this.position.x, this.position.y);
       setTouchable(Touchable.enabled);
-   
       addListener(new InputListener() 
       {
         @Override
