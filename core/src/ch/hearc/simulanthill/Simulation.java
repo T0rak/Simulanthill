@@ -8,7 +8,10 @@ import com.kotcrab.vis.ui.VisUI;
 import ch.hearc.simulanthill.actors.Ant;
 import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Asset;
+import ch.hearc.simulanthill.actors.ElementActor;
+import ch.hearc.simulanthill.actors.Obstacle;
 import ch.hearc.simulanthill.actors.Resource;
+import ch.hearc.simulanthill.map.MapConvertor;
 
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
@@ -51,15 +54,29 @@ public class Simulation implements Screen {
 			stage.addActor(tab[i]);
 		}
 
-<<<<<<< HEAD
+		/*
 		Anthill anthill = new Anthill(100,100);
 		stage.addActor(anthill);
 
-
-=======
 		Resource test = new Resource(200f, 500f, 70, 70, 100);
 		stage.addActor(test);
->>>>>>> f1ceb43e0574c93d7c648abb855a5666ec57b76e
+
+		Obstacle testObst1 = new Obstacle(600f, 200f, 70, 70);
+		stage.addActor(testObst1);
+
+		Obstacle testObst2 = new Obstacle(890f, 121f, 70, 70);
+		stage.addActor(testObst2);
+		*/
+
+		System.out.println(System.getProperty("user.dir"));
+
+		// Pk le programme se lance dans ASSETS ???? 
+		MapConvertor map = new MapConvertor(13, "..\\..\\maps\\testmap1.txt");
+
+		for (ElementActor element : map.getActorList()) {
+			stage.addActor(element);
+		}
+
 	}
    
 	@Override

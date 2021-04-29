@@ -1,14 +1,19 @@
-package ch.hearc.simulanthill.model;
+package ch.hearc.simulanthill.map;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.awt.*;
-import java.awt.event.*;
+//import java.awt.*;
+//import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import ch.hearc.simulanthill.actors.ElementActor;
+import ch.hearc.simulanthill.actors.Anthill;
+import ch.hearc.simulanthill.actors.Obstacle;
+import ch.hearc.simulanthill.actors.Resource;
 
 /**
  * 
@@ -17,33 +22,39 @@ public class MapConvertor
 {
 
 	private String fileName;
-	private Frame mainFrame;
-	private Label headerLabel;
-    private Label statusLabel;
-    private Panel controlPanel;
+	//private Frame mainFrame;
+	//private Label headerLabel;
+    //private Label statusLabel;
+    //private Panel controlPanel;
 
-	//The scalers
-	private int scale;
+	private int size;
 
 	private List<Character> acceptedCharList;
 
 	private List<List<Character>> mapCharList;
-	List<Character> lineCharList;
+	private List<Character> lineCharList;
 
-	public static void main(String[] args) 
-	{
+	/////////////////////////////////////////////////////
+	private List<ElementActor>  actorList;
+	/////////////////////////////////////////////////////
+
+	//public static void main(String[] args) 
+	//{
 		//MapConvertor aMap = new MapConvertor("C:\\Users\\Luce\\Documents\\LESGITSDUCOURS\\P2JAVA\\simulanthill\\maps\\testmap1.txt");
-		MapConvertor aMap = new MapConvertor();
-		aMap.showFileDialogDemo();
-	}
+		//MapConvertor aMap = new MapConvertor();
+		//aMap.showFileDialogDemo();
+	//}
 
 	/**
 	 * Constructor
 	 */
-	public MapConvertor() 
+	public MapConvertor(int _size, String _filename) 
 	{
+		this.size = _size;
+
 		acceptedCharList = new ArrayList<Character>();
 		mapCharList = new ArrayList<List<Character>>();
+		actorList = new ArrayList<ElementActor>();
 
 		acceptedCharList.add(Character.toUpperCase(' ')); 
 		acceptedCharList.add(Character.toUpperCase('#')); 
@@ -52,14 +63,29 @@ public class MapConvertor
 		acceptedCharList.add(Character.toUpperCase('O'));
 		acceptedCharList.add(Character.toUpperCase('\n')); //New line
 
-		scale = 3;
+		//prepareGUI();
 
-		prepareGUI();
+		if (validate(_filename))
+		{
+			convert();
+		}
+
+	}
+
+	public MapConvertor(String _filename)
+	{
+		this(30, _filename); //makes a default conversion with 30 of width & weight.
+	}
+
+	public List<ElementActor> getActorList()
+	{
+		return this.actorList;
 	}
 
 	/**
 	 * Generates the graphical interface
 	 */
+/*
 	private void prepareGUI()
 	{
 		mainFrame = new Frame("Test FileDialog (AWT)");	//Window Title
@@ -90,10 +116,12 @@ public class MapConvertor
 
 		mainFrame.setVisible(true);  
 	 }
+	 */
 
 	 /**
 	  * Opens the fileDialog
 	  */
+	 /* 
 	 private void showFileDialogDemo()
 	 {
 		headerLabel.setText("Control in action: FileDialog"); 
@@ -140,6 +168,7 @@ public class MapConvertor
 		controlPanel.add(generateButton);
 		mainFrame.setVisible(true);  
 	 }
+	*/
 
 	 /**
 	  * Checks whether a map is valid or not. 
@@ -235,20 +264,21 @@ public class MapConvertor
 				if(character == '\n')
 				{
 					line++;
+					column = -1;
 				}
 
 				switch (character) 
 				{
 					case 'R':
-						new Ressources(line*scale, column*scale);
+						actorList.add(new Resource(column*this.size, (line*this.size*-1)+800, this.size, this.size, this.size));
 						break;
 
 					case '#':
-						new Obstacle(line*scale, column*scale);
+						actorList.add(new Obstacle(column*this.size, (line*this.size*-1)+800, this.size, this.size));
 						break;
 
 					case 'O':
-						new AntHill(line*scale, column*scale);
+						actorList.add(new Anthill(column*this.size, (line*this.size*-1)+800, this.size, this.size));
 						break;
 				
 					default:
