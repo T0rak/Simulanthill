@@ -7,6 +7,7 @@ import com.kotcrab.vis.ui.VisUI;
 
 import ch.hearc.simulanthill.actors.Ant;
 import ch.hearc.simulanthill.actors.Asset;
+import ch.hearc.simulanthill.actors.Resource;
 
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
@@ -48,6 +49,9 @@ public class Simulation implements Screen {
 		for (int i = 0; i < nbAnts; i++) {
 			stage.addActor(tab[i]);
 		}
+
+		Resource test = new Resource(200f, 500f, 70, 70, 100);
+		stage.addActor(test);
 	}
    
 	@Override
