@@ -8,6 +8,7 @@ import com.kotcrab.vis.ui.VisUI;
 import ch.hearc.simulanthill.actors.Ant;
 import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Asset;
+import ch.hearc.simulanthill.actors.Resource;
 
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
@@ -50,10 +51,15 @@ public class Simulation implements Screen {
 			stage.addActor(tab[i]);
 		}
 
+<<<<<<< HEAD
 		Anthill anthill = new Anthill(100,100);
 		stage.addActor(anthill);
 
 
+=======
+		Resource test = new Resource(200f, 500f, 70, 70, 100);
+		stage.addActor(test);
+>>>>>>> f1ceb43e0574c93d7c648abb855a5666ec57b76e
 	}
    
 	@Override
