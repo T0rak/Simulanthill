@@ -12,6 +12,9 @@ public class Asset {
     static private AssetDescriptor<Texture> resource = new AssetDescriptor<Texture>("resource.png", Texture.class);
     static public void loadAssets() {
 		manager.load(Asset.ant);
+        manager.load(Asset.anthill);
+        manager.load(Asset.obstacle);
+        manager.load(Asset.resource);
 		//manager.load(new AssetDescriptor<Texture>("badlogic.jpg", Texture.class));
 		manager.finishLoading();
 	}
