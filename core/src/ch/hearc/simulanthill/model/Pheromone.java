@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill.model;
 
+import ch.hearc.simulanthill.actors.PheromoneType;
+
 public class Pheromone extends Element {
 
 	private static int lifeTimeInit;

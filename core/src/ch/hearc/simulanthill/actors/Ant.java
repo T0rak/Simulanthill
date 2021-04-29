@@ -1,9 +1,9 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
-public class AntActor extends ElementActor {
+public class Ant extends ElementActor {
     private float direction;
     private int viewSpanAngle;
 	private int capacity;
@@ -17,7 +17,7 @@ public class AntActor extends ElementActor {
      */
     private int state;
 
-    public AntActor(float x, float y, int width, int height) {
+    public Ant(float x, float y, int width, int height) {
         super(x, y, Asset.ant(), "ant");
 
         setSize(width, height);
@@ -30,13 +30,17 @@ public class AntActor extends ElementActor {
         this.sprite.rotate(this.direction);
     }
 
-    public AntActor() {
+    public Ant() {
         this(0, 0, 15, 15);
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
+        moveExploration();
+    }
+
+    public void moveExploration() {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
         if (this.position.x > Gdx.graphics.getWidth() || this.position.x < 0 || this.position.y > Gdx.graphics.getHeight() || this.position.y < 0) {
             deltaDirection -= 128.25;
@@ -46,8 +50,8 @@ public class AntActor extends ElementActor {
         this.sprite.rotate(deltaDirection);
         
         float directionRad = (float) Math.toRadians(this.direction);
-        this.position.x += MathUtils.cos(directionRad) * AntActor.speed;
-        this.position.y += MathUtils.sin(directionRad) * AntActor.speed;
+        this.position.x += MathUtils.cos(directionRad) * Ant.speed;
+        this.position.y += MathUtils.sin(directionRad) * Ant.speed;
 
         setPos(this.position.x, this.position.y);
     }

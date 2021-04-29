@@ -5,6 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 
+import ch.hearc.simulanthill.actors.Ant;
+import ch.hearc.simulanthill.actors.Asset;
+
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -36,10 +39,10 @@ public class Simulation implements Screen {
 		Asset.loadAssets();
 
 		int nbAnts = 5000;
-		AntActor tab[] = new AntActor[nbAnts];
+		Ant tab[] = new Ant[nbAnts];
 		
 		for (int i = 0; i < nbAnts; i++) {
-			tab[i] = new AntActor(MathUtils.random((float)Gdx.graphics.getWidth()), MathUtils.random((float)Gdx.graphics.getHeight()), 12, 12);
+			tab[i] = new Ant(MathUtils.random((float)Gdx.graphics.getWidth()), MathUtils.random((float)Gdx.graphics.getHeight()), 12, 12);
 		}
 
 		for (int i = 0; i < nbAnts; i++) {

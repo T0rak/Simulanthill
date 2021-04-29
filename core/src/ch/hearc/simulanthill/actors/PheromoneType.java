@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill.model;
+package ch.hearc.simulanthill.actors;
 
 public enum PheromoneType 
 {
