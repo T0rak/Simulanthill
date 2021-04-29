@@ -15,16 +15,23 @@ import ch.hearc.simulanthill.map.MapConvertor;
 
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.MathUtils;
 
 public class Simulation implements Screen {
  
 	private final Game game;
-	private Stage stage;
+	private Ecosystem ecosystem;
 	private Viewport viewport;
+	private Viewport vp;
+	SimInterface sm;
    
 	public Simulation(Game game) {
 		this.game = game;
@@ -34,26 +41,29 @@ public class Simulation implements Screen {
 	@Override
 	public void show() {
 		VisUI.load();
+		Asset.loadAssets();
+		
+		InputMultiplexer multiPlexer = new InputMultiplexer();
+
+		vp = new FitViewport(1600,900);
 		viewport = new FitViewport(1600, 900);
+		//viewport.setScreenPosition(500, 500);
 	
-		stage = new Stage(viewport);
+		ecosystem = new Ecosystem(viewport,"..\\..\\maps\\testmap1.txt");
+		sm = new SimInterface(vp);
+
+		//ecosystem.getCamera().translate(-200, -200, 0);
+
+		multiPlexer.addProcessor(sm);
+		multiPlexer.addProcessor(ecosystem);
    
-		Gdx.input.setInputProcessor(stage);
+		//Gdx.input.setInputProcessor(ecosystem);
+		Gdx.input.setInputProcessor(multiPlexer);
    
 		//loadAssets();
-		Asset.loadAssets();
-
-		int nbAnts = 5000;
-		Ant tab[] = new Ant[nbAnts];
 		
-		for (int i = 0; i < nbAnts; i++) {
-			tab[i] = new Ant(MathUtils.random((float)Gdx.graphics.getWidth()), MathUtils.random((float)Gdx.graphics.getHeight()), 12, 12);
-		}
 
-		for (int i = 0; i < nbAnts; i++) {
-			stage.addActor(tab[i]);
-		}
-
+		
 		/*
 		Anthill anthill = new Anthill(100,100);
 		stage.addActor(anthill);
@@ -71,11 +81,7 @@ public class Simulation implements Screen {
 		System.out.println(System.getProperty("user.dir"));
 
 		// Pk le programme se lance dans ASSETS ???? 
-		MapConvertor map = new MapConvertor(13, "..\\..\\maps\\testmap1.txt");
-
-		for (ElementActor element : map.getActorList()) {
-			stage.addActor(element);
-		}
+		
 
 	}
    
@@ -83,15 +89,25 @@ public class Simulation implements Screen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(250, 250, 250, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		//viewport.setScreenPosition(10, 10);
+		//viewport.update(1600, 1900, true);
+		Gdx.gl.glViewport( 250,240,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2 );
 
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
+		//ecosystem.getViewport().apply();
+		ecosystem.act(Gdx.graphics.getDeltaTime());
+		ecosystem.draw();
+
+		//Gdx.gl.glViewport( 0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight() );
+		sm.getViewport().apply();
+		sm.act();
+		sm.draw();
 
 	}
    
 	@Override
 	public void resize(int width, int height) {
-		viewport.update(width, height, true);
+		viewport.update(width, height);
+		vp.update(width, height);
 	}
    
 	@Override
@@ -111,7 +127,7 @@ public class Simulation implements Screen {
    
 	@Override
 	public void dispose() {
-		stage.dispose();
+		ecosystem.dispose();
 	}
    
 	/*private void loadAssets() {

@@ -2,7 +2,7 @@ package ch.hearc.simulanthill.actors;
 
 public class Obstacle extends ElementActor {
 
-	public Obstacle(float _posX, float _posY, int _width, int _height)
+	public Obstacle(float _posX, float _posY, float _width, float _height)
 	{
 		//TODO : change values fron pannel input ? 
         super(_posX, _posY, Asset.obstacle(), "obstacle");

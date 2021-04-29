@@ -1,7 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
 public class Anthill extends ElementActor{
-    public Anthill(float x, float y, int width, int height) {
+    public Anthill(float x, float y, float width, float height) {
         super(x, y, Asset.anthill(), "anthill");
 
         setSize(width, height);

@@ -26,6 +26,8 @@ public class MapConvertor
 	//private Label headerLabel;
     //private Label statusLabel;
     //private Panel controlPanel;
+	private int width;
+	private int height;
 
 	private int size;
 
@@ -51,6 +53,8 @@ public class MapConvertor
 	public MapConvertor(int _size, String _filename) 
 	{
 		this.size = _size;
+		this.width = 0;
+		this.height = 0;
 
 		acceptedCharList = new ArrayList<Character>();
 		mapCharList = new ArrayList<List<Character>>();
@@ -67,7 +71,7 @@ public class MapConvertor
 
 		if (validate(_filename))
 		{
-			convert();
+			//convert();
 		}
 
 	}
@@ -75,6 +79,16 @@ public class MapConvertor
 	public MapConvertor(String _filename)
 	{
 		this(30, _filename); //makes a default conversion with 30 of width & weight.
+	}
+
+	public int getWidth()
+	{
+		return this.width;
+	}
+
+	public int getHeight()
+	{
+		return this.height;
 	}
 
 	public List<ElementActor> getActorList()
@@ -237,7 +251,7 @@ public class MapConvertor
 		return false;
 	}
 
-	private void convert()
+	public void convert(float _size)
 	{
 		int line = 0;
 		int column = 0;
@@ -263,6 +277,10 @@ public class MapConvertor
 
 				if(character == '\n')
 				{
+					if(this.width == 0)
+					{
+						this.width = column-1;
+					}
 					line++;
 					column = -1;
 				}
@@ -270,15 +288,15 @@ public class MapConvertor
 				switch (character) 
 				{
 					case 'R':
-						actorList.add(new Resource(column*this.size, (line*this.size*-1)+800, this.size, this.size, this.size));
+						actorList.add(new Resource(column*_size, (line*_size*-1)+800, _size, _size, 10));
 						break;
 
 					case '#':
-						actorList.add(new Obstacle(column*this.size, (line*this.size*-1)+800, this.size, this.size));
+						actorList.add(new Obstacle(column*_size, (line*_size*-1)+800, _size, _size));
 						break;
 
 					case 'O':
-						actorList.add(new Anthill(column*this.size, (line*this.size*-1)+800, this.size, this.size));
+						actorList.add(new Anthill(column*_size, (line*_size*-1)+800, _size, _size));
 						break;
 				
 					default:
@@ -288,6 +306,8 @@ public class MapConvertor
 				column++;
 
 			}
+
+			this.height = line;
 
 			br.close();
 			fr.close();
@@ -299,7 +319,9 @@ public class MapConvertor
 			//TODO : Throw a IO error message
 			e.printStackTrace();
 			System.out.println("Unable to read the file");
-		}   
+		} 
+
+		
 
 	}
 	

@@ -42,6 +42,16 @@ public class ElementActor extends Actor {
       boundFromSprite();
     }
 
+    public float getPosX()
+    {
+      return sprite.getX();
+    }
+
+    public float getPosY()
+    {
+      return sprite.getY();
+    }
+
     public void setSize(float w, float h) {
       sprite.setSize(w, h);
       boundFromSprite();
