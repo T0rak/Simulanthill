@@ -4,11 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-//import java.awt.*;
-//import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 
 import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.Anthill;
@@ -20,16 +19,9 @@ import ch.hearc.simulanthill.actors.Resource;
  */
 public class MapConvertor 
 {
-
 	private String fileName;
-	//private Frame mainFrame;
-	//private Label headerLabel;
-    //private Label statusLabel;
-    //private Panel controlPanel;
 	private int width;
 	private int height;
-
-	private int size;
 
 	private List<Character> acceptedCharList;
 
@@ -40,19 +32,11 @@ public class MapConvertor
 	private List<ElementActor>  actorList;
 	/////////////////////////////////////////////////////
 
-	//public static void main(String[] args) 
-	//{
-		//MapConvertor aMap = new MapConvertor("C:\\Users\\Luce\\Documents\\LESGITSDUCOURS\\P2JAVA\\simulanthill\\maps\\testmap1.txt");
-		//MapConvertor aMap = new MapConvertor();
-		//aMap.showFileDialogDemo();
-	//}
-
 	/**
 	 * Constructor
 	 */
 	public MapConvertor(int _size, String _filename) 
 	{
-		this.size = _size;
 		this.width = 0;
 		this.height = 0;
 
@@ -66,8 +50,6 @@ public class MapConvertor
 		acceptedCharList.add(Character.toUpperCase('\r')); //Carriage return
 		acceptedCharList.add(Character.toUpperCase('O'));
 		acceptedCharList.add(Character.toUpperCase('\n')); //New line
-
-		//prepareGUI();
 
 		if (validate(_filename))
 		{
@@ -95,94 +77,6 @@ public class MapConvertor
 	{
 		return this.actorList;
 	}
-
-	/**
-	 * Generates the graphical interface
-	 */
-/*
-	private void prepareGUI()
-	{
-		mainFrame = new Frame("Test FileDialog (AWT)");	//Window Title
-		mainFrame.setSize(400,400);
-		mainFrame.setLayout(new GridLayout(3, 1));
-
-		mainFrame.addWindowListener(new WindowAdapter() 
-		{
-		   public void windowClosing(WindowEvent windowEvent)
-		   {
-			  System.exit(0);
-		   }        
-		}); 
-		
-		headerLabel = new Label();
-		headerLabel.setAlignment(Label.CENTER);
-
-		statusLabel = new Label();        
-		statusLabel.setAlignment(Label.CENTER);
-		statusLabel.setSize(350,100);
-
-		controlPanel = new Panel();
-		controlPanel.setLayout(new FlowLayout());
-
-		mainFrame.add(headerLabel);
-		mainFrame.add(controlPanel);
-		mainFrame.add(statusLabel);
-
-		mainFrame.setVisible(true);  
-	 }
-	 */
-
-	 /**
-	  * Opens the fileDialog
-	  */
-	 /* 
-	 private void showFileDialogDemo()
-	 {
-		headerLabel.setText("Control in action: FileDialog"); 
-  
-		final FileDialog fileDialog = new FileDialog(mainFrame,"Select file");
-		fileDialog.setFile("*.txt");
-
-		Button showFileDialogButton = new Button("Open File");
-
-		Button generateButton = new Button("Generate a random map");
-
-		showFileDialogButton.addActionListener(new ActionListener() // annonymus function : event on click --> opens the fileDialog
-		{
-		   @Override
-		   public void actionPerformed(ActionEvent e) 
-		   {
-			  fileDialog.setVisible(true);
-
-			  if (fileDialog.getFile().length()!=0)
-			  {
-				if (validate(fileDialog.getDirectory()+fileDialog.getFile()))
-				{
-					convert();
-				}
-			  }
-
-			  statusLabel.setText("File Selected :"  + fileDialog.getDirectory() + fileDialog.getFile()); //Outputs the file selected.
-		   }
-		});
-
-		generateButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				random(117, 53);	//Will just launch the random method
-				//Defined a fixed width and height.
- 
-			   statusLabel.setText("Map generated"); //Outputs an informational message
-			}
-		});
-  
-		controlPanel.add(showFileDialogButton);
-		controlPanel.add(generateButton);
-		mainFrame.setVisible(true);  
-	 }
-	*/
 
 	 /**
 	  * Checks whether a map is valid or not. 
@@ -265,52 +159,62 @@ public class MapConvertor
 			FileReader fr = new FileReader(f);
 			BufferedReader br = new BufferedReader(fr);
 
+			//We put the lines in a stack, so we can pop then un in reverse order
+			Stack<String> lines = new Stack<String>();
+			String currentline = br.readLine();
+			while(currentline != null) 
+			{
+				lines.push(currentline);
+				currentline = br.readLine();
+			}
+
 			Character character = ' ';
 
-			int c = 0;             
-			while((c = br.read()) != -1)         //Read char by Char
+			while (! lines.empty())
 			{
-					 
-				character = Character.toUpperCase((char) c);           //converting integer to char
+				currentline = lines.pop();
 
-				System.out.print(character);        //Display the Character
-
-				if(character == '\n')
+				for (int i = 0 ; i < currentline.length() ; i++ )        
 				{
-					if(this.width == 0)
+					character = Character.toUpperCase(currentline.charAt(i)); 
+
+					System.out.print(character); //Display the Character
+
+					switch (character) 
 					{
-						this.width = column-1;
+						case 'R':
+							actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
+							break;
+
+						case '#':
+							actorList.add(new Obstacle(column*_size, line*_size, _size, _size));
+							break;
+
+						case 'O':
+							actorList.add(new Anthill(column*_size, line*_size, _size, _size));
+							break;
+					
+						default:
+							break;
 					}
-					line++;
-					column = -1;
+					column++;
 				}
+				line++;
 
-				switch (character) 
+				if(this.width == 0)
 				{
-					case 'R':
-						actorList.add(new Resource(column*_size, (line*_size*-1)+800, _size, _size, 10));
-						break;
-
-					case '#':
-						actorList.add(new Obstacle(column*_size, (line*_size*-1)+800, _size, _size));
-						break;
-
-					case 'O':
-						actorList.add(new Anthill(column*_size, (line*_size*-1)+800, _size, _size));
-						break;
-				
-					default:
-						break;
+					this.width = column-1;
 				}
+				System.out.println(); // just for the console output 
 
-				column++;
-
+				column = 0;
 			}
 
 			this.height = line;
 
 			br.close();
 			fr.close();
+
 			System.out.println("Map Converted !!");
 
 		} 
@@ -320,9 +224,36 @@ public class MapConvertor
 			e.printStackTrace();
 			System.out.println("Unable to read the file");
 		} 
+	}
 
-		
+	public void readAndPrintInReverseOrder() throws IOException {
 
+		String path = "src/misctests/test.txt";
+	
+		BufferedReader br = null;
+	
+		try {
+			br = new BufferedReader(new FileReader(path));
+			Stack<String> lines = new Stack<String>();
+			String line = br.readLine();
+			while(line != null) {
+				lines.push(line);
+				line = br.readLine();
+			}
+	
+			while(! lines.empty()) {
+				System.out.println(lines.pop());
+			}
+	
+		} finally {
+			if(br != null) {
+				try {
+					br.close();   
+				} catch(IOException e) {
+					// can't help it
+				}
+			}
+		}
 	}
 	
 

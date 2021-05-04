@@ -20,7 +20,7 @@ public class AntHill extends MapTile {
 		idGen++; 
 		this.posX = _posX;
 		this.posY = _posY;
-		this.antCapacity = 200;
+		this.antCapacity = 10000000;
 		this.ressourceCapacity = 1000;
 
 		//We need now to create the ants:
