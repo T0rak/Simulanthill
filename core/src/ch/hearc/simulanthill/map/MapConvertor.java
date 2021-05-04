@@ -20,25 +20,27 @@ import ch.hearc.simulanthill.actors.Resource;
 public class MapConvertor 
 {
 	private String fileName;
+	private boolean isValid;
 	private int width;
 	private int height;
 
 	private List<Character> acceptedCharList;
-
 	private List<List<Character>> mapCharList;
 	private List<Character> lineCharList;
 
 	/////////////////////////////////////////////////////
 	private List<ElementActor>  actorList;
+	private ElementActor[][][] elementActor3D;
 	/////////////////////////////////////////////////////
 
 	/**
 	 * Constructor
 	 */
-	public MapConvertor(int _size, String _filename) 
+	public MapConvertor(String _filename, float _parentWidth, float _parentHeight) 
 	{
 		this.width = 0;
 		this.height = 0;
+		this.isValid = false;
 
 		acceptedCharList = new ArrayList<Character>();
 		mapCharList = new ArrayList<List<Character>>();
@@ -54,14 +56,16 @@ public class MapConvertor
 		if (validate(_filename))
 		{
 			//convert();
+			this.isValid = true;
 		}
 
 	}
-
-	public MapConvertor(String _filename)
+	/*
+	public MapConvertor(String _filename, int _parentWidth, int _parentHeight)
 	{
-		this(30, _filename); //makes a default conversion with 30 of width & weight.
+		this(_filename); //makes a default conversion with 30 of width & weight.
 	}
+	*/
 
 	public int getWidth()
 	{
@@ -91,6 +95,8 @@ public class MapConvertor
 		if(f.exists() && !f.isDirectory() && fileName.substring(fileName.length()-3, fileName.length()).equalsIgnoreCase("txt")) 
 		{ 
     		System.out.println("The file exists");
+			int line = 0;
+			int column = 0;
 
 			//We need to check if all characters are valid : provided by https://www.candidjava.com/tutorial/program-to-read-a-file-character-by-character/ 
 			try 
@@ -106,6 +112,16 @@ public class MapConvertor
 						 
 					character = Character.toUpperCase((char) c);           //converting integer to char
 
+					if(character == '\n')
+					{
+						if(this.width == 0)
+						{
+							this.width = column-1;
+						}
+						line++;
+						column = -1;
+					}
+
 					System.out.print(character);        //Display the Character
 
 					if (!acceptedCharList.contains(character))
@@ -118,11 +134,16 @@ public class MapConvertor
 					}
 					else
 					{
+						column++;
 						//TODO : add the chars in a List then loop on it to put it in the main List
 					}
 				}
 
 				System.out.println("Map is valid ! :) ");
+				this.height = line;
+				System.out.println();
+				System.out.println("width map : "+ this.width);
+				System.out.println("height map : "+ this.height);
 
 				br.close();
 				fr.close();
@@ -147,115 +168,107 @@ public class MapConvertor
 
 	public void convert(float _size)
 	{
-		int line = 0;
-		int column = 0;
-
-		File f = new File(fileName);
-	
-		System.out.println("Converting...");
-
-		try 
+		if (this.isValid)
 		{
-			FileReader fr = new FileReader(f);
-			BufferedReader br = new BufferedReader(fr);
+			int line = 0;
+			int column = 0;
 
-			//We put the lines in a stack, so we can pop then un in reverse order
-			Stack<String> lines = new Stack<String>();
-			String currentline = br.readLine();
-			while(currentline != null) 
+			File f = new File(fileName);
+		
+			System.out.println("Converting...");
+
+			try 
 			{
-				lines.push(currentline);
-				currentline = br.readLine();
-			}
+				FileReader fr = new FileReader(f);
+				BufferedReader br = new BufferedReader(fr);
 
-			Character character = ' ';
-
-			while (! lines.empty())
-			{
-				currentline = lines.pop();
-
-				for (int i = 0 ; i < currentline.length() ; i++ )        
+				//We put the lines in a stack, so we can pop then un in reverse order
+				Stack<String> lines = new Stack<String>();
+				String currentline = br.readLine();
+				while(currentline != null) 
 				{
-					character = Character.toUpperCase(currentline.charAt(i)); 
+					lines.push(currentline);
+					currentline = br.readLine();
+				}
 
-					System.out.print(character); //Display the Character
+				/* 0 : Obstacle
+				   1 : Ressource
+				   2 : Anthill		
+				   --> size = 3
+				*/
+				this.elementActor3D = new ElementActor[this.height][this.width][3];
 
-					switch (character) 
+				Character character = ' ';
+
+				while (! lines.empty())
+				{
+					currentline = lines.pop();
+
+					for (int i = 0 ; i < currentline.length() ; i++ )        
 					{
-						case 'R':
-							actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
-							break;
+						character = Character.toUpperCase(currentline.charAt(i)); 
 
-						case '#':
-							actorList.add(new Obstacle(column*_size, line*_size, _size, _size));
-							break;
+						//System.out.print(character); //Display the Character
 
-						case 'O':
-							actorList.add(new Anthill(column*_size, line*_size, _size, _size));
-							break;
-					
-						default:
-							break;
+						/*
+						if(character == '\n')
+						{
+							line++;
+							column = -1;
+						}
+						*/
+
+						switch (character) 
+						{
+							case 'R':
+								//actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
+								this.elementActor3D[line][column][1] = new Resource(column*_size, line*_size, _size, _size, 10);
+								break;
+
+							case '#':
+								//actorList.add(new Obstacle(column*_size, line*_size, _size, _size));
+								this.elementActor3D[line][column][0] = new Obstacle(column*_size, line*_size, _size, _size);
+								break;
+
+							case 'O':
+								//actorList.add(new Anthill(column*_size, line*_size, _size, _size));
+								this.elementActor3D[line][column][2] = new Anthill(column*_size, line*_size, _size, _size);
+								break;
+						
+							default:
+								break;
+						}
+						column++;
 					}
-					column++;
-				}
-				line++;
+					line++;
 
-				if(this.width == 0)
-				{
-					this.width = column-1;
-				}
-				System.out.println(); // just for the console output 
+					if(this.width == 0)
+					{
+						this.width = column-1;
+					}
+					//System.out.println(); // just for the console output 
 
-				column = 0;
+					column = 0;
+				}
+
+				br.close();
+				fr.close();
+
+				System.out.println("Map Converted !!");
+
 			}
-
-			this.height = line;
-
-			br.close();
-			fr.close();
-
-			System.out.println("Map Converted !!");
-
-		} 
-		catch (IOException e)	//Unuseful but needed...
+			catch (IOException e)	//Unuseful but needed...
+			{
+				//TODO : Throw a IO error message
+				e.printStackTrace();
+				System.out.println("Unable to read the file");
+			} 
+		}
+		else
 		{
-			//TODO : Throw a IO error message
-			e.printStackTrace();
-			System.out.println("Unable to read the file");
-		} 
-	}
-
-	public void readAndPrintInReverseOrder() throws IOException {
-
-		String path = "src/misctests/test.txt";
-	
-		BufferedReader br = null;
-	
-		try {
-			br = new BufferedReader(new FileReader(path));
-			Stack<String> lines = new Stack<String>();
-			String line = br.readLine();
-			while(line != null) {
-				lines.push(line);
-				line = br.readLine();
-			}
-	
-			while(! lines.empty()) {
-				System.out.println(lines.pop());
-			}
-	
-		} finally {
-			if(br != null) {
-				try {
-					br.close();   
-				} catch(IOException e) {
-					// can't help it
-				}
-			}
+			System.out.println("ERROR : unable to convert map : map is not valid");
 		}
 	}
-	
 
 	/**
 	 * Generates a valid random map 

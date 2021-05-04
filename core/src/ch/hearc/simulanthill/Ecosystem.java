@@ -31,14 +31,12 @@ public class Ecosystem extends Stage
 
     public void loadMap(String filepath, float width, float height)
     {
-        MapConvertor map = new MapConvertor(1, filepath);
-        
-
+        MapConvertor map = new MapConvertor(filepath, width, height);
         
         map.convert(1);
-        float size = width / map.getWidth();
-        Gdx.app.log("Y TEST", String.valueOf(map.getWidth()));
-        map.convert(size);
+        //float size = width / map.getWidth();
+        //Gdx.app.log("Y TEST", String.valueOf(map.getWidth()));
+        //map.convert(size);
         
 		for (ElementActor element : map.getActorList()) {
             //element.setPos(element.getPosX()*size, element.getPosY()*size);
