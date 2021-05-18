@@ -11,7 +11,9 @@ import ch.hearc.simulanthill.map.MapConvertor;
 
 public class Ecosystem extends Stage
 {
-    public Ecosystem(Viewport viewport, String filepath)
+    private static Ecosystem instance = null;
+
+    private Ecosystem(Viewport viewport, String filepath)
     {
         super(viewport);
         int nbAnts = 5000;
@@ -27,6 +29,19 @@ public class Ecosystem extends Stage
 
         loadMap(filepath, 1600, 900);
 
+    }
+
+    public static Ecosystem getInstance(Viewport viewport, String filepath)
+    {
+        if(instance == null)
+        {
+            return new Ecosystem(viewport, filepath);
+        }
+        else
+        {
+            return instance;
+        }
+        
     }
 
     public void loadMap(String filepath, float width, float height)
