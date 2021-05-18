@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import ch.hearc.simulanthill.actors.ElementActor;
+import ch.hearc.simulanthill.Ecosystem;
 import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Obstacle;
 import ch.hearc.simulanthill.actors.Resource;
@@ -24,6 +25,9 @@ public class MapConvertor
 	private static int WIDTH;
 	private static int HEIGHT;
 
+	private static int PARENT_WIDTH;
+	private static int PARENT_HEIGHT;
+
 	private static float SIZE;
 
 	private static List<Character> ACCEPTED_CHAR_LIST;
@@ -31,7 +35,6 @@ public class MapConvertor
 	private static List<Character> LINE_CHAR_LIST;
 
 	/////////////////////////////////////////////////////
-	private static List<ElementActor>  ACTOR_LIST;
 	private static ElementActor[][][] ELEMENT_ACTOR_3D;
 	/////////////////////////////////////////////////////
 
@@ -44,11 +47,10 @@ public class MapConvertor
 		HEIGHT = 0;
 		IS_VALID = false;
 
-		SIZE = 10; //DEFAUT VALUE
+		//SIZE = _parentWidth / Ecosystem.getInstance().getWidth(); //DEFAUT VALUE
 
 		ACCEPTED_CHAR_LIST = new ArrayList<Character>();
 		MAP_CHAR_LIST = new ArrayList<List<Character>>();
-		ACTOR_LIST = new ArrayList<ElementActor>();
 
 		ACCEPTED_CHAR_LIST.add(Character.toUpperCase(' ')); 
 		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('#')); 
@@ -84,11 +86,6 @@ public class MapConvertor
 	public static int getHeight()
 	{
 		return HEIGHT;
-	}
-
-	public static List<ElementActor> getActorList()
-	{
-		return ACTOR_LIST;
 	}
 
 	 /**
@@ -207,11 +204,14 @@ public class MapConvertor
 				   2 : Anthill		
 				   --> size = 3
 				*/
+
+				SIZE = Math.min(Ecosystem.getCurrentEcosystem().getWidth()/WIDTH, Ecosystem.getCurrentEcosystem().getHeight()/HEIGHT);
+
 				ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][3];
 
 				Character character = ' ';
 
-				while(! lines.empty())
+				while(!lines.empty())
 				{
 					currentline = lines.pop();
 
@@ -261,7 +261,8 @@ public class MapConvertor
 
 					column = 0;
 				}
-
+				Ecosystem.getCurrentEcosystem().setElementActorGrid(ELEMENT_ACTOR_3D);
+				Ecosystem.getCurrentEcosystem().setCaseSize(SIZE);
 				br.close();
 				fr.close();
 
@@ -279,6 +280,8 @@ public class MapConvertor
 		{
 			System.out.println("ERROR : unable to convert map : map is not valid");
 		}
+
+		
 	}
 
 	/**

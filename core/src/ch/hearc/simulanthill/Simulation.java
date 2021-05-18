@@ -49,7 +49,8 @@ public class Simulation implements Screen {
 		viewport = new FitViewport(1600, 900);
 		//viewport.setScreenPosition(500, 500);
 	
-		ecosystem = Ecosystem.getInstance(viewport,"..\\..\\maps\\testmap1.txt");
+		ecosystem = Ecosystem.getInstance(viewport);
+		ecosystem.loadMap("..\\..\\maps\\testmap1.txt", 1600, 900);
 		sm = new SimInterface(vp);
 
 		//ecosystem.getCamera().translate(-200, -200, 0);
