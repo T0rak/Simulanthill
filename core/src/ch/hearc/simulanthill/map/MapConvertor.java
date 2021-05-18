@@ -19,44 +19,53 @@ import ch.hearc.simulanthill.actors.Resource;
  */
 public class MapConvertor 
 {
-	private String fileName;
-	private boolean isValid;
-	private int width;
-	private int height;
+	private static String FILE_NAME;
+	private static boolean IS_VALID;
+	private static int WIDTH;
+	private static int HEIGHT;
 
-	private List<Character> acceptedCharList;
-	private List<List<Character>> mapCharList;
-	private List<Character> lineCharList;
+	private static float SIZE;
+
+	private static List<Character> ACCEPTED_CHAR_LIST;
+	private static List<List<Character>> MAP_CHAR_LIST;
+	private static List<Character> LINE_CHAR_LIST;
 
 	/////////////////////////////////////////////////////
-	private List<ElementActor>  actorList;
-	private ElementActor[][][] elementActor3D;
+	private static List<ElementActor>  ACTOR_LIST;
+	private static ElementActor[][][] ELEMENT_ACTOR_3D;
 	/////////////////////////////////////////////////////
 
 	/**
 	 * Constructor
 	 */
-	public MapConvertor(String _filename, float _parentWidth, float _parentHeight) 
+	public static void generate(String _filename, float _parentWidth, float _parentHeight) 
 	{
-		this.width = 0;
-		this.height = 0;
-		this.isValid = false;
+		WIDTH = 0;
+		HEIGHT = 0;
+		IS_VALID = false;
 
-		acceptedCharList = new ArrayList<Character>();
-		mapCharList = new ArrayList<List<Character>>();
-		actorList = new ArrayList<ElementActor>();
+		SIZE = 10; //DEFAUT VALUE
 
-		acceptedCharList.add(Character.toUpperCase(' ')); 
-		acceptedCharList.add(Character.toUpperCase('#')); 
-		acceptedCharList.add(Character.toUpperCase('R')); 
-		acceptedCharList.add(Character.toUpperCase('\r')); //Carriage return
-		acceptedCharList.add(Character.toUpperCase('O'));
-		acceptedCharList.add(Character.toUpperCase('\n')); //New line
+		ACCEPTED_CHAR_LIST = new ArrayList<Character>();
+		MAP_CHAR_LIST = new ArrayList<List<Character>>();
+		ACTOR_LIST = new ArrayList<ElementActor>();
 
-		if (validate(_filename))
+		ACCEPTED_CHAR_LIST.add(Character.toUpperCase(' ')); 
+		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('#')); 
+		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('R')); 
+		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('\r')); //Carriage return
+		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('O'));
+		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('\n')); //New line
+
+		if(validate(_filename))
 		{
 			//convert();
-			this.isValid = true;
+			IS_VALID = true;
+		}
+
+		if(IS_VALID)
+		{
+			convert();
 		}
 
 	}
@@ -67,19 +76,19 @@ public class MapConvertor
 	}
 	*/
 
-	public int getWidth()
+	public static int getWidth()
 	{
-		return this.width;
+		return WIDTH;
 	}
 
-	public int getHeight()
+	public static int getHeight()
 	{
-		return this.height;
+		return HEIGHT;
 	}
 
-	public List<ElementActor> getActorList()
+	public static List<ElementActor> getActorList()
 	{
-		return this.actorList;
+		return ACTOR_LIST;
 	}
 
 	 /**
@@ -87,12 +96,12 @@ public class MapConvertor
 	  * The map is selected through a fileDialog.
 	  * @param _fileName //absolute path fileName
 	  */
-	private boolean validate(String _fileName) 
+	private static boolean validate(String _fileName) 
 	{
-		this.fileName = _fileName;
+		FILE_NAME = _fileName;
 
-		File f = new File(fileName);
-		if(f.exists() && !f.isDirectory() && fileName.substring(fileName.length()-3, fileName.length()).equalsIgnoreCase("txt")) 
+		File f = new File(FILE_NAME);
+		if(f.exists() && !f.isDirectory() && FILE_NAME.substring(FILE_NAME.length()-3, FILE_NAME.length()).equalsIgnoreCase("txt")) 
 		{ 
     		System.out.println("The file exists");
 			int line = 0;
@@ -114,9 +123,9 @@ public class MapConvertor
 
 					if(character == '\n')
 					{
-						if(this.width == 0)
+						if(WIDTH == 0)
 						{
-							this.width = column-1;
+							WIDTH = column-1;
 						}
 						line++;
 						column = -1;
@@ -124,7 +133,7 @@ public class MapConvertor
 
 					System.out.print(character);        //Display the Character
 
-					if (!acceptedCharList.contains(character))
+					if (!ACCEPTED_CHAR_LIST.contains(character))
 					{
 						System.out.println("\n\nInvalid character : " + character );
 						//TODO : Throw a character message error
@@ -135,22 +144,21 @@ public class MapConvertor
 					else
 					{
 						column++;
-						//TODO : add the chars in a List then loop on it to put it in the main List
 					}
 				}
 
 				System.out.println("Map is valid ! :) ");
-				this.height = line;
+				HEIGHT = line;
 				System.out.println();
-				System.out.println("width map : "+ this.width);
-				System.out.println("height map : "+ this.height);
+				System.out.println("width map : "+ WIDTH);
+				System.out.println("height map : "+ HEIGHT);
 
 				br.close();
 				fr.close();
 				return true;
 
 			} 
-			catch (IOException e)	//Unuseful but needed...
+			catch(IOException e)	//Unuseful but needed...
 			{
 				//TODO : Throw a IO error message
 				e.printStackTrace();
@@ -166,14 +174,17 @@ public class MapConvertor
 		return false;
 	}
 
-	public void convert(float _size)
+	/**
+	 * Will convert the map from characters to objects.
+	 */
+	public static void convert()
 	{
-		if (this.isValid)
+		if(IS_VALID)
 		{
 			int line = 0;
 			int column = 0;
 
-			File f = new File(fileName);
+			File f = new File(FILE_NAME);
 		
 			System.out.println("Converting...");
 
@@ -196,15 +207,15 @@ public class MapConvertor
 				   2 : Anthill		
 				   --> size = 3
 				*/
-				this.elementActor3D = new ElementActor[this.height][this.width][3];
+				ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][3];
 
 				Character character = ' ';
 
-				while (! lines.empty())
+				while(! lines.empty())
 				{
 					currentline = lines.pop();
 
-					for (int i = 0 ; i < currentline.length() ; i++ )        
+					for(int i = 0 ; i < currentline.length() ; i++ )        
 					{
 						character = Character.toUpperCase(currentline.charAt(i)); 
 
@@ -218,21 +229,21 @@ public class MapConvertor
 						}
 						*/
 
-						switch (character) 
+						switch(character) 
 						{
 							case 'R':
 								//actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
-								this.elementActor3D[line][column][1] = new Resource(column*_size, line*_size, _size, _size, 10);
+								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE, 10);
 								break;
 
 							case '#':
 								//actorList.add(new Obstacle(column*_size, line*_size, _size, _size));
-								this.elementActor3D[line][column][0] = new Obstacle(column*_size, line*_size, _size, _size);
+								ELEMENT_ACTOR_3D[line][column][0] = new Obstacle(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 
 							case 'O':
 								//actorList.add(new Anthill(column*_size, line*_size, _size, _size));
-								this.elementActor3D[line][column][2] = new Anthill(column*_size, line*_size, _size, _size);
+								ELEMENT_ACTOR_3D[line][column][2] = new Anthill(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 						
 							default:
@@ -242,9 +253,9 @@ public class MapConvertor
 					}
 					line++;
 
-					if(this.width == 0)
+					if(WIDTH == 0)
 					{
-						this.width = column-1;
+						WIDTH = column-1;
 					}
 					//System.out.println(); // just for the console output 
 
@@ -257,7 +268,7 @@ public class MapConvertor
 				System.out.println("Map Converted !!");
 
 			}
-			catch (IOException e)	//Unuseful but needed...
+			catch(IOException e)	//Unuseful but needed...
 			{
 				//TODO : Throw a IO error message
 				e.printStackTrace();
@@ -273,7 +284,7 @@ public class MapConvertor
 	/**
 	 * Generates a valid random map 
 	 */
-	private void random(int _width, int _height) 
+	public static void random(int _width, int _height) 
 	{
 		
 		int width = _width;		
@@ -287,22 +298,22 @@ public class MapConvertor
 
 		char pickedChar;
 
-		for (int index = 0 ; index < acceptedCharList.size() ; index ++)
+		for(int index = 0 ; index < ACCEPTED_CHAR_LIST.size() ; index ++)
 		{
-			acceptedChars += acceptedCharList.get(index);
+			acceptedChars += ACCEPTED_CHAR_LIST.get(index);
 		}
 
 		//We want a higher probability of having spaces:
-		for (int index = 0 ; index < 50 ; index ++)
+		for(int index = 0 ; index < 50 ; index ++)
 		{
 			acceptedChars += ' ';
 		}
 
-		mapCharList.clear();
+		MAP_CHAR_LIST.clear();
 
 		for(int i = 0 ; i < height ; i++ )
 		{
-			lineCharList = new ArrayList<Character>();
+			LINE_CHAR_LIST = new ArrayList<Character>();
 	
 			for(int j = 0 ; j < width ; j++ )
 			{
@@ -311,7 +322,7 @@ public class MapConvertor
 				|| j == 0
 				|| j == width - 1)  //this means that it's the first line or the last one or an edge
 				{
-					lineCharList.add('#');
+					LINE_CHAR_LIST.add('#');
 				}
 				else
 				{
@@ -319,31 +330,31 @@ public class MapConvertor
 					{
 					pickedChar = acceptedChars.charAt(r.nextInt(acceptedChars.length()));
 
-					if (hasAntHill && pickedChar == 'O')
+					if(hasAntHill && pickedChar == 'O')
 					{
 						pickedChar = '\n';
 					}
 
-					} while (pickedChar == '\n' || pickedChar == '\r' );
+					} while(pickedChar == '\n' || pickedChar == '\r' );
 
-					if (pickedChar == 'O')
+					if(pickedChar == 'O')
 					{
 						hasAntHill = true;
 					}
 
-					lineCharList.add(pickedChar);	
+					LINE_CHAR_LIST.add(pickedChar);	
 				}
 				
 			}
 
-			lineCharList.add('\n');
+			LINE_CHAR_LIST.add('\n');
 
-			mapCharList.add(lineCharList);
+			MAP_CHAR_LIST.add(LINE_CHAR_LIST);
 		}
 
-		for (List<Character> lines : mapCharList)
+		for(List<Character> lines : MAP_CHAR_LIST)
 		{
-			for (int i = 0 ; i < lines.size() ; i++)
+			for(int i = 0 ; i < lines.size() ; i++)
 			{
 				System.out.print(lines.get(i));
 			}
