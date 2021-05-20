@@ -1,7 +1,5 @@
 package ch.hearc.simulanthill.actors;
 
-import java.util.List;
-
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.Ecosystem;
@@ -23,7 +21,6 @@ public class Anthill extends ElementActor{
     public Anthill() {
         this(0, 0);
     }
-
 
     public void act(float delta) {
         super.act(delta);

@@ -3,8 +3,6 @@ package ch.hearc.simulanthill;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -115,7 +113,6 @@ public class Ecosystem extends Stage
     {
         return this.caseSize;
     }
-
 
     public boolean isObstacle(int x, int y)
     {
