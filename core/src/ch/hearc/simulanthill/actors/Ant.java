@@ -1,5 +1,6 @@
 package ch.hearc.simulanthill.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.Ecosystem;
@@ -22,9 +23,8 @@ public class Ant extends ElementActor {
     public Ant(float x, float y, int width, int height, Anthill anthill) {
         super(x, y, Asset.ant(), "ant");
 
+        sprite.setOrigin(width / 2, height / 2);
         setSize(width, height);
-        this.sprite.setOrigin(width/2, height/2);
-        
         this.capacity = 0;
         this.viewSpanAngle = 15;
         this.state = 0;
@@ -36,40 +36,42 @@ public class Ant extends ElementActor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        moveExploration();
+        foodResearch();
+        move();
+
     }
 
-    public void moveExploration() {
+    public void foodResearch() {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
-        /*if (this.position.x > Gdx.graphics.getWidth() || this.position.x < 0 || this.position.y > Gdx.graphics.getHeight() || this.position.y < 0) {
-            deltaDirection -= 128.25;
-        }*/
         this.direction = (float)(this.direction + deltaDirection) % 360f;
-
         this.sprite.rotate(deltaDirection);
-        
-        float directionRad = (float) Math.toRadians(this.direction);
-        float nextPosX = (float) (this.position.x + MathUtils.cos(directionRad) * Ant.speed);
-        float nextPosY = (float) (this.position.y + MathUtils.sin(directionRad) * Ant.speed);
-        
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
-        if (ecosystem.isObstacle((int) (nextPosX / ecosystem.getCaseSize()), (int) (nextPosY / ecosystem.getCaseSize())))
+    }
+
+    public void move() {
+    
+        float directionRad = (float) Math.toRadians(this.direction);
+        float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
+        float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
+
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
+        if (ecosystem.isObstacle(MathUtils.round(nextPosX / ecosystem.getCaseSize()), MathUtils.round(nextPosY / ecosystem.getCaseSize())))
         {
-            deltaDirection += 128.25;
-            this.direction = (float)(this.direction + deltaDirection) % 360f;
+            float deltaDirection = 12.5f;
+            this.direction = (float)(direction + deltaDirection) % 360f;
             this.sprite.rotate(deltaDirection);
         }
         else {
-            this.position.x = nextPosX;
-            this.position.y = nextPosY;
+            setPosition(nextPosX, nextPosY);
         }
-        setPos(this.position.x, this.position.y);
+        setPosition(getX(),getY());
     }
     
     
     @Override
     public String toString() {
-        return this.position.toString();
+        return "Fourmi !";
+        //return getX().toString();
     }
 }

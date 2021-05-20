@@ -15,13 +15,13 @@ import com.badlogic.gdx.Gdx;
 
 public class ElementActor extends Actor {
     Sprite sprite;
-    protected Vector2 position;
+
 
     public ElementActor(float x, float y, Texture texture, final String actorName/*, Element element*/) {
       sprite = new Sprite(texture);
-      this.position = new Vector2(x, y);
-      setPos(x, y);
-
+      //setPos(x, y);
+      
+      setPosition(x, y);
       setTouchable(Touchable.enabled);
       
       addListener(new InputListener() {
@@ -37,28 +37,18 @@ public class ElementActor extends Actor {
       this(0, 0, texture, actorName);
     }
    
-    public void setPos(float x, float y){
-      sprite.setPosition(x, y);
-      boundFromSprite();
-    }
+   @Override
+   public void setPosition(float x, float y) {
+    // TODO Auto-generated method stub
+    sprite.setPosition(x, y);
+    super.setPosition(x, y);
+   }
 
-    public float getPosX()
-    {
-      return sprite.getX();
-    }
-
-    public float getPosY()
-    {
-      return sprite.getY();
-    }
-
-    public void setSize(float w, float h) {
-      sprite.setSize(w, h);
-      boundFromSprite();
-    }
-
-    private void boundFromSprite() {
-      setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+    @Override
+    public void setSize(float width, float height) {
+      // TODO Auto-generated method stub
+      sprite.setSize(width, height);
+      super.setSize(width, height);
     }
    
     @Override

@@ -7,8 +7,8 @@ public class Obstacle extends ElementActor {
 		//TODO : change values fron pannel input ? 
         super(_posX, _posY, Asset.obstacle(), "obstacle");
     
-        setSize(_width,_height);
-        this.sprite.setOrigin(_width/2, _height/2);
+        setSize(_width, _height);
+        this.sprite.setOrigin(_width / 2, _height / 2);
     }
 
     public Obstacle(float x, float y) {
