@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import ch.hearc.simulanthill.Ecosystem;
 
 public class Anthill extends ElementActor{
-    private int nbLimit = 10000;
+    private int nbLimit = 100;
     private int nbAnts;
     public Anthill(float x, float y, float width, float height) {
         super(x, y, Asset.anthill(), "anthill");

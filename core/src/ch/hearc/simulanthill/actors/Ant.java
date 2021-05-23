@@ -2,15 +2,20 @@ package ch.hearc.simulanthill.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 import ch.hearc.simulanthill.Ecosystem;
 
-public class Ant extends ElementActor {
+public class Ant extends ElementActor
+{
+    private static int PHEROMONE_COUNTDOWN = 20;
     private float direction;
     private int viewSpanAngle;
 	private int capacity;
 	private static double speed = 1;
     private Anthill anthill;
+    private int nextCheck;
+    private int pheromoneCountdown;
     
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
@@ -20,7 +25,8 @@ public class Ant extends ElementActor {
      */
     private int state;
 
-    public Ant(float x, float y, int width, int height, Anthill anthill) {
+    public Ant(float x, float y, int width, int height, Anthill anthill)
+    {
         super(x, y, Asset.ant(), "ant");
 
         sprite.setOrigin(width / 2, height / 2);
@@ -31,24 +37,76 @@ public class Ant extends ElementActor {
         this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
         this.anthill = anthill;
+        pheromoneCountdown = PHEROMONE_COUNTDOWN;
+        nextCheck = 100;
     }
 
     @Override
-    public void act(float delta) {
+    public void act(float delta)
+    {
         super.act(delta);
-        foodResearch();
+        if (nextCheck == 0) {
+            nextCheck = 100;
+            foodResearch();
+        } else {
+            explore();
+        }
         move();
+        nextCheck--;
+        
+        pheromoneCountdown--;
+        if (pheromoneCountdown < 0) {
+            releasePheromone(PheromoneType.HOME);
+            pheromoneCountdown = PHEROMONE_COUNTDOWN;
+        }
 
     }
 
-    public void foodResearch() {
+    public void collectFood()
+    {
+        
+    }
+
+    public void foodResearch()
+    {
+        //trouver nourriture
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        Vector2 res =  ecosystem.checkRessourceAround(getX(), getY(), 5);
+        
+        if (res != null) 
+        {
+            
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
+            float deltaDirection = (float)(newDirection - this.direction) % 360f;
+
+            direction = newDirection;
+            sprite.rotate(deltaDirection);
+            
+        }
+        else 
+        {
+             explore();
+        }
+        //trouver phéromone nourriture
+        
+        //rien
+
+    }
+
+    public void homeResearch()
+    {
+        explore();
+    }
+
+    public void explore()
+    {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
         this.direction = (float)(this.direction + deltaDirection) % 360f;
         this.sprite.rotate(deltaDirection);
-
     }
 
-    public void move() {
+    public void move()
+    {
     
         float directionRad = (float) Math.toRadians(this.direction);
         float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
@@ -56,7 +114,7 @@ public class Ant extends ElementActor {
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         
-        if (ecosystem.isObstacle(MathUtils.round(nextPosX / ecosystem.getCaseSize()), MathUtils.round(nextPosY / ecosystem.getCaseSize())))
+        if (ecosystem.isObstacle(nextPosX, nextPosY))
         {
             float deltaDirection = 12.5f;
             this.direction = (float)(direction + deltaDirection) % 360f;
@@ -68,9 +126,13 @@ public class Ant extends ElementActor {
         setPosition(getX(),getY());
     }
     
-    
+    public void releasePheromone(PheromoneType type) {
+        Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type);
+    }
+
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Fourmi !";
         //return getX().toString();
     }
