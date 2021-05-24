@@ -3,7 +3,6 @@ package ch.hearc.simulanthill;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,6 +12,7 @@ import ch.hearc.simulanthill.actors.Ant;
 import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.Pheromone;
 import ch.hearc.simulanthill.actors.PheromoneType;
+import ch.hearc.simulanthill.actors.Resource;
 import ch.hearc.simulanthill.map.MapConvertor;
 
 public class Ecosystem extends Stage
@@ -132,6 +132,11 @@ public class Ecosystem extends Stage
         return (elementActorGrid[y][x][1] != null);
     }
 
+    public boolean isRessource(float x, float y)
+    {
+        return (elementActorGrid[castInCase(y)][castInCase(x)][1] != null);
+    }
+
     public boolean isAnthill(float x, float y)
     {
         int xCase = castInCase(x);
@@ -163,6 +168,17 @@ public class Ecosystem extends Stage
         return null;
     }
 
+    public int takeResource(float x, float y, int quantity) {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        return ((Resource)elementActorGrid[yCase][xCase][1]).decrease(quantity);
+    }
+
+    public void removeResource(float x, float y) {
+        elementActorGrid[castInCase(y)][castInCase(x)][1] = null;
+
+    }
+
     public void addPheromone(float x, float y, PheromoneType type) {
       
         int i = pheromoneIndex(type);
@@ -171,9 +187,10 @@ public class Ecosystem extends Stage
         addActor(p);
     }
 
-    public void removePheromone(Pheromone pheromone) {
-        int i = pheromoneIndex(pheromone.getType());
-        elementActorGrid[(int)(pheromone.getY()/caseSize)][(int)(pheromone.getX()/caseSize)][i] = null;
+    public void removePheromone(float x, float y, PheromoneType type) {
+        int i = pheromoneIndex(type);
+        elementActorGrid[castInCase(y)][castInCase(y)][i] = null;
+
     }
 
     private int castInCase(float f)
@@ -189,14 +206,14 @@ public class Ecosystem extends Stage
     private int pheromoneIndex(PheromoneType type) {
         int i;
         switch (type) {
-            case DANGER:
-                i = 5;
+            case HOME:
+                i = 3;
                 break;
             case RESSOURCE:
                 i = 4;
                 break;
-            case HOME:
-                i = 3;
+            case DANGER:
+                i = 5;
                 break;
             default:
             // TODO: print error
@@ -205,4 +222,5 @@ public class Ecosystem extends Stage
         }   
         return i;
     }
+
 }

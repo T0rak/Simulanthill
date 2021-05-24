@@ -1,28 +1,28 @@
 package ch.hearc.simulanthill.actors;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+
+import ch.hearc.simulanthill.Ecosystem;
 
 public class Resource extends ElementActor 
 {
+    private static final int INIT_CAPACITY = 10;
     int capacity;
 
-    public Resource(float _x, float _y, float _width, float _height, int _capacity) {
+    public Resource(float _x, float _y, float _width, float _height) {
         super(_x, _y, Asset.resource(), "food");
         setSize(_width, _height);
-        this.capacity = _capacity;
-        setTouchable(Touchable.enabled);
+        this.capacity = INIT_CAPACITY;
     }
 
-    public int reduce(int _reduction) {
+    public int decrease(int _quantity) {
         int ret = 0;
-        if (this.capacity < _reduction) {
+        if (this.capacity < _quantity) {
             ret = this.capacity;
-            this.remove();
-
+            remove();
         } else {
-            this.capacity -= _reduction;
-            ret = _reduction;
+            this.capacity -= _quantity;
+            ret = _quantity;
             
         }
         return ret;
@@ -31,5 +31,13 @@ public class Resource extends ElementActor
     @Override
     public void act(float delta) {
         super.act(delta);
+        sprite.setAlpha((float)capacity / INIT_CAPACITY);
     }
+
+    
+    @Override
+	public boolean remove() {
+		Ecosystem.getCurrentEcosystem().removeResource(getX(), getY());
+		return super.remove();
+	}
 }

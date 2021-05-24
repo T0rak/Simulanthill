@@ -51,7 +51,7 @@ public class Pheromone extends ElementActor{
 
 	@Override
 	public boolean remove() {
-		Ecosystem.getCurrentEcosystem().removePheromone(this);
+		Ecosystem.getCurrentEcosystem().removePheromone(getX(), getY(), pheromoneType);
 		return super.remove();
 	}
 

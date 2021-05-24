@@ -7,11 +7,12 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Ant extends ElementActor
 {
-    private static int PHEROMONE_COUNTDOWN = 20;
+    private static final int PHEROMONE_COUNTDOWN = 20;
+    private static final int MAX_CAPACITY = 1;
+	private static double speed = 1;
     private float direction;
     private int viewSpanAngle;
 	private int capacity;
-	private static double speed = 1;
     private Anthill anthill;
     private int nextCheck;
     private int pheromoneCountdown;
@@ -58,12 +59,15 @@ public class Ant extends ElementActor
             releasePheromone(PheromoneType.HOME);
             pheromoneCountdown = PHEROMONE_COUNTDOWN;
         }
-
+        collectFood();
     }
 
     public void collectFood()
     {
-        
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        if (ecosystem.isRessource(getX(), getY())) {
+            capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
+        }
     }
 
     public void foodResearch()

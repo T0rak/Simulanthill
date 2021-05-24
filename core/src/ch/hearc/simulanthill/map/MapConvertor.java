@@ -236,7 +236,7 @@ public class MapConvertor
 						{
 							case 'R':
 								//actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
-								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE, 10);
+								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 
 							case '#':
