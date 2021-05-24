@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill;
 
+import java.util.Vector;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -24,6 +26,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 public class Simulation implements Screen {
  
@@ -47,68 +50,58 @@ public class Simulation implements Screen {
 
 		vp = new FitViewport(1600,900);
 		viewport = new FitViewport(1600, 900);
-		//viewport.setScreenPosition(500, 500);
+
 	
 		ecosystem = Ecosystem.getInstance(viewport);
 		ecosystem.loadMap("..\\..\\maps\\testmap1.txt", 1600, 900);
 		sm = new SimInterface(vp);
 
-		//ecosystem.getCamera().translate(-200, -200, 0);
 
 		multiPlexer.addProcessor(sm);
 		multiPlexer.addProcessor(ecosystem);
    
-		//Gdx.input.setInputProcessor(ecosystem);
 		Gdx.input.setInputProcessor(multiPlexer);
-   
-		//loadAssets();
-		
-
-		
-		/*
-		Anthill anthill = new Anthill(100,100);
-		stage.addActor(anthill);
-
-		Resource test = new Resource(200f, 500f, 70, 70, 100);
-		stage.addActor(test);
-
-		Obstacle testObst1 = new Obstacle(600f, 200f, 70, 70);
-		stage.addActor(testObst1);
-
-		Obstacle testObst2 = new Obstacle(890f, 121f, 70, 70);
-		stage.addActor(testObst2);
-		*/
 
 		System.out.println(System.getProperty("user.dir"));
-
-		// Pk le programme se lance dans ASSETS ???? 
-		
-
 	}
    
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(250, 250, 250, 1);
+		Gdx.gl.glClearColor(100, 100, 100, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		//viewport.setScreenPosition(10, 10);
-		//viewport.update(1600, 1900, true);
-		Gdx.gl.glViewport( 250,240,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2 );
 
-		//ecosystem.getViewport().apply();
-		ecosystem.act(Gdx.graphics.getDeltaTime());
-		ecosystem.draw();
-
-		//Gdx.gl.glViewport( 0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight() );
 		sm.getViewport().apply();
 		sm.act();
 		sm.draw();
 
+		if(viewport.getScreenX() == 0)
+		{
+			Vector2 v = sm.simulation.localToStageCoordinates(new Vector2(0,0));
+			Vector2 v2 = sm.stageToScreenCoordinates(v);
+
+			viewport.update(1600/2, 900/2);
+			viewport.setScreenPosition((int)(v2.x), 900-(int)(v2.y));
+		}
+
+		ecosystem.getViewport().apply();
+		ecosystem.act(Gdx.graphics.getDeltaTime());
+		ecosystem.draw();
+
+	
 	}
    
 	@Override
 	public void resize(int width, int height) {
-		viewport.update(width, height);
+
 		vp.update(width, height);
+		//sm.getViewport().apply();
+		Vector2 v = sm.simulation.localToStageCoordinates(new Vector2(0,0));
+		Vector2 v2 = sm.stageToScreenCoordinates(v);
+
+		viewport.update(width/2, height/2);
+		viewport.setScreenPosition((int)(v2.x), height-(int)(v2.y));
+
+		
 	}
    
 	@Override
