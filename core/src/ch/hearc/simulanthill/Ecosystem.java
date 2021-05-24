@@ -2,7 +2,9 @@ package ch.hearc.simulanthill;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.spi.CurrencyNameProvider;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -127,12 +129,12 @@ public class Ecosystem extends Stage
         return (elementActorGrid[yCase][xCase][0] != null);
     }
 
-    public boolean isRessource(int x, int y)
+    public boolean isResource(int x, int y)
     {
         return (elementActorGrid[y][x][1] != null);
     }
 
-    public boolean isRessource(float x, float y)
+    public boolean isResource(float x, float y)
     {
         return (elementActorGrid[castInCase(y)][castInCase(x)][1] != null);
     }
@@ -143,8 +145,21 @@ public class Ecosystem extends Stage
         int yCase = castInCase(y);
         return (elementActorGrid[yCase][xCase][2] != null);
     }
+    
 
-    public Vector2 checkRessourceAround(float x, float y, int radius)
+    public boolean isPheromone(int x, int y, PheromoneType type)
+    {
+        return (elementActorGrid[y][x][pheromoneIndex(type)] != null);
+    }
+
+    public boolean isPheromone(float x, float y, PheromoneType type)
+    {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        return (elementActorGrid[yCase][xCase][pheromoneIndex(type)] != null);
+    }
+
+    public Vector2 checkResourceAround(float x, float y, int radius)
     {
         int xCase = castInCase(x);
         int yCase = castInCase(y);
@@ -159,13 +174,48 @@ public class Ecosystem extends Stage
                 if (j >= elementActorGrid.length || j < 0){
                     break;
                 }
-                if (isRessource(i, j))
+                if (isResource(i, j))
                 {
                     return new Vector2(castFromCase(i), castFromCase(j));
                 }
             }
         }
         return null;
+    }
+
+    public Vector2 checkStrongestPheromoneAround(float x, float y, int radius, PheromoneType type)
+    {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        
+        int index = pheromoneIndex(type);
+        Pheromone strongestPheromone = null;
+        int strongestPower = 0;
+
+        for (int i = xCase - radius; i <= xCase + radius; i++) 
+        {
+            if (i >= elementActorGrid[0].length || i < 0){
+                break;
+            }
+            for (int j = yCase - radius; j <= yCase + radius; j++)
+            {
+                if (j >= elementActorGrid.length || j < 0){
+                    break;
+                }
+                if (isPheromone(i, j, type))
+                {
+                    Pheromone p = ((Pheromone)elementActorGrid[j][i][index]);
+                    if (p.getPower() > strongestPower) {
+                        strongestPheromone = p;
+                        strongestPower = p.getPower();
+                    }
+                }
+            }
+        }
+        if (strongestPheromone == null) {
+            return null;
+        }
+        return new Vector2(strongestPheromone.getX(), strongestPheromone.getY());
     }
 
     public int takeResource(float x, float y, int quantity) {
@@ -182,14 +232,22 @@ public class Ecosystem extends Stage
     public void addPheromone(float x, float y, PheromoneType type) {
       
         int i = pheromoneIndex(type);
-        Pheromone p = new Pheromone(x, y, type);
-        elementActorGrid[(int) (y / caseSize)][(int) (x / caseSize)][i] = p;
-        addActor(p);
+        int caseX = castInCase(x);
+        int caseY = castInCase(y);
+        Pheromone currentPheromoneCase = (Pheromone)elementActorGrid[caseY][caseX][i];
+        
+        if (currentPheromoneCase == null) {
+            Pheromone p = new Pheromone(x, y, type);
+            elementActorGrid[caseY][caseX][i] = p;
+            addActor(p);
+        } else {
+            currentPheromoneCase.reinforce();
+        }
     }
 
     public void removePheromone(float x, float y, PheromoneType type) {
         int i = pheromoneIndex(type);
-        elementActorGrid[castInCase(y)][castInCase(y)][i] = null;
+        elementActorGrid[castInCase(y)][castInCase(x)][i] = null;
 
     }
 
