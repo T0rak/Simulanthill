@@ -3,6 +3,7 @@ package ch.hearc.simulanthill.actors;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Element;
+import com.badlogic.gdx.utils.Disposable;
 
 import ch.hearc.simulanthill.Ecosystem;
 
@@ -12,7 +13,6 @@ public class Pheromone extends ElementActor{
 	private int lifeTime;
 	private PheromoneType pheromoneType;
 	private double range;
-	private int[] glouton;
 
 	public Pheromone(float _posX, float _posY, PheromoneType _type)
 	{
@@ -21,10 +21,7 @@ public class Pheromone extends ElementActor{
 		this.pheromoneType = _type;
 		this.range = 20;
 		setSize(8, 8);
-		glouton = new int[100000];
-		for (int i = 0; i < 100000; i++) {
-			glouton[i] = i;
-		}
+
 	}
 
 	public void setLifetimeInit(int _lifeTimeInit)
@@ -38,6 +35,7 @@ public class Pheromone extends ElementActor{
 		if (lifeTime <= 0) {
 			remove();
 		}
+
 		sprite.setAlpha((float)lifeTime / lifeTimeInit);
 	}
 
@@ -61,4 +59,5 @@ public class Pheromone extends ElementActor{
 		Ecosystem.getCurrentEcosystem().removePheromone(this);
 		return super.remove();
 	}
+
 }
