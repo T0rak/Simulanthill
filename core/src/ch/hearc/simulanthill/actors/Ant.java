@@ -16,7 +16,6 @@ public class Ant extends ElementActor
     private Anthill anthill;
     private int nextCheck;
     private int pheromoneCountdown;
-    
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
      * 1 -> follow food pheromones 
@@ -45,21 +44,23 @@ public class Ant extends ElementActor
     public void act(float delta)
     {
         super.act(delta);
-        if (nextCheck == 0) {
-            nextCheck = 100;
-            foodResearch();
+        if (capacity == MAX_CAPACITY) {
+            releasePheromone(PheromoneType.RESSOURCE);
         } else {
-            explore();
+            if (nextCheck == 0) {
+                nextCheck = 100;
+                foodResearch();
+            } else {
+                explore();
+            }
+            collectFood();
+            releasePheromone(PheromoneType.HOME);
         }
         move();
         nextCheck--;
         
         pheromoneCountdown--;
-        if (pheromoneCountdown < 0) {
-            releasePheromone(PheromoneType.HOME);
-            pheromoneCountdown = PHEROMONE_COUNTDOWN;
-        }
-        collectFood();
+        
     }
 
     public void collectFood()
@@ -119,7 +120,7 @@ public class Ant extends ElementActor
         
         if (ecosystem.isObstacle(nextPosX, nextPosY))
         {
-            float deltaDirection = 12.5f;
+            float deltaDirection = MathUtils.random(-180f, 180f);
             this.direction = (float)(direction + deltaDirection) % 360f;
             this.sprite.rotate(deltaDirection);
         }
@@ -130,7 +131,10 @@ public class Ant extends ElementActor
     }
     
     public void releasePheromone(PheromoneType type) {
-        Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type);
+        if (pheromoneCountdown < 0) {
+            Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type);
+            pheromoneCountdown = PHEROMONE_COUNTDOWN;
+        }
     }
 
     @Override
