@@ -1,6 +1,5 @@
 package ch.hearc.simulanthill.actors;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -38,7 +37,7 @@ public class Ant extends ElementActor
         this.sprite.rotate(this.direction);
         this.anthill = anthill;
         pheromoneCountdown = PHEROMONE_COUNTDOWN;
-        nextCheck = 100;
+        nextCheck = 150;
     }
 
     @Override

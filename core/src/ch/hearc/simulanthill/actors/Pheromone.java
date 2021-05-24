@@ -1,10 +1,5 @@
 package ch.hearc.simulanthill.actors;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Element;
-import com.badlogic.gdx.utils.Disposable;
-
 import ch.hearc.simulanthill.Ecosystem;
 
 public class Pheromone extends ElementActor{
@@ -16,12 +11,12 @@ public class Pheromone extends ElementActor{
 
 	public Pheromone(float _posX, float _posY, PheromoneType _type)
 	{
-		super(_posX, _posY, Asset.resource(), "pheromone");
+		super(_posX, _posY, (_type == PheromoneType.HOME ? Asset.homePheromone() : Asset.foodPheromone()), "pheromone");
+
 		this.lifeTime = lifeTimeInit;
 		this.pheromoneType = _type;
 		this.range = 20;
-		setSize(8, 8);
-
+		setSize(5, 5);
 	}
 
 	public void setLifetimeInit(int _lifeTimeInit)
