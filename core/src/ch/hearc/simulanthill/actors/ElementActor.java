@@ -17,12 +17,11 @@ public class ElementActor extends Actor {
     Sprite sprite;
 
 
-    public ElementActor(float x, float y, Texture texture, final String actorName/*, Element element*/) {
+    public ElementActor(float x, float y, Texture texture, final String actorName) {
       sprite = new Sprite(texture);
-      //setPos(x, y);
       
       setPosition(x, y);
-      setTouchable(Touchable.enabled);
+      /*setTouchable(Touchable.enabled);
       
       addListener(new InputListener() {
         @Override
@@ -30,7 +29,7 @@ public class ElementActor extends Actor {
           Gdx.app.log("Object at position: ", ElementActor.this.toString());
           return true;
         }
-      });
+      });*/
     }
 
     public ElementActor(Texture texture, final String actorName) {
