@@ -10,11 +10,15 @@ public class Asset {
     static private AssetDescriptor<Texture> anthill = new AssetDescriptor<Texture>("anthill.png", Texture.class);
     static private AssetDescriptor<Texture> obstacle = new AssetDescriptor<Texture>("obstacle.png", Texture.class);
     static private AssetDescriptor<Texture> resource = new AssetDescriptor<Texture>("resource.png", Texture.class);
+    static private AssetDescriptor<Texture> homePheromone = new AssetDescriptor<Texture>("homePheromone.png", Texture.class);
+    static private AssetDescriptor<Texture> foodPheromone = new AssetDescriptor<Texture>("foodPheromone.png", Texture.class);
     static public void loadAssets() {
 		manager.load(Asset.ant);
         manager.load(Asset.anthill);
         manager.load(Asset.obstacle);
         manager.load(Asset.resource);
+        manager.load(Asset.homePheromone);
+        manager.load(Asset.foodPheromone);
 		//manager.load(new AssetDescriptor<Texture>("badlogic.jpg", Texture.class));
 		manager.finishLoading();
 	}
@@ -37,6 +41,16 @@ public class Asset {
     static public Texture resource()
     {
         return manager.get(resource);
+    }
+
+    static public Texture homePheromone()
+    {
+        return manager.get(homePheromone);
+    }
+
+    static public Texture foodPheromone()
+    {
+        return manager.get(foodPheromone);
     }
 
 }
