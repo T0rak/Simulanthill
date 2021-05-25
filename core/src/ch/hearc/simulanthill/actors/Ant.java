@@ -124,7 +124,11 @@ public class Ant extends ElementActor
 
     public void homeResearch()
     {
-        direction = MathUtils.radiansToDegrees * MathUtils.atan2(anthill.getY() - getY(), anthill.getX() - getX());
+        float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(anthill.getY() - getY(), anthill.getX() - getX());
+        
+        float deltaDirection = (float)(newDirection - this.direction) % 360f;
+        direction = newDirection;
+        sprite.rotate(deltaDirection);
     }
 
     public void explore()
