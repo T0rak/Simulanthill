@@ -1,37 +1,69 @@
 package ch.hearc.simulanthill.actors;
 
-import com.badlogic.gdx.math.Vector2;
+import ch.hearc.simulanthill.Ecosystem;
 
-public class Pheromone {
+public class Pheromone extends ElementActor {
     
-    private static int lifeTimeInit;
+    private static int INIT_LIFE_TIME = 500;
 	private int lifeTime;
 	private PheromoneType pheromoneType;
-	private double range;
-	private Vector2 position;
-	public Pheromone(int _posX, int _posY) 
+	private int power;
+	private int maxLifeTime;
+
+	public Pheromone(float _posX, float _posY, PheromoneType _type)
 	{
-		//TODO : surround with synchonized in case of Threads ?
-		//TODO : define values from panel
-		this.lifeTime = lifeTimeInit;
-		this.pheromoneType = PheromoneType.HOME;
-		this.range = 20;
-		this.position = new Vector2(_posX, _posY);
+		super(_posX, _posY, (_type == PheromoneType.HOME ? Asset.homePheromone() : Asset.foodPheromone()), "pheromone");
+
+		this.lifeTime = INIT_LIFE_TIME;
+		this.maxLifeTime = INIT_LIFE_TIME;
+		this.pheromoneType = _type;
+		this.power = 1;
+		setSize(4, 4);
 	}
 
 	public void setLifetimeInit(int _lifeTimeInit)
 	{
-		lifeTimeInit = _lifeTimeInit;
+		INIT_LIFE_TIME = _lifeTimeInit;
 	}
 
 	public void decreaseLifeTime()
 	{
 		this.lifeTime--;
+		if (lifeTime <= 0) {
+			remove();
+		}
+		sprite.setAlpha((float)lifeTime / maxLifeTime);
+	}
+
+	public PheromoneType getType() {
+		return pheromoneType;
 	}
 
 	//We don't need any id in Obstacles
 	public int getId()
 	{
 		return -1;
-	};
+	}
+
+	public int getPower() {
+		return power;
+	}
+
+	public void act(float _delta) {
+		super.act(_delta);
+		decreaseLifeTime();
+	}
+
+	public void reinforce() {
+		lifeTime += 100;
+		maxLifeTime = lifeTime;
+		power *= 2;
+	}
+
+	@Override
+	public boolean remove() {
+		Ecosystem.getCurrentEcosystem().removePheromone(getX(), getY(), pheromoneType);
+		return super.remove();
+	}
+
 }

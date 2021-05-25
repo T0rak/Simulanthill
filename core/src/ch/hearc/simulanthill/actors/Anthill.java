@@ -1,13 +1,11 @@
 package ch.hearc.simulanthill.actors;
 
-import java.util.List;
-
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.Ecosystem;
 
 public class Anthill extends ElementActor{
-    private int nbLimit = 2000;
+    private int nbLimit = 100;
     private int nbAnts;
     public Anthill(float x, float y, float width, float height) {
         super(x, y, Asset.anthill(), "anthill");
@@ -24,7 +22,6 @@ public class Anthill extends ElementActor{
         this(0, 0);
     }
 
-
     public void act(float delta) {
         super.act(delta);
         if (nbAnts < nbLimit)
@@ -40,6 +37,6 @@ public class Anthill extends ElementActor{
     public void createAnt()
     {
         nbAnts++;
-        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.position.x, this.position.y, 12, 12, this));
+        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX(), this.getY(), 12, 12, this));
     }
 }

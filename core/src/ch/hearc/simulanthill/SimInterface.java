@@ -1,23 +1,9 @@
 package ch.hearc.simulanthill;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-
-import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.layout.HorizontalFlowGroup;
-import com.kotcrab.vis.ui.layout.VerticalFlowGroup;
-import com.kotcrab.vis.ui.widget.Separator;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSlider;
@@ -34,7 +20,6 @@ public class SimInterface extends Stage
 
 	private VisTable lytMain;
 	private VisTable lytSimulation;
-	private VisTable lytSpeedParameters;
 	private VisTable lytParameters;
 	private VisTable lytMapButtons;
 	private VisTable lytPheromonesParameters;
@@ -55,7 +40,7 @@ public class SimInterface extends Stage
 	private VisImageButton btnObstacle;
 	private VisImageButton btnAnt;
 	private VisImageButton btnAnthill;
-	
+	 
 	private VisLabel lblSpeed;
 	private VisLabel lblAnt;
 	private VisLabel lblPheromone;
@@ -81,7 +66,6 @@ public class SimInterface extends Stage
 		//Create All layout
 		lytMain = 					new VisTable();
 		lytSimulation = 			new VisTable();
-		lytSpeedParameters = 		new VisTable();
 		lytParameters = 			new VisTable();
 		lytMapButtons = 			new VisTable();
 		lytPheromonesParameters = 	new VisTable();

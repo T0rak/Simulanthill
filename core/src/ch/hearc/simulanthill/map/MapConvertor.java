@@ -199,15 +199,18 @@ public class MapConvertor
 					currentline = br.readLine();
 				}
 
-				/* 0 : Obstacle
-				   1 : Ressource
-				   2 : Anthill		
-				   --> size = 3
+				/*  0 : Obstacle
+					1 : Ressource
+					2 : Anthill	
+					3 : HomePheromone	
+					4 : FoodPheromone
+					5 : DangerPheromone
+				   --> size = 6
 				*/
 
 				SIZE = Math.min(Ecosystem.getCurrentEcosystem().getWidth()/WIDTH, Ecosystem.getCurrentEcosystem().getHeight()/HEIGHT);
 
-				ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][3];
+				ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][6];
 
 				Character character = ' ';
 
@@ -233,7 +236,7 @@ public class MapConvertor
 						{
 							case 'R':
 								//actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
-								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE, 10);
+								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 
 							case '#':

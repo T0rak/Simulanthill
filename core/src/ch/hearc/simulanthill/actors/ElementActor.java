@@ -3,26 +3,22 @@ package ch.hearc.simulanthill.actors;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+
+
 
 //import ch.hearc.simulanthill.model.Element;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.Gdx;
 
 public class ElementActor extends Actor {
     Sprite sprite;
-    protected Vector2 position;
 
-    public ElementActor(float x, float y, Texture texture, final String actorName/*, Element element*/) {
+
+    public ElementActor(float x, float y, Texture texture, final String actorName) {
       sprite = new Sprite(texture);
-      this.position = new Vector2(x, y);
-      setPos(x, y);
-
-      setTouchable(Touchable.enabled);
+      
+      setPosition(x, y);
+      /*setTouchable(Touchable.enabled);
       
       addListener(new InputListener() {
         @Override
@@ -30,35 +26,25 @@ public class ElementActor extends Actor {
           Gdx.app.log("Object at position: ", ElementActor.this.toString());
           return true;
         }
-      });
+      });*/
     }
 
     public ElementActor(Texture texture, final String actorName) {
       this(0, 0, texture, actorName);
     }
    
-    public void setPos(float x, float y){
-      sprite.setPosition(x, y);
-      boundFromSprite();
-    }
+   @Override
+   public void setPosition(float x, float y) {
+    // TODO Auto-generated method stub
+    sprite.setPosition(x, y);
+    super.setPosition(x, y);
+   }
 
-    public float getPosX()
-    {
-      return sprite.getX();
-    }
-
-    public float getPosY()
-    {
-      return sprite.getY();
-    }
-
-    public void setSize(float w, float h) {
-      sprite.setSize(w, h);
-      boundFromSprite();
-    }
-
-    private void boundFromSprite() {
-      setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+    @Override
+    public void setSize(float width, float height) {
+      // TODO Auto-generated method stub
+      sprite.setSize(width, height);
+      super.setSize(width, height);
     }
    
     @Override

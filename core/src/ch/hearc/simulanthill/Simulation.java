@@ -3,29 +3,16 @@ package ch.hearc.simulanthill;
 import java.util.Vector;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 
-import ch.hearc.simulanthill.actors.Ant;
-import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Asset;
-import ch.hearc.simulanthill.actors.ElementActor;
-import ch.hearc.simulanthill.actors.Obstacle;
-import ch.hearc.simulanthill.actors.Resource;
-import ch.hearc.simulanthill.map.MapConvertor;
-
 //import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Simulation implements Screen {
@@ -54,7 +41,7 @@ public class Simulation implements Screen {
 	
 		ecosystem = Ecosystem.getInstance(viewport);
 		ecosystem.loadMap("..\\..\\maps\\testmap1.txt", 1600, 900);
-		sm = new SimInterface(vp);
+		sm = new SimInterface(vp); 
 
 
 		multiPlexer.addProcessor(sm);

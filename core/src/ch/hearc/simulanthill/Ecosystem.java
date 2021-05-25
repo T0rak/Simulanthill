@@ -2,14 +2,19 @@ package ch.hearc.simulanthill;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.spi.CurrencyNameProvider;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.actors.Ant;
 import ch.hearc.simulanthill.actors.ElementActor;
+import ch.hearc.simulanthill.actors.Pheromone;
+import ch.hearc.simulanthill.actors.PheromoneType;
+import ch.hearc.simulanthill.actors.Resource;
 import ch.hearc.simulanthill.map.MapConvertor;
 
 public class Ecosystem extends Stage
@@ -111,22 +116,169 @@ public class Ecosystem extends Stage
     {
         this.caseSize = caseSize;
     }
+
     public float getCaseSize()
     {
         return this.caseSize;
     }
 
-
-    public boolean isObstacle(int x, int y)
+    public boolean isObstacle(float x, float y)
     {
-        return (elementActorGrid[y][x][0] != null);
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        return (elementActorGrid[yCase][xCase][0] != null);
     }
-    public boolean isRessource(int x, int y)
+
+    public boolean isResource(int x, int y)
     {
         return (elementActorGrid[y][x][1] != null);
     }
-    public boolean isAnthill(int x, int y)
+
+    public boolean isResource(float x, float y)
     {
-        return (elementActorGrid[y][x][2] != null);
+        return (elementActorGrid[castInCase(y)][castInCase(x)][1] != null);
     }
+
+    public boolean isAnthill(float x, float y)
+    {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        return (elementActorGrid[yCase][xCase][2] != null);
+    }
+    
+
+    public boolean isPheromone(int x, int y, PheromoneType type)
+    {
+        return (elementActorGrid[y][x][pheromoneIndex(type)] != null);
+    }
+
+    public boolean isPheromone(float x, float y, PheromoneType type)
+    {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        return (elementActorGrid[yCase][xCase][pheromoneIndex(type)] != null);
+    }
+
+    public Vector2 checkResourceAround(float x, float y, int radius)
+    {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        
+        for (int i = xCase - radius; i <= xCase + radius; i++) 
+        {
+            if (i >= elementActorGrid[0].length || i < 0){
+                break;
+            }
+            for (int j = yCase - radius; j <= yCase + radius; j++)
+            {
+                if (j >= elementActorGrid.length || j < 0){
+                    break;
+                }
+                if (isResource(i, j))
+                {
+                    return new Vector2(castFromCase(i), castFromCase(j));
+                }
+            }
+        }
+        return null;
+    }
+
+    public Vector2 checkStrongestPheromoneAround(float x, float y, int radius, PheromoneType type)
+    {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        
+        int index = pheromoneIndex(type);
+        Pheromone strongestPheromone = null;
+        int strongestPower = 0;
+
+        for (int i = xCase - radius; i <= xCase + radius; i++) 
+        {
+            if (i >= elementActorGrid[0].length || i < 0){
+                break;
+            }
+            for (int j = yCase - radius; j <= yCase + radius; j++)
+            {
+                if (j >= elementActorGrid.length || j < 0){
+                    break;
+                }
+                if (isPheromone(i, j, type))
+                {
+                    Pheromone p = ((Pheromone)elementActorGrid[j][i][index]);
+                    if (p.getPower() > strongestPower) {
+                        strongestPheromone = p;
+                        strongestPower = p.getPower();
+                    }
+                }
+            }
+        }
+        if (strongestPheromone == null) {
+            return null;
+        }
+        return new Vector2(strongestPheromone.getX(), strongestPheromone.getY());
+    }
+
+    public int takeResource(float x, float y, int quantity) {
+        int xCase = castInCase(x);
+        int yCase = castInCase(y);
+        return ((Resource)elementActorGrid[yCase][xCase][1]).decrease(quantity);
+    }
+
+    public void removeResource(float x, float y) {
+        elementActorGrid[castInCase(y)][castInCase(x)][1] = null;
+
+    }
+
+    public void addPheromone(float x, float y, PheromoneType type) {
+      
+        int i = pheromoneIndex(type);
+        int caseX = castInCase(x);
+        int caseY = castInCase(y);
+        Pheromone currentPheromoneCase = (Pheromone)elementActorGrid[caseY][caseX][i];
+        
+        if (currentPheromoneCase == null) {
+            Pheromone p = new Pheromone(x, y, type);
+            elementActorGrid[caseY][caseX][i] = p;
+            addActor(p);
+        } else {
+            currentPheromoneCase.reinforce();
+        }
+    }
+
+    public void removePheromone(float x, float y, PheromoneType type) {
+        int i = pheromoneIndex(type);
+        elementActorGrid[castInCase(y)][castInCase(x)][i] = null;
+
+    }
+
+    private int castInCase(float f)
+    {
+        return MathUtils.round(f / getCaseSize());
+    }
+
+    private int castFromCase(int i)
+    {
+        return (int) (i * getCaseSize() + getCaseSize()/2);
+    }
+
+    private int pheromoneIndex(PheromoneType type) {
+        int i;
+        switch (type) {
+            case HOME:
+                i = 3;
+                break;
+            case RESSOURCE:
+                i = 4;
+                break;
+            case DANGER:
+                i = 5;
+                break;
+            default:
+            // TODO: print error
+                i = -1;
+                break;
+        }   
+        return i;
+    }
+
 }
