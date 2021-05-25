@@ -8,7 +8,7 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Ant extends ElementActor
 {
-    private static final int PHEROMONE_RELEASE_COUNTDOWN = 5;
+    private static final int PHEROMONE_RELEASE_COUNTDOWN = 20;
     private static final int PHEROMONE_CHECK_COUNTDOWN = 3;
     private static final int NEXT_CHECK_COUNTDOWN = 100;
     private static final int MAX_CAPACITY = 1;
@@ -161,10 +161,10 @@ public class Ant extends ElementActor
     }
     
     public void releasePheromone(PheromoneType type) {
-        //if (pheromoneCountdown < 0) {
+        if (pheromoneCountdown < 0) {
             Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type);
             pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
-        //}
+        }
     }
 
     public boolean followPheromone(PheromoneType type) {

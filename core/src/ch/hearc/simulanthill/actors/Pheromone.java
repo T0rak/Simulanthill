@@ -8,12 +8,14 @@ public class Pheromone extends ElementActor {
 	private int lifeTime;
 	private PheromoneType pheromoneType;
 	private int power;
+	private int maxLifeTime;
 
 	public Pheromone(float _posX, float _posY, PheromoneType _type)
 	{
 		super(_posX, _posY, (_type == PheromoneType.HOME ? Asset.homePheromone() : Asset.foodPheromone()), "pheromone");
 
 		this.lifeTime = INIT_LIFE_TIME;
+		this.maxLifeTime = INIT_LIFE_TIME;
 		this.pheromoneType = _type;
 		this.power = 1;
 		setSize(4, 4);
@@ -30,8 +32,7 @@ public class Pheromone extends ElementActor {
 		if (lifeTime <= 0) {
 			remove();
 		}
-
-		sprite.setAlpha((float)lifeTime / INIT_LIFE_TIME);
+		sprite.setAlpha((float)lifeTime / maxLifeTime);
 	}
 
 	public PheromoneType getType() {
@@ -54,7 +55,8 @@ public class Pheromone extends ElementActor {
 	}
 
 	public void reinforce() {
-		lifeTime = 2 * INIT_LIFE_TIME;
+		lifeTime += 100;
+		maxLifeTime = lifeTime;
 		power *= 2;
 	}
 
