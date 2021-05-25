@@ -7,7 +7,7 @@
 #      RRRRRRRRRRRRR                      #                                          #                              #
 #         RRRRRRRRRRRRRRRRRR              #                                          #     rrrrrr                   #
 #   RRRRRRRRRRRRRR                        #                                          #                              #
-#      RRRRRRRRRRRRRRR                    ######                                     #################              #
+#      RRRRRRRRRRRRRRR                    ######                                     ########                       #
 #            RRRRRRRRRRRRRRRRR            ###                                                                       #
 #      RRRRRRRRRRRRRRRRRRR                #######                                                                   #
 #                                                                                                                   #
@@ -37,7 +37,11 @@
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
-#                                                                                                                   #
+#RRRRRRRRRRRRRRRRRR                                                                                                 #
+#RRRRRRRRRRRRRR                                                                                                     #
+#   RRRRRRRRRRRRRRR                                                                                                 #
+#         RRRRRRRRRRRRRRRRR                                                                                         #
+#   RRRRRRRRRRRRRRRRRRR                                                                                             #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #

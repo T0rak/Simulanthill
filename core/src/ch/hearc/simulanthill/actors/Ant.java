@@ -8,11 +8,14 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Ant extends ElementActor
 {
-    private static final int PHEROMONE_RELEASE_COUNTDOWN = 20;
-    private static final int PHEROMONE_CHECK_COUNTDOWN = 3;
-    private static final int NEXT_CHECK_COUNTDOWN = 100;
+    private static final int PHEROMONE_RELEASE_COUNTDOWN = 2;
+    private static final int PHEROMONE_CHECK_COUNTDOWN = 0;
+    private static final int NEXT_CHECK_COUNTDOWN = 1;
     private static final int MAX_CAPACITY = 1;
+    private static final int FIELD_OF_VIEW = 5;
+
 	private static double speed = 1;
+    
     private float direction;
     private int viewSpanAngle;
 	private int capacity;
@@ -20,6 +23,8 @@ public class Ant extends ElementActor
     private int nextCheck;
     private int pheromoneCountdown;
     private int pheromoneCheckCountdown;
+    private Pheromone followedPheromone;
+
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
      * 1 -> follow food pheromones 
@@ -35,14 +40,15 @@ public class Ant extends ElementActor
         sprite.setOrigin(width / 2, height / 2);
         setSize(width, height);
         this.capacity = 0;
-        this.viewSpanAngle = 10;
+        this.viewSpanAngle = 15;
         this.state = 0;
         this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
         this.anthill = anthill;
-        pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
-        pheromoneCheckCountdown = PHEROMONE_CHECK_COUNTDOWN;
-        nextCheck = NEXT_CHECK_COUNTDOWN;
+        this.followedPheromone = null;
+        this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+        this.pheromoneCheckCountdown = PHEROMONE_CHECK_COUNTDOWN;
+        this.nextCheck = NEXT_CHECK_COUNTDOWN;
     }
 
     @Override
@@ -50,7 +56,7 @@ public class Ant extends ElementActor
     {
         super.act(delta);
         
-        if (capacity >= MAX_CAPACITY) {
+        /*if (capacity >= MAX_CAPACITY) {
             if (nextCheck < 0) {
                 nextCheck = NEXT_CHECK_COUNTDOWN;
                 homeResearch();
@@ -76,8 +82,20 @@ public class Ant extends ElementActor
             }
             //releasePheromone(PheromoneType.HOME);
             collectFood();
-        }
+        }*/
 
+        if (capacity >= MAX_CAPACITY)
+        {
+            homeResearch();
+            releasePheromone(PheromoneType.RESSOURCE);
+        }
+        else
+        {
+            foodResearch();
+        }
+        
+        
+        
         move();
         nextCheck--;
         pheromoneCheckCountdown--;
@@ -103,32 +121,41 @@ public class Ant extends ElementActor
 
     public void foodResearch()
     {
-        //trouver nourriture
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        Vector2 res =  ecosystem.checkResourceAround(getX(), getY(), 3);
-        
-        if (res != null) 
-        {
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
-            float deltaDirection = (float)(newDirection - this.direction) % 360f;
+            Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
-            direction = newDirection;
-            sprite.rotate(deltaDirection);
-        }
-        else 
-        {
-             explore();
-        }
+            Vector2 res = ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
+            
+            if (res != null) 
+            {
+                float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
+                float deltaDirection = (float)(newDirection - this.direction) % 360f;
 
+                direction = newDirection;
+                sprite.rotate(deltaDirection);
+            }
+            else 
+            {
+                followPheromone(ElementActorType.FOOD_PHEROMONE);
+            }
+        collectFood();
     }
 
     public void homeResearch()
     {
-        float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(anthill.getY() - getY(), anthill.getX() - getX());
-        
-        float deltaDirection = (float)(newDirection - this.direction) % 360f;
-        direction = newDirection;
-        sprite.rotate(deltaDirection);
+        if (nextCheck < 0)
+        {
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(anthill.getY() - getY(), anthill.getX() - getX());
+            
+            float deltaDirection = (float)(newDirection - this.direction) % 360f;
+            direction = newDirection;
+            sprite.rotate(deltaDirection);
+            nextCheck = NEXT_CHECK_COUNTDOWN;
+        }
+        else
+        {
+            explore();
+        }
+        depositFood();
     }
 
     public void explore()
@@ -162,13 +189,48 @@ public class Ant extends ElementActor
     
     public void releasePheromone(PheromoneType type) {
         if (pheromoneCountdown < 0) {
-            Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type);
+            Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type, this);
             pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         }
     }
 
-    public boolean followPheromone(PheromoneType type) {
-        if (pheromoneCheckCountdown < 0) {
+    public void followPheromone(ElementActorType type) {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
+        if (followedPheromone != null)
+        {
+            Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type, followedPheromone.getAnt());
+
+            if (res != null) 
+            {
+                if (res != followedPheromone && res.getLifeTime() < followedPheromone.getLifeTime())
+                {
+                    followedPheromone = res;
+                    float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.getY() - getY(), res.getX() - getX());
+                    float deltaDirection = (float)(newDirection - this.direction) % 360f;
+
+                    direction = newDirection;
+                    sprite.rotate(deltaDirection);
+                }
+                else
+                {
+                    explore();
+                }
+            }
+            else 
+            {
+                followedPheromone = null;
+            }
+        }
+        else
+        {
+            followedPheromone = ecosystem.checkRadialPheromone(getX(), getY(), 3, type);
+            if (followedPheromone == null)
+              {
+              explore();
+              }
+        }
+        /*if (pheromoneCheckCountdown < 0) {
             float testY = MathUtils.sin(direction);
             float testX = MathUtils.cos(direction);
             Vector2 res = Ecosystem.getCurrentEcosystem().checkStrongestPheromoneAround(getX() + 3*testX, getY() + 3*testY, 3, type);
@@ -184,7 +246,7 @@ public class Ant extends ElementActor
                 return true;
             }
         }
-        return false;
+        return false;*/
     }
 
     @Override
