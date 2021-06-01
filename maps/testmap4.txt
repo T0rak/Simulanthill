@@ -31,24 +31,24 @@
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
-#                                                                                  RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR   #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
-#RRRRRRRRRRRRRRRRRR                                                   RRRRRRRRRRR                                   #
-#RRRRRRRRRRRRRR                                                       RRRRRRRRRRR                                   #
-#   RRRRRRRRRRRRRRR                                                   RRRRRRRRRRR                                   #
-#         RRRRRRRRRRRRRRRRR                                           RRRRRRRRRRR                                   #
-#   RRRRRRRRRRRRRRRRRRR                                               RRRRRRRRRRR                                   #
-#                                                                     RRRRRRRRRRR                                   #
 #                                                                                                                   #
-#                                                          R                                                        #
-#                                                          R                                                        #
-#                                                          R                                                        #
-#                                                          R                                           ##############
-#                                                          R                                                        #
+#RRRRRRRRRRRRRRRRRR                                                                                                 #
+#RRRRRRRRRRRRRR                                                                                                     #
+#   RRRRRRRRRRRRRRR                                                                                                 #
+#         RRRRRRRRRRRRRRRRR                                                               RRRRRRRRRRRRRRRRR         #
+#   RRRRRRRRRRRRRRRRRRR                                                                                             #
+#                                                                                                                   #
+#                                                                        RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                   ##############
+#                                                          R             RRRRRRRRRRR                                #
 #                                                          R                                                        #
 #                                                          R                                                        #
 #                                                          R                                    O                   #

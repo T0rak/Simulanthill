@@ -10,12 +10,12 @@ public class Ant extends ElementActor
 {
     private static final int PHEROMONE_RELEASE_COUNTDOWN = 5;
     private static final int PHEROMONE_CHECK_COUNTDOWN = 0;
-    private static final int NEXT_CHECK_COUNTDOWN = 1;
+    private static final int NEXT_CHECK_COUNTDOWN = -1;
     private static final int MAX_CAPACITY = 1;
     private static final int FIELD_OF_VIEW = 5;
     private static final int PHEROMONE_RELEASE_TIME = 1000;
 
-	private static double speed = 1;
+	private static double speed = 0.2;
     
     private float direction;
     private int viewSpanAngle;
@@ -27,6 +27,8 @@ public class Ant extends ElementActor
     private Pheromone followedPheromone;
     private int pheromoneTime;
     private int stepFrom;
+    private ElementActor goal;
+    private boolean goalIsPassed;
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
      * 1 -> follow food pheromones 
@@ -53,42 +55,55 @@ public class Ant extends ElementActor
         this.nextCheck = NEXT_CHECK_COUNTDOWN;
         this.pheromoneTime = PHEROMONE_RELEASE_TIME;
         this.stepFrom = 0;
+        this.goalIsPassed = true;
     }
 
     @Override
     public void act(float delta)
     {
         super.act(delta);
+
+        ElementActor newGoal = null;
         
-        /*if (capacity >= MAX_CAPACITY) {
-            if (nextCheck < 0) {
-                nextCheck = NEXT_CHECK_COUNTDOWN;
-                homeResearch();
-
-            } else {
-                explore();
+        if (capacity < MAX_CAPACITY)
+        {
+            newGoal = searchFood();
+            
+            if (newGoal == null)
+            {
+                newGoal = searchPheromone(PheromoneType.RESSOURCE);
             }
-
-            releasePheromone(PheromoneType.RESSOURCE);
-            depositFood();
-
-        } else {
-            if (nextCheck < 0) {
-                nextCheck = NEXT_CHECK_COUNTDOWN;
-                foodResearch();
-
-            } else if (pheromoneCheckCountdown < 0) {
-                pheromoneCheckCountdown = PHEROMONE_CHECK_COUNTDOWN;
-                followPheromone(PheromoneType.RESSOURCE);
-
-            } else {
-                explore();
+        }
+        else
+        {
+            newGoal = searchAnthill();
+            if (newGoal == null) {
+                //newGoal = this.anthill;
+                newGoal = searchPheromone(PheromoneType.HOME);
             }
-            //releasePheromone(PheromoneType.HOME);
-            collectFood();
-        }*/
+        }
 
-        if (capacity >= MAX_CAPACITY)
+        if (newGoal != null)
+        {
+            Gdx.app.log("Passed ?", newGoal.getClass().getName());
+            changeGoal(newGoal);
+        }
+        
+        
+        
+        if (goalIsPassed || goal == null)
+        {
+            //explore();
+        }
+        else{
+            //Gdx.app.log("F","I follow");
+            followGoal();
+            checkOnGoal();
+        }
+        
+    
+
+        /*if (capacity >= MAX_CAPACITY)
         {
             
             homeResearch();
@@ -97,63 +112,134 @@ public class Ant extends ElementActor
         else
         {
             foodResearch();
-            //if (pheromoneTime > 0)
-            {
-                releasePheromone(PheromoneType.HOME, stepFrom);
-                //pheromoneTime--;
-            }
-        }
+            releasePheromone(PheromoneType.HOME, stepFrom);
+            
+        }*/
         //Ecosystem.getCurrentEcosystem().checkRadial(getX(), getY(), 5, ElementActorType.RESSOURCE);
         //explore();
         
         move();
+        
+        if (capacity < MAX_CAPACITY)
+        {
+            tryCollectFood();
+            releasePheromone(PheromoneType.HOME);
+        }
+        else{
+            tryDepositFood();
+            releasePheromone(PheromoneType.RESSOURCE);
+        }
+        
         nextCheck--;
         pheromoneCheckCountdown--;
         pheromoneCountdown--;
         stepFrom++;
-        
+        Gdx.app.log("nbSteps", "" + stepFrom);
     }
 
-    public void collectFood()
+    public void tryCollectFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isResource(getX(), getY())) {
+        if (ecosystem.isElement(getX(), getY(), ElementActorType.RESSOURCE) != null) {
             capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
             followedPheromone = null;
             stepFrom = 0;
+            goalIsPassed = false;
         }
     }
 
-    public void depositFood()
+    public void tryDepositFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isAnthill(getX(), getY())) {
+        if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) {
             capacity = 0;
             pheromoneTime = PHEROMONE_RELEASE_TIME;
             followedPheromone = null;
             stepFrom = 0;
+            goalIsPassed = false;
         }
     }
 
-    public void foodResearch()
+    public ElementActor searchAnthill()
     {
-            Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.ANTHILL);
+    }
 
-            Vector2 res = ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
-            
-            if (res != null) 
-            {
-                float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
-                float deltaDirection = (float)(newDirection - this.direction) % 360f;
+    public ElementActor searchFood()
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
+    }
 
-                direction = newDirection;
-                sprite.rotate(deltaDirection);
-            }
-            else 
-            {
+    public ElementActor searchPheromone(PheromoneType type)
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        ElementActor res = null;
+        if (goal != null && goal.getClass() == Pheromone.class && ((Pheromone)goal).getType() == type) {
+            res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type, (Pheromone)goal);
+        }
+        else{
+            res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type);
+        }
+        return res;
+    }
+
+    public void followGoal()
+    {
+        if (goal != null)
+        {
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() - getY(), goal.getX() - getX());
+            float deltaDirection = (float)(newDirection - this.direction) % 360f;
+
+            direction = newDirection;
+            sprite.rotate(deltaDirection);
+        }
+    }
+
+    public void checkOnGoal()
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        if (goal != null)
+        {
+            goalIsPassed = ecosystem.isOnElement(getX(),getY(), goal);
+        }
+    }
+
+    public void changeGoal(ElementActor newGoal)
+    {
+        goal = newGoal;
+        goalIsPassed = false;
+    }
+
+   /* public void foodResearch()
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+
+        Vector2 res = ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
+        
+        if (res != null) 
+        {
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
+            float deltaDirection = (float)(newDirection - this.direction) % 360f;
+
+            direction = newDirection;
+            sprite.rotate(deltaDirection);
+        }
+        else 
+        {
+            if (nextCheck < 0) {
                 followPheromone(ElementActorType.FOOD_PHEROMONE);
+                nextCheck = NEXT_CHECK_COUNTDOWN;
             }
-        collectFood();
+            else
+            {
+                explore();
+            }
+            
+            
+        }
+        tryCollectFood();
     }
 
     public void homeResearch()
@@ -172,11 +258,20 @@ public class Ant extends ElementActor
             }
             else 
             {
-                followPheromone(ElementActorType.HOME_PHEROMONE);
-            }
-        depositFood();
-    }
+                
 
+                if (nextCheck < 0) {
+                    followPheromone(ElementActorType.HOME_PHEROMONE);
+                    nextCheck = NEXT_CHECK_COUNTDOWN;
+                }
+                else
+                {
+                    explore();
+                }
+            }
+        tryDepositFood();
+    }
+    */
     public void explore()
     {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
@@ -192,7 +287,7 @@ public class Ant extends ElementActor
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         
-        if (ecosystem.isObstacle(nextPosX, nextPosY))
+        if (ecosystem.isElement(nextPosX, nextPosY, ElementActorType.OBSTACLE) != null)
         {
             float deltaDirection = MathUtils.random(-180f, 180f);
             direction = (float)(direction + deltaDirection) % 360f;
@@ -206,13 +301,13 @@ public class Ant extends ElementActor
         setPosition(getX(), getY());
     }
     
-    public void releasePheromone(PheromoneType type, int stepFrom) {
+    public void releasePheromone(PheromoneType type) {
         if (pheromoneCountdown < 0) {
             Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type, this, stepFrom);
             pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         }
     }
-
+/*
     public void followPheromone(ElementActorType type) {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         
@@ -232,36 +327,22 @@ public class Ant extends ElementActor
             }
             else 
             {
-                followedPheromone = null;
+                //if (fol)
+                //followedPheromone = null;
                 explore();
             }
         }
         else
         {
-            followedPheromone = ecosystem.checkRadialPheromone(getX(), getY(), 3, type);
+            followedPheromone = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type);
             if (followedPheromone == null)
               {
               explore();
               }
         }
-        /*if (pheromoneCheckCountdown < 0) {
-            float testY = MathUtils.sin(direction);
-            float testX = MathUtils.cos(direction);
-            Vector2 res = Ecosystem.getCurrentEcosystem().checkStrongestPheromoneAround(getX() + 3*testX, getY() + 3*testY, 3, type);
-
-            if (res != null) 
-            {
-                float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
-                float deltaDirection = (float)(newDirection - this.direction) % 360f;
-    
-                direction = newDirection;
-                sprite.rotate(deltaDirection);
-                pheromoneCheckCountdown = PHEROMONE_CHECK_COUNTDOWN;
-                return true;
-            }
-        }
-        return false;*/
+        
     }
+    */
 
     @Override
     public String toString()
