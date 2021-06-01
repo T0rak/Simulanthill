@@ -8,11 +8,12 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Ant extends ElementActor
 {
-    private static final int PHEROMONE_RELEASE_COUNTDOWN = 2;
+    private static final int PHEROMONE_RELEASE_COUNTDOWN = 5;
     private static final int PHEROMONE_CHECK_COUNTDOWN = 0;
     private static final int NEXT_CHECK_COUNTDOWN = 1;
     private static final int MAX_CAPACITY = 1;
     private static final int FIELD_OF_VIEW = 5;
+    private static final int PHEROMONE_RELEASE_TIME = 1000;
 
 	private static double speed = 1;
     
@@ -24,7 +25,8 @@ public class Ant extends ElementActor
     private int pheromoneCountdown;
     private int pheromoneCheckCountdown;
     private Pheromone followedPheromone;
-
+    private int pheromoneTime;
+    private int stepFrom;
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
      * 1 -> follow food pheromones 
@@ -49,6 +51,8 @@ public class Ant extends ElementActor
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         this.pheromoneCheckCountdown = PHEROMONE_CHECK_COUNTDOWN;
         this.nextCheck = NEXT_CHECK_COUNTDOWN;
+        this.pheromoneTime = PHEROMONE_RELEASE_TIME;
+        this.stepFrom = 0;
     }
 
     @Override
@@ -86,20 +90,27 @@ public class Ant extends ElementActor
 
         if (capacity >= MAX_CAPACITY)
         {
+            
             homeResearch();
-            releasePheromone(PheromoneType.RESSOURCE);
+            releasePheromone(PheromoneType.RESSOURCE, stepFrom);
         }
         else
         {
             foodResearch();
+            //if (pheromoneTime > 0)
+            {
+                releasePheromone(PheromoneType.HOME, stepFrom);
+                //pheromoneTime--;
+            }
         }
-        
-        
+        //Ecosystem.getCurrentEcosystem().checkRadial(getX(), getY(), 5, ElementActorType.RESSOURCE);
+        //explore();
         
         move();
         nextCheck--;
         pheromoneCheckCountdown--;
         pheromoneCountdown--;
+        stepFrom++;
         
     }
 
@@ -108,6 +119,8 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isResource(getX(), getY())) {
             capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
+            followedPheromone = null;
+            stepFrom = 0;
         }
     }
 
@@ -116,6 +129,9 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isAnthill(getX(), getY())) {
             capacity = 0;
+            pheromoneTime = PHEROMONE_RELEASE_TIME;
+            followedPheromone = null;
+            stepFrom = 0;
         }
     }
 
@@ -142,19 +158,22 @@ public class Ant extends ElementActor
 
     public void homeResearch()
     {
-        if (nextCheck < 0)
-        {
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(anthill.getY() - getY(), anthill.getX() - getX());
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+
+            Vector2 res = ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.ANTHILL);
             
-            float deltaDirection = (float)(newDirection - this.direction) % 360f;
-            direction = newDirection;
-            sprite.rotate(deltaDirection);
-            nextCheck = NEXT_CHECK_COUNTDOWN;
-        }
-        else
-        {
-            explore();
-        }
+            if (res != null) 
+            {
+                float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.y - getY(), res.x - getX());
+                float deltaDirection = (float)(newDirection - this.direction) % 360f;
+
+                direction = newDirection;
+                sprite.rotate(deltaDirection);
+            }
+            else 
+            {
+                followPheromone(ElementActorType.HOME_PHEROMONE);
+            }
         depositFood();
     }
 
@@ -187,9 +206,9 @@ public class Ant extends ElementActor
         setPosition(getX(), getY());
     }
     
-    public void releasePheromone(PheromoneType type) {
+    public void releasePheromone(PheromoneType type, int stepFrom) {
         if (pheromoneCountdown < 0) {
-            Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type, this);
+            Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type, this, stepFrom);
             pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         }
     }
@@ -199,27 +218,22 @@ public class Ant extends ElementActor
         
         if (followedPheromone != null)
         {
-            Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type, followedPheromone.getAnt());
-
+            Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type, followedPheromone);
+            //Gdx.app.log("test","dedans");
             if (res != null) 
             {
-                if (res != followedPheromone && res.getLifeTime() < followedPheromone.getLifeTime())
-                {
-                    followedPheromone = res;
-                    float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.getY() - getY(), res.getX() - getX());
-                    float deltaDirection = (float)(newDirection - this.direction) % 360f;
+                followedPheromone = res;                                       
+                float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(res.getY() - getY(), res.getX() - getX());
+                float deltaDirection = (float)(newDirection - this.direction);
 
-                    direction = newDirection;
-                    sprite.rotate(deltaDirection);
-                }
-                else
-                {
-                    explore();
-                }
+                direction = newDirection;
+                sprite.rotate(deltaDirection);
+                
             }
             else 
             {
                 followedPheromone = null;
+                explore();
             }
         }
         else

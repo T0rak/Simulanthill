@@ -31,26 +31,26 @@
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
+#                                                                                  RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR   #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
 #                                                                                                                   #
+#RRRRRRRRRRRRRRRRRR                                                   RRRRRRRRRRR                                   #
+#RRRRRRRRRRRRRR                                                       RRRRRRRRRRR                                   #
+#   RRRRRRRRRRRRRRR                                                   RRRRRRRRRRR                                   #
+#         RRRRRRRRRRRRRRRRR                                           RRRRRRRRRRR                                   #
+#   RRRRRRRRRRRRRRRRRRR                                               RRRRRRRRRRR                                   #
+#                                                                     RRRRRRRRRRR                                   #
 #                                                                                                                   #
-#RRRRRRRRRRRRRRRRRR                                                                                                 #
-#RRRRRRRRRRRRRR                                                                                                     #
-#   RRRRRRRRRRRRRRR                                                                                                 #
-#         RRRRRRRRRRRRRRRRR                                                                                         #
-#   RRRRRRRRRRRRRRRRRRR                                                                                             #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                      ##############
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                               O                   #
-#                                                                                                                   #
+#                                                          R                                                        #
+#                                                          R                                                        #
+#                                                          R                                                        #
+#                                                          R                                           ##############
+#                                                          R                                                        #
+#                                                          R                                                        #
+#                                                          R                                                        #
+#                                                          R                                    O                   #
+#                                                          R                                                        #
 #####################################################################################################################
