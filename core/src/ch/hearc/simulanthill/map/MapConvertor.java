@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -25,30 +26,28 @@ public class MapConvertor
 	private static int WIDTH;
 	private static int HEIGHT;
 
-	private static int PARENT_WIDTH;
-	private static int PARENT_HEIGHT;
-
 	private static float SIZE;
 
 	private static List<Character> ACCEPTED_CHAR_LIST;
 	private static List<List<Character>> MAP_CHAR_LIST;
-	private static List<Character> LINE_CHAR_LIST;
 
 	/////////////////////////////////////////////////////
 	private static ElementActor[][][] ELEMENT_ACTOR_3D;
+	
+	//for random generation
+	private static List<String> mapStructuresResources;
+	private static List<String> mapStructuresObstacle;
+	private static Character[][][] ELEMENT_ACTOR_3D_char_temp;
 	/////////////////////////////////////////////////////
 
-	/**
-	 * Constructor
-	 */
-	public static void generate(String _filename, float _parentWidth, float _parentHeight) 
+	public static void main(String[] args) 
 	{
-		WIDTH = 0;
-		HEIGHT = 0;
-		IS_VALID = false;
+		init();
+		random(50, 25);
+	}
 
-		//SIZE = _parentWidth / Ecosystem.getInstance().getWidth(); //DEFAUT VALUE
-
+	private static void init()
+	{
 		ACCEPTED_CHAR_LIST = new ArrayList<Character>();
 		MAP_CHAR_LIST = new ArrayList<List<Character>>();
 
@@ -59,9 +58,40 @@ public class MapConvertor
 		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('O'));
 		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('\n')); //New line
 
+		//we add to map structure some patterns so that they will spanw randomly:
+		mapStructuresResources = new LinkedList<String>();
+		mapStructuresObstacle = new LinkedList<String>();
+
+		mapStructuresResources.add("R\n  RR\n   R\nRRR\n  RR\nRR\nRR\nRR\nRRRRR\n  RRR\n  RRR\n  RR\n");
+		mapStructuresResources.add("  RRR\nRRRRRR\n  RRRRRRRR\n  RRRRR\n  RRR\n  R\n");
+		mapStructuresResources.add("RRRRR RRRRRR RRRRR           RRRRRRRR\n    RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\n                      RRRR\n");
+		mapStructuresResources.add("        RRRRRR\n       RRRRR RR  RRRR\n  RRRRRRRRRRRRR\n    RRRRRRRRR\n    RRRRR RRRRR\n        RR\n");
+		mapStructuresResources.add("RRRRRR\n      RRR  RRR\n        RR\n          RRRR\n            R\n          RR RRR\n                RRRRR\n");
+		mapStructuresResources.add("           R  RRR\n              RR\n  RRR       RRRR\n          RR  R\n          RR R\n      RR R\n      RRRRRRRR\n RRRR\n");
+		mapStructuresResources.add("    RRRRRRRRRRRR\n    RRR    RR    RRRR\nRRR  RRR          RR\nRR      RR R    RR\nRRRRR         RRRRR\n    RRRRRRRR\n");
+		mapStructuresResources.add("RRRRRRRRRRRR\n      RRRRRRRRRRRRRRRR\n");
+		mapStructuresResources.add(" RRR\n  RR\n  RR\n  R\n  RRRR\n    R\n    RR\n    R  R R\n   R    R\n");
+		mapStructuresResources.add("   RRRR\nRRRRR\n  RRRRRR\n    RRRR\n    RR  RRRR\n");
+
+		mapStructuresObstacle.add("#####################\n");
+		mapStructuresObstacle.add("#\n#\n#\n#\n#\n#\n#\n");
+		mapStructuresObstacle.add("#### ###### #####           ########\n    ##############################\n                      ####\n");
+
+	}
+
+	/**
+	 * Constructor
+	 */
+	public static void generate(String _filename, float _parentWidth, float _parentHeight) 
+	{
+		WIDTH = 0;
+		HEIGHT = 0;
+		IS_VALID = false;
+
+		init();
+
 		if(validate(_filename))
 		{
-			//convert();
 			IS_VALID = true;
 		}
 
@@ -71,12 +101,6 @@ public class MapConvertor
 		}
 
 	}
-	/*
-	public MapConvertor(String _filename, int _parentWidth, int _parentHeight)
-	{
-		this(_filename); //makes a default conversion with 30 of width & weight.
-	}
-	*/
 
 	public static int getWidth()
 	{
@@ -113,10 +137,10 @@ public class MapConvertor
 				Character character = ' ';
 
 				int c = 0;             
-				while((c = br.read()) != -1)         //Read char by Char
+				while((c = br.read()) != -1) //Read char by Char
 				{
 						 
-					character = Character.toUpperCase((char) c);           //converting integer to char
+					character = Character.toUpperCase((char) c); //converting integer to char
 
 					if(character == '\n')
 					{
@@ -128,7 +152,7 @@ public class MapConvertor
 						column = -1;
 					}
 
-					System.out.print(character);        //Display the Character
+					System.out.print(character); //Display the Character
 
 					if (!ACCEPTED_CHAR_LIST.contains(character))
 					{
@@ -155,7 +179,7 @@ public class MapConvertor
 				return true;
 
 			} 
-			catch(IOException e)	//Unuseful but needed...
+			catch(IOException e)
 			{
 				//TODO : Throw a IO error message
 				e.printStackTrace();
@@ -222,30 +246,17 @@ public class MapConvertor
 					{
 						character = Character.toUpperCase(currentline.charAt(i)); 
 
-						//System.out.print(character); //Display the Character
-
-						/*
-						if(character == '\n')
-						{
-							line++;
-							column = -1;
-						}
-						*/
-
 						switch(character) 
 						{
 							case 'R':
-								//actorList.add(new Resource(column*_size, line*_size, _size, _size, 10));
 								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 
 							case '#':
-								//actorList.add(new Obstacle(column*_size, line*_size, _size, _size));
 								ELEMENT_ACTOR_3D[line][column][0] = new Obstacle(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 
 							case 'O':
-								//actorList.add(new Anthill(column*_size, line*_size, _size, _size));
 								ELEMENT_ACTOR_3D[line][column][2] = new Anthill(column*SIZE, line*SIZE, SIZE, SIZE);
 								break;
 						
@@ -260,7 +271,6 @@ public class MapConvertor
 					{
 						WIDTH = column-1;
 					}
-					//System.out.println(); // just for the console output 
 
 					column = 0;
 				}
@@ -272,7 +282,7 @@ public class MapConvertor
 				System.out.println("Map Converted !!");
 
 			}
-			catch(IOException e)	//Unuseful but needed...
+			catch(IOException e)
 			{
 				//TODO : Throw a IO error message
 				e.printStackTrace();
@@ -292,78 +302,116 @@ public class MapConvertor
 	 */
 	public static void random(int _width, int _height) 
 	{
-		
-		int width = _width;		
-		int height = _height;
+
+		WIDTH = _width;		
+		HEIGHT = _height;
 
 		Random r = new Random();
 
-		String acceptedChars = "";
-
-		boolean hasAntHill = false;
-
-		char pickedChar;
-
-		for(int index = 0 ; index < ACCEPTED_CHAR_LIST.size() ; index ++)
-		{
-			acceptedChars += ACCEPTED_CHAR_LIST.get(index);
-		}
-
-		//We want a higher probability of having spaces:
-		for(int index = 0 ; index < 50 ; index ++)
-		{
-			acceptedChars += ' ';
-		}
-
 		MAP_CHAR_LIST.clear();
 
-		for(int i = 0 ; i < height ; i++ )
+		ELEMENT_ACTOR_3D_char_temp = new Character[HEIGHT][WIDTH][1];
+
+		//The map must be rounded by obstacles.
+		for(int i = 0 ; i < HEIGHT ; i++ )
 		{
-			LINE_CHAR_LIST = new ArrayList<Character>();
-	
-			for(int j = 0 ; j < width ; j++ )
+			for(int j = 0 ; j < WIDTH ; j++ )
 			{
 				if(i == 0 
-				|| i == height - 1
+				|| i == HEIGHT - 1
 				|| j == 0
-				|| j == width - 1)  //this means that it's the first line or the last one or an edge
+				|| j == WIDTH - 1)  //this means that it's the first line or the last one or an edge
 				{
-					LINE_CHAR_LIST.add('#');
+					ELEMENT_ACTOR_3D_char_temp[i][j][0] = '#';
 				}
 				else
 				{
-					do
-					{
-					pickedChar = acceptedChars.charAt(r.nextInt(acceptedChars.length()));
-
-					if(hasAntHill && pickedChar == 'O')
-					{
-						pickedChar = '\n';
-					}
-
-					} while(pickedChar == '\n' || pickedChar == '\r' );
-
-					if(pickedChar == 'O')
-					{
-						hasAntHill = true;
-					}
-
-					LINE_CHAR_LIST.add(pickedChar);	
+					ELEMENT_ACTOR_3D_char_temp[i][j][0] = ' ';
 				}
-				
 			}
 
-			LINE_CHAR_LIST.add('\n');
-
-			MAP_CHAR_LIST.add(LINE_CHAR_LIST);
 		}
 
-		for(List<Character> lines : MAP_CHAR_LIST)
+		//Lets popout 5 spots where to add the patterns:
+		for (int i = 0 ; i < 5 ; i++)
 		{
-			for(int i = 0 ; i < lines.size() ; i++)
+			int xCoord = r.nextInt(WIDTH-1) + 1;
+			int yCoord = r.nextInt(HEIGHT-1) + 1; 
+
+			//We have now the x and y coords where to start the pattern
+
+			//We need to know which pattern to draw
+			int index = 0;
+			String resourceStructure = "";
+			if (i < 2)
 			{
-				System.out.print(lines.get(i));
+				index = r.nextInt(mapStructuresResources.size());
+				resourceStructure = mapStructuresResources.get(index);
+
 			}
+			else
+			{
+				index = r.nextInt(mapStructuresObstacle.size());
+				resourceStructure = mapStructuresObstacle.get(index);
+			}
+
+			int w = 0;
+			int h = 0;
+			//now, we need to put each char of the pattern in the tab
+			for (char character : resourceStructure.toCharArray()) 
+			{
+				if (character == '\n')
+				{
+					w = 0;
+					h++;
+				}
+				else
+				{
+					if ( (xCoord + w ) < WIDTH - 1 && (yCoord + h ) < HEIGHT - 1 )
+					{
+						ELEMENT_ACTOR_3D_char_temp[yCoord + h][xCoord + w][0] = character;
+					}
+					w++;
+					
+				}
+			}
+		}
+
+		//Last thing to do is to place the anthill in a spot where's nothing
+		int xCoord = 0 ;
+		int yCoord = 0 ;
+		do 
+		{
+			yCoord = r.nextInt(WIDTH-1) + 1;
+			xCoord = r.nextInt(HEIGHT-1) + 1; 
+
+		} while (ELEMENT_ACTOR_3D_char_temp[xCoord][yCoord][0] != ' ');
+
+		ELEMENT_ACTOR_3D_char_temp[xCoord][yCoord][0] = 'O';
+
+		ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][6];
+		for (int i = 0; i < HEIGHT; i++)
+		{
+			for (int j = 0; j < WIDTH; j++)
+			{
+				System.out.print(ELEMENT_ACTOR_3D_char_temp[i][j][0]);
+
+				/*
+				switch(ELEMENT_ACTOR_3D_char_temp[i][j][0])
+				{
+					case '#' : 
+						ELEMENT_ACTOR_3D[i][j][0] = new Obstacle(j*SIZE, i*SIZE, SIZE, SIZE);
+						break;
+					case 'O' :
+						ELEMENT_ACTOR_3D[i][j][2] = new Anthill(j*SIZE, i*SIZE, SIZE, SIZE);
+						break;
+					case 'R':
+						ELEMENT_ACTOR_3D[i][j][1] = new Resource(j*SIZE, i*SIZE, SIZE, SIZE);
+						break;
+				}
+				*/
+			}
+			System.out.println();
 		}
 		
 

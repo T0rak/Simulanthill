@@ -36,7 +36,7 @@ public class Simulation implements Screen {
 		InputMultiplexer multiPlexer = new InputMultiplexer();
 
 		vp = new FitViewport(1600,900);
-		viewport = new FitViewport(1600,900);
+		viewport = new FitViewport(1600,900); //////
 
 	
 		ecosystem = Ecosystem.getInstance(viewport);
