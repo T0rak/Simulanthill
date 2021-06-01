@@ -23,13 +23,12 @@ public class MapConvertor
 {
 	private static String FILE_NAME;
 	private static boolean IS_VALID;
+	
 	private static int WIDTH;
 	private static int HEIGHT;
-
 	private static float SIZE;
 
 	private static List<Character> ACCEPTED_CHAR_LIST;
-	private static List<List<Character>> MAP_CHAR_LIST;
 
 	/////////////////////////////////////////////////////
 	private static ElementActor[][][] ELEMENT_ACTOR_3D;
@@ -40,16 +39,23 @@ public class MapConvertor
 	private static Character[][][] ELEMENT_ACTOR_3D_char_temp;
 	/////////////////////////////////////////////////////
 
-	public static void main(String[] args) 
+	/**
+	 * Resets the map used in the simulator. Has to be call each time a new map want's to be used.
+	 */
+	private static void reset()
 	{
-		init();
-		random(50, 25);
+		ELEMENT_ACTOR_3D = null;			//to erase an array is enough (https://stackoverflow.com/questions/15448457/deleting-an-entire-array#15448477)
+		ELEMENT_ACTOR_3D_char_temp = null;
+		ACCEPTED_CHAR_LIST = null;
+		mapStructuresResources = null;
+		mapStructuresObstacle = null;
+		IS_VALID = false;
+
 	}
 
 	private static void init()
 	{
 		ACCEPTED_CHAR_LIST = new ArrayList<Character>();
-		MAP_CHAR_LIST = new ArrayList<List<Character>>();
 
 		ACCEPTED_CHAR_LIST.add(Character.toUpperCase(' ')); 
 		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('#')); 
@@ -76,6 +82,8 @@ public class MapConvertor
 		mapStructuresObstacle.add("#####################\n");
 		mapStructuresObstacle.add("#\n#\n#\n#\n#\n#\n#\n");
 		mapStructuresObstacle.add("#### ###### #####           ########\n    ##############################\n                      ####\n");
+		mapStructuresObstacle.add("#\n  ##\n   #\n ###\n  ##\n##\n##\n##\n#####\n  ###\n  ###\n  ##\n");
+		mapStructuresObstacle.add("  ###\n######\n  ########\n  #####\n  ###\n  #\n");
 
 	}
 
@@ -100,6 +108,12 @@ public class MapConvertor
 			convert();
 		}
 
+	}
+
+	public static void generate_random(float _parentWidth, float _parentHeight)
+	{
+		init();
+		random((int)_parentWidth, (int)_parentHeight);
 	}
 
 	public static int getWidth()
@@ -303,12 +317,13 @@ public class MapConvertor
 	public static void random(int _width, int _height) 
 	{
 
-		WIDTH = _width;		
-		HEIGHT = _height;
+		WIDTH = _width/10;		
+		HEIGHT = _height/10;
+		SIZE = Math.min(Ecosystem.getCurrentEcosystem().getWidth()/WIDTH, Ecosystem.getCurrentEcosystem().getHeight()/HEIGHT);
+
+		System.out.println("SIZE : "+SIZE);
 
 		Random r = new Random();
-
-		MAP_CHAR_LIST.clear();
 
 		ELEMENT_ACTOR_3D_char_temp = new Character[HEIGHT][WIDTH][1];
 
@@ -332,8 +347,10 @@ public class MapConvertor
 
 		}
 
-		//Lets popout 5 spots where to add the patterns:
-		for (int i = 0 ; i < 5 ; i++)
+		int max = 20;
+
+		//Lets popout max spots where to add the patterns:
+		for (int i = 0 ; i < max ; i++)
 		{
 			int xCoord = r.nextInt(WIDTH-1) + 1;
 			int yCoord = r.nextInt(HEIGHT-1) + 1; 
@@ -343,7 +360,9 @@ public class MapConvertor
 			//We need to know which pattern to draw
 			int index = 0;
 			String resourceStructure = "";
-			if (i < 2)
+
+			//lets just say that we want half resources pattern & half obstacles pattern
+			if (i < max/2)
 			{
 				index = r.nextInt(mapStructuresResources.size());
 				resourceStructure = mapStructuresResources.get(index);
@@ -394,9 +413,8 @@ public class MapConvertor
 		{
 			for (int j = 0; j < WIDTH; j++)
 			{
-				System.out.print(ELEMENT_ACTOR_3D_char_temp[i][j][0]);
+				//System.out.print(ELEMENT_ACTOR_3D_char_temp[i][j][0]);
 
-				/*
 				switch(ELEMENT_ACTOR_3D_char_temp[i][j][0])
 				{
 					case '#' : 
@@ -409,11 +427,13 @@ public class MapConvertor
 						ELEMENT_ACTOR_3D[i][j][1] = new Resource(j*SIZE, i*SIZE, SIZE, SIZE);
 						break;
 				}
-				*/
+
 			}
-			System.out.println();
+			//System.out.println();
 		}
-		
+
+		Ecosystem.getCurrentEcosystem().setElementActorGrid(ELEMENT_ACTOR_3D);
+		Ecosystem.getCurrentEcosystem().setCaseSize(SIZE);
 
 	}
 
