@@ -207,27 +207,30 @@ public class Ecosystem extends Stage
     public Pheromone checkRadialPheromone(float x, float y, int radius, PheromoneType type, Pheromone pheromone)
     {
         Pheromone res = null;
-        int resStepFrom = 0;
-        if (pheromone != null)
+        int resStepFrom = Integer.MAX_VALUE;
+        /*if (pheromone != null)
         {
             resStepFrom = pheromone.getStepFrom();
-        }
+        }*/
         int xCase = castInCase(x);
         int yCase = castInCase(y);
         for (int i = -1; i <= 1; i++)
         {
             for (int j = -1; j <= 1; j++)
             {
-                Pheromone actor = checkRadialLinePheromone(xCase, yCase, radius, i, j, toActorType(type), pheromone);
-                //Pheromone actor = (Pheromone)isElement(xi, yi, type);
-                if (actor != null)
+                if (!(j == 0 && i == 0))
                 {
-                    if(actor.getStepFrom() < resStepFrom || (res == null && pheromone == null))
+                    Pheromone actor = checkRadialLinePheromone(xCase, yCase, radius, i, j, toActorType(type), pheromone);
+                    //Pheromone actor = (Pheromone)isElement(xi, yi, type);
+                    if (actor != null)
                     {
-                        res = actor;
-                        resStepFrom = actor.getStepFrom();
+                        if(actor.getStepFrom() < resStepFrom)
+                        {
+                            res = actor;
+                            resStepFrom = actor.getStepFrom();
+                        }
+                        
                     }
-                    
                 }
             }
         }
@@ -244,12 +247,11 @@ public class Ecosystem extends Stage
     private Pheromone checkRadialLinePheromone(int x, int y, int radius, int dx, int dy, ElementActorType type, Pheromone pheromone)
     {
         Pheromone res = null;
-        int resStepFrom = 0;
-
-        if (pheromone != null)
+        int resStepFrom = Integer.MAX_VALUE;
+        /*if (pheromone != null)
         {
             resStepFrom = pheromone.getStepFrom();
-        }
+        }*/
 
         for (int i = 1; i <= radius; i++)
         {
@@ -259,7 +261,7 @@ public class Ecosystem extends Stage
             Pheromone actor = (Pheromone)isElement(xi, yi, type);
             if (actor != null)
             {
-                if(actor.getStepFrom() < resStepFrom || (res == null && pheromone == null))
+                if(actor.getStepFrom() < resStepFrom)
                 {
                     res = actor;
                     resStepFrom = actor.getStepFrom();
@@ -270,34 +272,33 @@ public class Ecosystem extends Stage
             {
                 return res;
             }
-            else
+
+            if (Math.abs(dx) == Math.abs(dy))
             {
-                if (Math.abs(dx) == Math.abs(dy))
+                Pheromone actor2 = (Pheromone)isElement(xi + dx, yi, type);
+                //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
+                if (actor2 != null)
                 {
-                    Pheromone actor2 = (Pheromone)isElement(xi + dx, yi, type);
-                    //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
-                    if (actor2 != null)
+                    if(actor2.getStepFrom() < resStepFrom)
                     {
-                        if(actor2.getStepFrom() < resStepFrom)
-                        {
-                            res = actor2;
-                            resStepFrom = actor2.getStepFrom();
-                        }
-                        
+                        res = actor2;
+                        resStepFrom = actor2.getStepFrom();
                     }
-                    Pheromone actor3 = (Pheromone)isElement(xi + dx, yi, type);
-                    //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
-                    if (actor3 != null)
+                    
+                }
+                Pheromone actor3 = (Pheromone)isElement(xi + dx, yi, type);
+                //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
+                if (actor3 != null)
+                {
+                    if(actor3.getStepFrom() < resStepFrom)
                     {
-                        if(actor3.getStepFrom() < resStepFrom)
-                        {
-                            res = actor3;
-                            resStepFrom = actor3.getStepFrom();
-                        }
-                        
+                        res = actor3;
+                        resStepFrom = actor3.getStepFrom();
                     }
+                    
                 }
             }
+
         }
         return res;
     }
@@ -339,7 +340,7 @@ public class Ecosystem extends Stage
 
     }
 
-    private int castInCase(float f)
+    public int castInCase(float f)
     {
         return MathUtils.round(f / getCaseSize());
     }

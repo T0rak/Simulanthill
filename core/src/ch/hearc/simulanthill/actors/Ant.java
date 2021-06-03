@@ -15,7 +15,7 @@ public class Ant extends ElementActor
     private static final int FIELD_OF_VIEW = 5;
     private static final int PHEROMONE_RELEASE_TIME = 1000;
 
-	private static double speed = 0.2;
+	private static double speed = 1;
     
     private float direction;
     private int viewSpanAngle;
@@ -29,6 +29,7 @@ public class Ant extends ElementActor
     private int stepFrom;
     private ElementActor goal;
     private boolean goalIsPassed;
+    private int lastStepFrom;
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
      * 1 -> follow food pheromones 
@@ -46,7 +47,8 @@ public class Ant extends ElementActor
         this.capacity = 0;
         this.viewSpanAngle = 15;
         this.state = 0;
-        this.direction = MathUtils.random(360f);
+        this.direction = 90;
+        //this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
         this.anthill = anthill;
         this.followedPheromone = null;
@@ -56,6 +58,7 @@ public class Ant extends ElementActor
         this.pheromoneTime = PHEROMONE_RELEASE_TIME;
         this.stepFrom = 0;
         this.goalIsPassed = true;
+        this.lastStepFrom = Integer.MAX_VALUE;
     }
 
     @Override
@@ -63,10 +66,23 @@ public class Ant extends ElementActor
     {
         super.act(delta);
 
+        if (capacity < MAX_CAPACITY)
+        {
+            
+            tryCollectFood();
+            
+        }
+        else{
+            
+            tryDepositFood();
+            
+        }
+
         ElementActor newGoal = null;
         
         if (capacity < MAX_CAPACITY)
         {
+            releasePheromone(PheromoneType.HOME);
             newGoal = searchFood();
             
             if (newGoal == null)
@@ -76,6 +92,7 @@ public class Ant extends ElementActor
         }
         else
         {
+            releasePheromone(PheromoneType.RESSOURCE);
             newGoal = searchAnthill();
             if (newGoal == null) {
                 //newGoal = this.anthill;
@@ -85,23 +102,25 @@ public class Ant extends ElementActor
 
         if (newGoal != null)
         {
-            Gdx.app.log("Passed ?", newGoal.getClass().getName());
-            changeGoal(newGoal);
+           goal = newGoal;
+           Gdx.app.log("("+goal.getX() +";"+ goal.getY()+")", goal.getClass().getName());
+           if (goal.getClass() == Pheromone.class)
+           {
+            Gdx.app.log("Type : ", ((Pheromone)goal).getStepFrom()+";"+((Pheromone)goal).getType());
+           }
+           
         }
         
         
         
-        if (goalIsPassed || goal == null)
+        if (goal == null)
         {
-            //explore();
+            explore();
         }
         else{
-            //Gdx.app.log("F","I follow");
             followGoal();
-            checkOnGoal();
         }
-        
-    
+     
 
         /*if (capacity >= MAX_CAPACITY)
         {
@@ -118,23 +137,19 @@ public class Ant extends ElementActor
         //Ecosystem.getCurrentEcosystem().checkRadial(getX(), getY(), 5, ElementActorType.RESSOURCE);
         //explore();
         
+        
+        
+        
+
+
         move();
         
-        if (capacity < MAX_CAPACITY)
-        {
-            tryCollectFood();
-            releasePheromone(PheromoneType.HOME);
-        }
-        else{
-            tryDepositFood();
-            releasePheromone(PheromoneType.RESSOURCE);
-        }
         
         nextCheck--;
         pheromoneCheckCountdown--;
         pheromoneCountdown--;
         stepFrom++;
-        Gdx.app.log("nbSteps", "" + stepFrom);
+        //Gdx.app.log("nbSteps", "" + stepFrom);
     }
 
     public void tryCollectFood()
@@ -143,8 +158,13 @@ public class Ant extends ElementActor
         if (ecosystem.isElement(getX(), getY(), ElementActorType.RESSOURCE) != null) {
             capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
             followedPheromone = null;
-            stepFrom = 0;
-            goalIsPassed = false;
+            if (capacity >= MAX_CAPACITY)
+            {
+                stepFrom = 0;
+                lastStepFrom = Integer.MAX_VALUE;
+            }
+            goal = null;
+            
         }
     }
 
@@ -153,10 +173,9 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) {
             capacity = 0;
-            pheromoneTime = PHEROMONE_RELEASE_TIME;
-            followedPheromone = null;
             stepFrom = 0;
-            goalIsPassed = false;
+            goal = null;
+            lastStepFrom = Integer.MAX_VALUE;
         }
     }
 
@@ -175,14 +194,36 @@ public class Ant extends ElementActor
     public ElementActor searchPheromone(PheromoneType type)
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        ElementActor res = null;
-        if (goal != null && goal.getClass() == Pheromone.class && ((Pheromone)goal).getType() == type) {
-            res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type, (Pheromone)goal);
+
+        Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type);
+
+
+        if (res != null && res.getStepFrom() < lastStepFrom)
+        {
+            lastStepFrom = res.getStepFrom();
+            return res;
         }
-        else{
-            res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type);
+        else
+        {
+            /*if (res != null)
+                {if (Math.abs(res.getStepFrom() - lastStepFrom) > 30)
+                {
+                    lastStepFrom = Integer.MAX_VALUE;
+                }
+            }*/
+            goal = null;
         }
-        return res;
+        
+        
+        if (res == null)
+        {
+            lastStepFrom = Integer.MAX_VALUE;
+            goal = null;
+        }
+
+        return null;
+
+       
     }
 
     public void followGoal()
@@ -190,6 +231,7 @@ public class Ant extends ElementActor
         if (goal != null)
         {
             float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() - getY(), goal.getX() - getX());
+            System.out.println(newDirection);
             float deltaDirection = (float)(newDirection - this.direction) % 360f;
 
             direction = newDirection;
@@ -200,9 +242,11 @@ public class Ant extends ElementActor
     public void checkOnGoal()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (goal != null)
+        if (goal != null && goalIsPassed == false)
         {
             goalIsPassed = ecosystem.isOnElement(getX(),getY(), goal);
+            System.out.println("("+ecosystem.castInCase(getX())+";"+ecosystem.castInCase(goal.getX())+")");
+            System.out.println("("+ecosystem.castInCase(getY())+";"+ecosystem.castInCase(goal.getY())+")");
         }
     }
 

@@ -4,7 +4,7 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Pheromone extends ElementActor {
     
-    private static int INIT_LIFE_TIME = 500;
+    private static int INIT_LIFE_TIME = 600;
 	private int lifeTime;
 	private PheromoneType pheromoneType;
 	private int stepFrom;
