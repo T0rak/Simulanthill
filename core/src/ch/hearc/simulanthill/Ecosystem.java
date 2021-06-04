@@ -197,7 +197,16 @@ public class Ecosystem extends Stage
                     if (actor3 != null)
                     {
                         return actor3;   
-                    }               
+                    } 
+                    
+                    if (isElement(xi + dx, yi, ElementActorType.OBSTACLE) != null)
+                    {
+                        return null;
+                    }
+                    if (isElement(xi, yi + dy, ElementActorType.OBSTACLE) != null)
+                    {
+                        return null;
+                    }
                 }
             }
         }
@@ -218,7 +227,7 @@ public class Ecosystem extends Stage
         {
             for (int j = -1; j <= 1; j++)
             {
-                if (!(j == 0 && i == 0))
+                //if (!(j == 0 && i == 0))
                 {
                     Pheromone actor = checkRadialLinePheromone(xCase, yCase, radius, i, j, toActorType(type), pheromone);
                     //Pheromone actor = (Pheromone)isElement(xi, yi, type);
@@ -297,6 +306,15 @@ public class Ecosystem extends Stage
                     }
                     
                 }
+
+                if (isElement(xi + dx, yi, ElementActorType.OBSTACLE) != null)
+                {
+                    return res;
+                }
+                if (isElement(xi, yi + dy, ElementActorType.OBSTACLE) != null)
+                {
+                    return res;
+                }
             }
 
         }
@@ -321,11 +339,24 @@ public class Ecosystem extends Stage
         int caseY = castInCase(y);
         Pheromone currentPheromoneCase = (Pheromone)elementActorGrid[caseY][caseX][i];
         if (currentPheromoneCase != null) {
-            currentPheromoneCase.remove();
+            if (currentPheromoneCase.getStepFrom() > stepFrom)
+            {
+                currentPheromoneCase.remove();
+                Pheromone p = new Pheromone(x, y, type, ant, stepFrom);
+                elementActorGrid[caseY][caseX][i] = p;
+                addActor(p);
+            }
+            else
+            {
+                currentPheromoneCase.reinforce();
+            }
+            
         }
-        Pheromone p = new Pheromone(x, y, type, ant, stepFrom);
-        elementActorGrid[caseY][caseX][i] = p;
-        addActor(p);
+        else{
+            Pheromone p = new Pheromone(x, y, type, ant, stepFrom);
+            elementActorGrid[caseY][caseX][i] = p;
+            addActor(p);
+        }
         /*if (currentPheromoneCase == null) {
             Pheromone p = new Pheromone(x, y, type, ant);
             elementActorGrid[caseY][caseX][i] = p;

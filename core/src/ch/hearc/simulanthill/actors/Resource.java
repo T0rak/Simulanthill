@@ -6,7 +6,7 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Resource extends ElementActor 
 {
-    private static final int INIT_CAPACITY = 3;
+    private static final int INIT_CAPACITY = 10;
     int capacity;
 
     public Resource(float _x, float _y, float _width, float _height) {

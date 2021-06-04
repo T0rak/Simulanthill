@@ -12,7 +12,7 @@ public class Ant extends ElementActor
     private static final int PHEROMONE_CHECK_COUNTDOWN = 0;
     private static final int NEXT_CHECK_COUNTDOWN = -1;
     private static final int MAX_CAPACITY = 1;
-    private static final int FIELD_OF_VIEW = 5;
+    private static final int FIELD_OF_VIEW = 3;
     private static final int PHEROMONE_RELEASE_TIME = 1000;
 
 	private static double speed = 1;
@@ -30,6 +30,8 @@ public class Ant extends ElementActor
     private ElementActor goal;
     private boolean goalIsPassed;
     private int lastStepFrom;
+    private int countLastPhero;
+    private boolean blocked;
     /**
      * 0 -> food exploration (look for food or food pheromones to follow)
      * 1 -> follow food pheromones 
@@ -47,8 +49,8 @@ public class Ant extends ElementActor
         this.capacity = 0;
         this.viewSpanAngle = 15;
         this.state = 0;
-        this.direction = 90;
-        //this.direction = MathUtils.random(360f);
+        //this.direction = 90;
+        this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
         this.anthill = anthill;
         this.followedPheromone = null;
@@ -59,6 +61,8 @@ public class Ant extends ElementActor
         this.stepFrom = 0;
         this.goalIsPassed = true;
         this.lastStepFrom = Integer.MAX_VALUE;
+        countLastPhero = 0;
+        blocked = false;
     }
 
     @Override
@@ -103,10 +107,10 @@ public class Ant extends ElementActor
         if (newGoal != null)
         {
            goal = newGoal;
-           Gdx.app.log("("+goal.getX() +";"+ goal.getY()+")", goal.getClass().getName());
+           //Gdx.app.log("("+goal.getX() +";"+ goal.getY()+")", goal.getClass().getName());
            if (goal.getClass() == Pheromone.class)
            {
-            Gdx.app.log("Type : ", ((Pheromone)goal).getStepFrom()+";"+((Pheromone)goal).getType());
+            //Gdx.app.log("Type : ", ((Pheromone)goal).getStepFrom()+";"+((Pheromone)goal).getType());
            }
            
         }
@@ -198,19 +202,18 @@ public class Ant extends ElementActor
         Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type);
 
 
-        if (res != null && res.getStepFrom() < lastStepFrom)
+        if (res != null && (res.getStepFrom() < lastStepFrom || countLastPhero == 200))
         {
             lastStepFrom = res.getStepFrom();
+            countLastPhero = 0;
             return res;
         }
         else
         {
-            /*if (res != null)
-                {if (Math.abs(res.getStepFrom() - lastStepFrom) > 30)
-                {
-                    lastStepFrom = Integer.MAX_VALUE;
-                }
-            }*/
+            if (res != null)
+            {
+                countLastPhero ++;
+            }
             goal = null;
         }
         
@@ -228,10 +231,10 @@ public class Ant extends ElementActor
 
     public void followGoal()
     {
-        if (goal != null)
+        if (goal != null && blocked == false)
         {
             float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() - getY(), goal.getX() - getX());
-            System.out.println(newDirection);
+            //System.out.println(newDirection);
             float deltaDirection = (float)(newDirection - this.direction) % 360f;
 
             direction = newDirection;
@@ -325,6 +328,13 @@ public class Ant extends ElementActor
 
     public void move()
     {
+        if (blocked)
+        {
+            float deltaDirection = MathUtils.random(-40f, 40f);
+            direction = (float)(direction + deltaDirection) % 360f;
+            sprite.rotate(deltaDirection);
+        }
+        
         float directionRad = (float) Math.toRadians(this.direction);
         float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
@@ -333,23 +343,28 @@ public class Ant extends ElementActor
         
         if (ecosystem.isElement(nextPosX, nextPosY, ElementActorType.OBSTACLE) != null)
         {
-            float deltaDirection = MathUtils.random(-180f, 180f);
-            direction = (float)(direction + deltaDirection) % 360f;
-            sprite.rotate(deltaDirection);
+            blocked = true;
 
         }
         else {
+            blocked = false;
             setPosition(nextPosX, nextPosY);
 
         }
-        setPosition(getX(), getY());
+        //setPosition(getX(), getY());
     }
     
     public void releasePheromone(PheromoneType type) {
-        if (pheromoneCountdown < 0) {
-            Ecosystem.getCurrentEcosystem().addPheromone(getX(), getY(), type, this, stepFrom);
-            pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        if (ecosystem.isElement(getX(), getY(), ElementActorType.OBSTACLE) == null)
+        {
+            if (pheromoneCountdown < 0)
+            {
+                ecosystem.addPheromone(getX(), getY(), type, this, stepFrom);
+                pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+            }
         }
+        
     }
 /*
     public void followPheromone(ElementActorType type) {

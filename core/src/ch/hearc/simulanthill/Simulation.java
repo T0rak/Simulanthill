@@ -36,11 +36,11 @@ public class Simulation implements Screen {
 		InputMultiplexer multiPlexer = new InputMultiplexer();
 
 		vp = new FitViewport(1600,900);
-		viewport = new FitViewport(800,450);
+		viewport = new FitViewport(1600,900);
 
 	
 		ecosystem = Ecosystem.getInstance(viewport);
-		ecosystem.loadMap("..\\..\\maps\\testmap4.txt", 1600, 900);
+		ecosystem.loadMap("..\\..\\maps\\testmap1.txt", 1600, 900);
 		sm = new SimInterface(vp); 
 
 
