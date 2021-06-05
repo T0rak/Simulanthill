@@ -3,11 +3,6 @@ package ch.hearc.simulanthill.actors;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-
-
-
-//import ch.hearc.simulanthill.model.Element;
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class ElementActor extends Actor {
@@ -18,15 +13,6 @@ public class ElementActor extends Actor {
       sprite = new Sprite(texture);
       
       setPosition(x, y);
-      /*setTouchable(Touchable.enabled);
-      
-      addListener(new InputListener() {
-        @Override
-        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-          Gdx.app.log("Object at position: ", ElementActor.this.toString());
-          return true;
-        }
-      });*/
     }
 
     public ElementActor(Texture texture, final String actorName) {

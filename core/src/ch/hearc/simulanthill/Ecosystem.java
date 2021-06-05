@@ -2,13 +2,9 @@ package ch.hearc.simulanthill;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.spi.CurrencyNameProvider;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.actors.Ant;
@@ -374,11 +370,6 @@ public class Ecosystem extends Stage
     public int castInCase(float f)
     {
         return MathUtils.round(f / getCaseSize());
-    }
-
-    private int castFromCase(int i)
-    {
-        return (int) (i * getCaseSize() + getCaseSize()/2);
     }
 
     private ElementActorType toActorType(PheromoneType type)

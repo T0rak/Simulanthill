@@ -1,7 +1,4 @@
 package ch.hearc.simulanthill.actors;
-
-import com.badlogic.gdx.math.MathUtils;
-
 import ch.hearc.simulanthill.Ecosystem;
 
 public class Anthill extends ElementActor{

@@ -21,7 +21,6 @@ public class Asset {
         manager.load(Asset.homePheromone);
         manager.load(Asset.foodPheromone);
         manager.load(Asset.marker);
-		//manager.load(new AssetDescriptor<Texture>("badlogic.jpg", Texture.class));
 		manager.finishLoading();
 	}
 

@@ -24,10 +24,6 @@ public class MapConvertor
 	private static boolean IS_VALID;
 	private static int WIDTH;
 	private static int HEIGHT;
-
-	private static int PARENT_WIDTH;
-	private static int PARENT_HEIGHT;
-
 	private static float SIZE;
 
 	private static List<Character> ACCEPTED_CHAR_LIST;

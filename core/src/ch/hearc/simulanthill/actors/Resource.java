@@ -1,7 +1,5 @@
 package ch.hearc.simulanthill.actors;
 
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-
 import ch.hearc.simulanthill.Ecosystem;
 
 public class Resource extends ElementActor 
