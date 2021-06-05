@@ -40,17 +40,17 @@
 #RRRRRRRRRRRRRRRRRR                                                                                                 #
 #RRRRRRRRRRRRRR                                                                                                     #
 #   RRRRRRRRRRRRRRR                                                                                                 #
-#         RRRRRRRRRRRRRRRRR                                                                                         #
+#         RRRRRRRRRRRRRRRRR                                                               RRRRRRRRRRRRRRRRR         #
 #   RRRRRRRRRRRRRRRRRRR                                                                                             #
 #                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                      ##############
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                                                   #
-#                                                                                               O                   #
-#                                                                                                                   #
+#                                                                        RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                   ##############
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R                                                        #
+#                                                          R                                                        #
+#                                                          R                                    O                   #
+#                                                          R                                                        #
 #####################################################################################################################

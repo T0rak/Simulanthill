@@ -1,7 +1,5 @@
 package ch.hearc.simulanthill;
 
-import java.util.Vector;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
@@ -40,7 +38,7 @@ public class Simulation implements Screen {
 
 	
 		ecosystem = Ecosystem.getInstance(viewport);
-		ecosystem.loadMap("..\\..\\maps\\testmap4.txt", 1600, 900);
+		ecosystem.loadMap("..\\..\\maps\\testmap1.txt", 1600, 900);
 		sm = new SimInterface(vp); 
 
 
@@ -117,4 +115,4 @@ public class Simulation implements Screen {
    
 		manager.finishLoading();
 	}*/
-  }
+}
