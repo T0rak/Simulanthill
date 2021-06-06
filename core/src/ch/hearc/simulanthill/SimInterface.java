@@ -112,7 +112,7 @@ public class SimInterface extends Stage
 		//Fill simulation layout
 		//lytSimulation.add(simulationImage).colspan(4);
 	
-		lytSimulation.add(simulation).colspan(4).size(800,450);
+		lytSimulation.add(simulation).colspan(4).size((int)(1600/1.25), (int)(900/1.25));
 		lytSimulation.row();
 		lytSimulation.add(btnReset);
 		lytSimulation.add(btnPlay);

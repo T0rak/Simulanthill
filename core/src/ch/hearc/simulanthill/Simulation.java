@@ -64,7 +64,7 @@ public class Simulation implements Screen {
 			Vector2 v = sm.simulation.localToStageCoordinates(new Vector2(0,0));
 			Vector2 v2 = sm.stageToScreenCoordinates(v);
 
-			viewport.update(1600/2, 900/2);
+			viewport.update((int)(1600/1.25), (int)(900/1.25));
 			viewport.setScreenPosition((int)(v2.x), 900-(int)(v2.y));
 		}
 
@@ -83,7 +83,7 @@ public class Simulation implements Screen {
 		Vector2 v = sm.simulation.localToStageCoordinates(new Vector2(0,0));
 		Vector2 v2 = sm.stageToScreenCoordinates(v);
 
-		viewport.update(_width/2, _height/2);
+		viewport.update((int)(_width/1.25), (int)(_height/1.25));
 		viewport.setScreenPosition((int)(v2.x), _height-(int)(v2.y));
 		
 	}
