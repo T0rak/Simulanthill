@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Stack;
 
@@ -21,98 +19,82 @@ import ch.hearc.simulanthill.actors.Resource;
  */
 public class MapConvertor 
 {
-	private static String FILE_NAME;
-	private static boolean IS_VALID;
-	
+	public int width;
+	public int height;
+	private float parent_width;
+	private float parent_height;
+	public float size;
+	public String filename;
+
 	private static int WIDTH;
 	private static int HEIGHT;
 	private static float SIZE;
+	
+	private static final Character[] ACCEPTED_CHAR_LIST = {
+		Character.toUpperCase(' '),
+		Character.toUpperCase('#'),
+		Character.toUpperCase('R'),
+		Character.toUpperCase('\r'),
+		Character.toUpperCase('O'),
+		Character.toUpperCase('\n')
+	};
+	private static final String[] MAP_RESOURCES_STRUCTURES = {
+		"R\n  RR\n   R\nRRR\n  RR\nRR\nRR\nRR\nRRRRR\n  RRR\n  RRR\n  RR\n",
+		"  RRR\nRRRRRR\n  RRRRRRRR\n  RRRRR\n  RRR\n  R\n",
+		"RRRRR RRRRRR RRRRR           RRRRRRRR\n    RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\n                      RRRR\n",
+		"        RRRRRR\n       RRRRR RR  RRRR\n  RRRRRRRRRRRRR\n    RRRRRRRRR\n    RRRRR RRRRR\n        RR\n",
+		"RRRRRR\n      RRR  RRR\n        RR\n          RRRR\n            R\n          RR RRR\n                RRRRR\n",
+		"           R  RRR\n              RR\n  RRR       RRRR\n          RR  R\n          RR R\n      RR R\n      RRRRRRRR\n RRRR\n",
+		"    RRRRRRRRRRRR\n    RRR    RR    RRRR\nRRR  RRR          RR\nRR      RR R    RR\nRRRRR         RRRRR\n    RRRRRRRR\n",
+		"RRRRRRRRRRRR\n      RRRRRRRRRRRRRRRR\n",
+		" RRR\n  RR\n  RR\n  R\n  RRRR\n    R\n    RR\n    R  R R\n   R    R\n",
+		"   RRRR\nRRRRR\n  RRRRRR\n    RRRR\n    RR  RRRR\n",
+	};
 
-	private static List<Character> ACCEPTED_CHAR_LIST;
+	private static final String[] MAP_OBSTACLES_STRUCTURES = {
+		"#####################\n",
+		"#\n#\n#\n#\n#\n#\n#\n",
+		"#### ###### #####           ########\n    ##############################\n                      ####\n",
+		"#\n  ##\n   #\n ###\n  ##\n##\n##\n##\n#####\n  ###\n  ###\n  ##\n",
+		"  ###\n######\n  ########\n  #####\n  ###\n  #\n"
+	};
 
 	/////////////////////////////////////////////////////
 	private static ElementActor[][][] ELEMENT_ACTOR_3D;
 	
-	//for random generation
-	private static List<String> mapStructuresResources;
-	private static List<String> mapStructuresObstacle;
 	private static Character[][][] ELEMENT_ACTOR_3D_char_temp;
 	/////////////////////////////////////////////////////
 
-	/**
-	 * Resets the map used in the simulator. Has to be call each time a new map want's to be used.
-	 */
-	private static void reset()
-	{
-		ELEMENT_ACTOR_3D = null;			//to erase an array is enough (https://stackoverflow.com/questions/15448457/deleting-an-entire-array#15448477)
-		ELEMENT_ACTOR_3D_char_temp = null;
-		ACCEPTED_CHAR_LIST = null;
-		mapStructuresResources = null;
-		mapStructuresObstacle = null;
-		IS_VALID = false;
+	public MapConvertor(String _filename, float _width, float _height) {
+		width = 0;
+		height = 0;
+		filename = _filename;
+		if (validate())
+		{
+			convert();
+		} else {
+			System.out.println("ERROR : unable to convert map : map is not valid");
+		}
 
 	}
 
-	private static void init()
-	{
-		ACCEPTED_CHAR_LIST = new ArrayList<Character>();
-
-		ACCEPTED_CHAR_LIST.add(Character.toUpperCase(' ')); 
-		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('#')); 
-		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('R')); 
-		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('\r')); //Carriage return
-		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('O'));
-		ACCEPTED_CHAR_LIST.add(Character.toUpperCase('\n')); //New line
-
-		//we add to map structure some patterns so that they will spanw randomly:
-		mapStructuresResources = new LinkedList<String>();
-		mapStructuresObstacle = new LinkedList<String>();
-
-		mapStructuresResources.add("R\n  RR\n   R\nRRR\n  RR\nRR\nRR\nRR\nRRRRR\n  RRR\n  RRR\n  RR\n");
-		mapStructuresResources.add("  RRR\nRRRRRR\n  RRRRRRRR\n  RRRRR\n  RRR\n  R\n");
-		mapStructuresResources.add("RRRRR RRRRRR RRRRR           RRRRRRRR\n    RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\n                      RRRR\n");
-		mapStructuresResources.add("        RRRRRR\n       RRRRR RR  RRRR\n  RRRRRRRRRRRRR\n    RRRRRRRRR\n    RRRRR RRRRR\n        RR\n");
-		mapStructuresResources.add("RRRRRR\n      RRR  RRR\n        RR\n          RRRR\n            R\n          RR RRR\n                RRRRR\n");
-		mapStructuresResources.add("           R  RRR\n              RR\n  RRR       RRRR\n          RR  R\n          RR R\n      RR R\n      RRRRRRRR\n RRRR\n");
-		mapStructuresResources.add("    RRRRRRRRRRRR\n    RRR    RR    RRRR\nRRR  RRR          RR\nRR      RR R    RR\nRRRRR         RRRRR\n    RRRRRRRR\n");
-		mapStructuresResources.add("RRRRRRRRRRRR\n      RRRRRRRRRRRRRRRR\n");
-		mapStructuresResources.add(" RRR\n  RR\n  RR\n  R\n  RRRR\n    R\n    RR\n    R  R R\n   R    R\n");
-		mapStructuresResources.add("   RRRR\nRRRRR\n  RRRRRR\n    RRRR\n    RR  RRRR\n");
-
-		mapStructuresObstacle.add("#####################\n");
-		mapStructuresObstacle.add("#\n#\n#\n#\n#\n#\n#\n");
-		mapStructuresObstacle.add("#### ###### #####           ########\n    ##############################\n                      ####\n");
-		mapStructuresObstacle.add("#\n  ##\n   #\n ###\n  ##\n##\n##\n##\n#####\n  ###\n  ###\n  ##\n");
-		mapStructuresObstacle.add("  ###\n######\n  ########\n  #####\n  ###\n  #\n");
-
-	}
-
-	/**
-	 * Constructor
-	 */
+/*
 	public static void generate(String _filename, float _parentWidth, float _parentHeight) 
 	{
 		WIDTH = 0;
 		HEIGHT = 0;
-		IS_VALID = false;
-
-		init();
 
 		if(validate(_filename))
 		{
-			IS_VALID = true;
-		}
-
-		if(IS_VALID)
-		{
 			convert();
+		} else {
+			System.out.println("ERROR : unable to convert map : map is not valid");
 		}
 
 	}
-
+*/
 	public static void generate_random(float _parentWidth, float _parentHeight, int _nbElements)
 	{
-		init();
 		random((int)_parentWidth, (int)_parentHeight, _nbElements);
 	}
 
@@ -131,12 +113,10 @@ public class MapConvertor
 	  * The map is selected through a fileDialog.
 	  * @param _fileName //absolute path fileName
 	  */
-	private static boolean validate(String _fileName) 
+	private boolean validate() 
 	{
-		FILE_NAME = _fileName;
-
-		File f = new File(FILE_NAME);
-		if(f.exists() && !f.isDirectory() && FILE_NAME.substring(FILE_NAME.length()-3, FILE_NAME.length()).equalsIgnoreCase("txt")) 
+		File f = new File(filename);
+		if(f.exists() && !f.isDirectory() && filename.substring(filename.length()-3, filename.length()).equalsIgnoreCase("txt")) 
 		{ 
     		System.out.println("The file exists");
 			int line = 0;
@@ -158,9 +138,9 @@ public class MapConvertor
 
 					if(character == '\n')
 					{
-						if(WIDTH == 0)
+						if(width == 0)
 						{
-							WIDTH = column-1;
+							width = column-1;
 						}
 						line++;
 						column = -1;
@@ -168,7 +148,7 @@ public class MapConvertor
 
 					System.out.print(character); //Display the Character
 
-					if (!ACCEPTED_CHAR_LIST.contains(character))
+					if (!Arrays.asList(ACCEPTED_CHAR_LIST).contains(character))
 					{
 						System.out.println("\n\nInvalid character : " + character );
 						//TODO : Throw a character message error
@@ -183,10 +163,10 @@ public class MapConvertor
 				}
 
 				System.out.println("Map is valid ! :) ");
-				HEIGHT = line;
+				height = line;
 				System.out.println();
-				System.out.println("width map : "+ WIDTH);
-				System.out.println("height map : "+ HEIGHT);
+				System.out.println("width map : "+ width);
+				System.out.println("height map : "+ height);
 
 				br.close();
 				fr.close();
@@ -212,103 +192,92 @@ public class MapConvertor
 	/**
 	 * Will convert the map from characters to objects.
 	 */
-	public static void convert()
+	private void convert()
 	{
-		if(IS_VALID)
+		int line = 0;
+		int column = 0;
+
+		File f = new File(filename);
+	
+		System.out.println("Converting...");
+
+		try 
 		{
-			int line = 0;
-			int column = 0;
+			FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr);
 
-			File f = new File(FILE_NAME);
-		
-			System.out.println("Converting...");
-
-			try 
+			//We put the lines in a stack, so we can pop then un in reverse order
+			Stack<String> lines = new Stack<String>();
+			String currentline = br.readLine();
+			while(currentline != null) 
 			{
-				FileReader fr = new FileReader(f);
-				BufferedReader br = new BufferedReader(fr);
-
-				//We put the lines in a stack, so we can pop then un in reverse order
-				Stack<String> lines = new Stack<String>();
-				String currentline = br.readLine();
-				while(currentline != null) 
-				{
-					lines.push(currentline);
-					currentline = br.readLine();
-				}
-
-				/*  0 : Obstacle
-					1 : Ressource
-					2 : Anthill	
-					3 : HomePheromone	
-					4 : FoodPheromone
-					5 : DangerPheromone
-				   --> size = 6
-				*/
-
-				SIZE = Math.min(Ecosystem.getCurrentEcosystem().getWidth()/WIDTH, Ecosystem.getCurrentEcosystem().getHeight()/HEIGHT);
-
-				ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][6];
-
-				Character character = ' ';
-
-				while(!lines.empty())
-				{
-					currentline = lines.pop();
-
-					for(int i = 0 ; i < currentline.length() ; i++ )        
-					{
-						character = Character.toUpperCase(currentline.charAt(i)); 
-
-						switch(character) 
-						{
-							case 'R':
-								ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*SIZE, line*SIZE, SIZE, SIZE);
-								break;
-
-							case '#':
-								ELEMENT_ACTOR_3D[line][column][0] = new Obstacle(column*SIZE, line*SIZE, SIZE, SIZE);
-								break;
-
-							case 'O':
-								ELEMENT_ACTOR_3D[line][column][2] = new Anthill(column*SIZE, line*SIZE, SIZE, SIZE);
-								break;
-						
-							default:
-								break;
-						}
-						column++;
-					}
-					line++;
-
-					if(WIDTH == 0)
-					{
-						WIDTH = column-1;
-					}
-
-					column = 0;
-				}
-				Ecosystem.getCurrentEcosystem().setElementActorGrid(ELEMENT_ACTOR_3D);
-				Ecosystem.getCurrentEcosystem().setCaseSize(SIZE);
-				br.close();
-				fr.close();
-
-				System.out.println("Map Converted !!");
-
+				lines.push(currentline);
+				currentline = br.readLine();
 			}
-			catch(IOException e)
-			{
-				//TODO : Throw a IO error message
-				e.printStackTrace();
-				System.out.println("Unable to read the file");
-			} 
-		}
-		else
-		{
-			System.out.println("ERROR : unable to convert map : map is not valid");
-		}
 
-		
+			/*  0 : Obstacle
+				1 : Ressource
+				2 : Anthill	
+				3 : HomePheromone	
+				4 : FoodPheromone
+				5 : DangerPheromone
+				--> size = 6
+			*/
+
+			size = Math.min(Ecosystem.getCurrentEcosystem().getWidth() / width, Ecosystem.getCurrentEcosystem().getHeight() / height);
+
+			ELEMENT_ACTOR_3D = new ElementActor[height][width][6];
+
+			Character character = ' ';
+
+			while(!lines.empty())
+			{
+				currentline = lines.pop();
+
+				for(int i = 0 ; i < currentline.length() ; i++ )        
+				{
+					character = Character.toUpperCase(currentline.charAt(i)); 
+
+					switch(character) 
+					{
+						case 'R':
+							ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*size, line*size, size, size);
+							break;
+
+						case '#':
+							ELEMENT_ACTOR_3D[line][column][0] = new Obstacle(column*size, line*size, size, size);
+							break;
+
+						case 'O':
+							ELEMENT_ACTOR_3D[line][column][2] = new Anthill(column*size, line*size, size, size);
+							break;
+					
+						default:
+							break;
+					}
+					column++;
+				}
+				line++;
+
+				if(width == 0)
+				{
+					width = column-1;
+				}
+
+				column = 0;
+			}
+			br.close();
+			fr.close();
+			
+			System.out.println("Map Converted !!");
+
+		}
+		catch(IOException e)
+		{
+			//TODO : Throw a IO error message
+			e.printStackTrace();
+			System.out.println("Unable to read the file");
+		} 		
 	}
 
 	/**
@@ -362,14 +331,14 @@ public class MapConvertor
 			//lets just say that we want half resources pattern & half obstacles pattern
 			if (i < _nbElements/2)
 			{
-				index = r.nextInt(mapStructuresResources.size());
-				resourceStructure = mapStructuresResources.get(index);
+				index = r.nextInt(MAP_RESOURCES_STRUCTURES.length);
+				resourceStructure = MAP_RESOURCES_STRUCTURES[index];
 
 			}
 			else
 			{
-				index = r.nextInt(mapStructuresObstacle.size());
-				resourceStructure = mapStructuresObstacle.get(index);
+				index = r.nextInt(MAP_OBSTACLES_STRUCTURES.length);
+				resourceStructure = MAP_OBSTACLES_STRUCTURES[index];
 			}
 
 			int w = 0;
@@ -396,8 +365,7 @@ public class MapConvertor
 		//Last thing to do is to place the anthill in a spot where's nothing
 		int xCoord = 0 ;
 		int yCoord = 0 ;
-		do 
-		{
+		do {
 			yCoord = r.nextInt(WIDTH-1) + 1;
 			xCoord = r.nextInt(HEIGHT-1) + 1; 
 
@@ -429,9 +397,16 @@ public class MapConvertor
 			//System.out.println();
 		}
 
-		Ecosystem.getCurrentEcosystem().setElementActorGrid(ELEMENT_ACTOR_3D);
-		Ecosystem.getCurrentEcosystem().setCaseSize(SIZE);
+		//Ecosystem.getCurrentEcosystem().setElementActorGrid(ELEMENT_ACTOR_3D);
+		//Ecosystem.getCurrentEcosystem().setCaseSize(SIZE);
 
 	}
 
+	public static ElementActor[][][] getElementActorGrid() {
+		return ELEMENT_ACTOR_3D;
+	}
+
+	public float getCaseSize() {
+		return size;
+	}
 }

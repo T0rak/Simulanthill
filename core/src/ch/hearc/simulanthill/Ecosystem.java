@@ -20,7 +20,7 @@ public class Ecosystem extends Stage
     private static Ecosystem instance = null;
     private ElementActor[][][] elementActorGrid;
     private float caseSize;
-
+    private MapConvertor mapC;
     private List<Ant> ants;
 
     private Ecosystem(Viewport _viewport)
@@ -77,14 +77,17 @@ public class Ecosystem extends Stage
     public void loadMap(String _filepath, float _width, float _height)
     {
         System.out.println("TEST");
+
         //MapConvertor map = new MapConvertor(filepath, width, height);
         //MapConvertor.generate(filepath, width, height);
-        MapConvertor.generate_random(_width, _height, 40);
+        mapC = new MapConvertor(_filepath, _width, _height);
+        //MapConvertor.generate_random(_width, _height, 40);
         //map.convert(1);
         //float size = width / map.getWidth();
         //Gdx.app.log("Y TEST", String.valueOf(map.getWidth()));
         //map.convert(size);
-        
+        setElementActorGrid(MapConvertor.getElementActorGrid());
+        setCaseSize(mapC.getCaseSize());
 		for (ElementActor[][] elementA: elementActorGrid) 
         {
             for (ElementActor[] elementB: elementA) 
