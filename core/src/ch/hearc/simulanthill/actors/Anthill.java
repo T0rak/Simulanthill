@@ -4,23 +4,24 @@ import ch.hearc.simulanthill.Ecosystem;
 public class Anthill extends ElementActor{
     private int nbLimit = 1000;
     private int nbAnts;
-    public Anthill(float x, float y, float width, float height) {
-        super(x, y, Asset.anthill(), "anthill");
 
-        setSize(width, height);
-        this.sprite.setOrigin(width/2, height/2);
+    public Anthill(float _x, float _y, float _width, float _height) {
+        super(_x, _y, Asset.anthill(), "anthill");
+
+        setSize(_width, _height);
+        this.sprite.setOrigin(_width/2, _height/2);
     }
 
-    public Anthill(float x, float y) {
-        this(x, y, 30, 30);
+    public Anthill(float _x, float _y) {
+        this(_x, _y, 30, 30);
     }
 
     public Anthill() {
         this(0, 0);
     }
 
-    public void act(float delta) {
-        super.act(delta);
+    public void act(float _delta) {
+        super.act(_delta);
         if (nbAnts < nbLimit)
         {
             int nbCreated = 1;

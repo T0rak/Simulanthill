@@ -110,10 +110,10 @@ public class MapConvertor
 
 	}
 
-	public static void generate_random(float _parentWidth, float _parentHeight)
+	public static void generate_random(float _parentWidth, float _parentHeight, int _nbElements)
 	{
 		init();
-		random((int)_parentWidth, (int)_parentHeight);
+		random((int)_parentWidth, (int)_parentHeight, _nbElements);
 	}
 
 	public static int getWidth()
@@ -314,7 +314,7 @@ public class MapConvertor
 	/**
 	 * Generates a valid random map 
 	 */
-	public static void random(int _width, int _height) 
+	public static void random(int _width, int _height, int _nbElements) 
 	{
 
 		WIDTH = _width/10;		
@@ -347,10 +347,8 @@ public class MapConvertor
 
 		}
 
-		int max = 20;
-
 		//Lets popout max spots where to add the patterns:
-		for (int i = 0 ; i < max ; i++)
+		for (int i = 0 ; i < _nbElements ; i++)
 		{
 			int xCoord = r.nextInt(WIDTH-1) + 1;
 			int yCoord = r.nextInt(HEIGHT-1) + 1; 
@@ -362,7 +360,7 @@ public class MapConvertor
 			String resourceStructure = "";
 
 			//lets just say that we want half resources pattern & half obstacles pattern
-			if (i < max/2)
+			if (i < _nbElements/2)
 			{
 				index = r.nextInt(mapStructuresResources.size());
 				resourceStructure = mapStructuresResources.get(index);
@@ -391,7 +389,6 @@ public class MapConvertor
 						ELEMENT_ACTOR_3D_char_temp[yCoord + h][xCoord + w][0] = character;
 					}
 					w++;
-					
 				}
 			}
 		}

@@ -27,8 +27,8 @@ public class Resource extends ElementActor
     }
 
     @Override
-    public void act(float delta) {
-        super.act(delta);
+    public void act(float _delta) {
+        super.act(_delta);
         sprite.setAlpha((float)capacity / INIT_CAPACITY);
     }
 

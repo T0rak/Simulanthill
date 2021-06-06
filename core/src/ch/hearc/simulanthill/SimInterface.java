@@ -57,8 +57,8 @@ public class SimInterface extends Stage
 	public Actor simulation;
 
     
-	public SimInterface (Viewport vp) {
-		super(vp);
+	public SimInterface (Viewport _vp) {
+		super(_vp);
 		
 		
 		simulation = new Actor();

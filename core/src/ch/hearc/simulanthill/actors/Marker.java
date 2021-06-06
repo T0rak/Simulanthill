@@ -10,8 +10,8 @@ public class Marker extends ElementActor {
         this.sprite.setOrigin(_width / 2, _height / 2);
     }
 
-    public Marker(float x, float y) {
-        this(x, y, 30, 30);
+    public Marker(float _x, float _y) {
+        this(_x, _y, 30, 30);
     }
 
     public Marker() {

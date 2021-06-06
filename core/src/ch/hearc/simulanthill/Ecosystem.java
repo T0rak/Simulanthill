@@ -23,9 +23,9 @@ public class Ecosystem extends Stage
 
     private List<Ant> ants;
 
-    private Ecosystem(Viewport viewport)
+    private Ecosystem(Viewport _viewport)
     {
-        super(viewport);
+        super(_viewport);
         ants = new ArrayList<>();
 		
 
@@ -42,11 +42,11 @@ public class Ecosystem extends Stage
 
     }
 
-    public static Ecosystem getInstance(Viewport viewport)
+    public static Ecosystem getInstance(Viewport _viewport)
     {
         if(instance == null)
         {
-            instance = new Ecosystem(viewport);
+            instance = new Ecosystem(_viewport);
         }
         return instance;
         
@@ -74,12 +74,12 @@ public class Ecosystem extends Stage
 
     }
 
-    public void loadMap(String filepath, float width, float height)
+    public void loadMap(String _filepath, float _width, float _height)
     {
         System.out.println("TEST");
         //MapConvertor map = new MapConvertor(filepath, width, height);
         //MapConvertor.generate(filepath, width, height);
-        MapConvertor.generate_random(width, height);
+        MapConvertor.generate_random(_width, _height, 40);
         //map.convert(1);
         //float size = width / map.getWidth();
         //Gdx.app.log("Y TEST", String.valueOf(map.getWidth()));
@@ -106,14 +106,14 @@ public class Ecosystem extends Stage
         
     }
 
-    public void setElementActorGrid(ElementActor[][][] elementActorGrid)
+    public void setElementActorGrid(ElementActor[][][] _elementActorGrid)
     {
-        this.elementActorGrid = elementActorGrid;
+        this.elementActorGrid = _elementActorGrid;
     }
 
-    public void setCaseSize(float caseSize)
+    public void setCaseSize(float _caseSize)
     {
-        this.caseSize = caseSize;
+        this.caseSize = _caseSize;
     }
 
     public float getCaseSize()
@@ -121,36 +121,36 @@ public class Ecosystem extends Stage
         return this.caseSize;
     }
 
-    public ElementActor isElement(float x, float y, ElementActorType type)
+    public ElementActor isElement(float _x, float _y, ElementActorType _type)
     {
-        int xCase = castInCase(x);
-        int yCase = castInCase(y);
-        return elementActorGrid[yCase][xCase][type.getValue()];
+        int xCase = castInCase(_x);
+        int yCase = castInCase(_y);
+        return elementActorGrid[yCase][xCase][_type.getValue()];
     }
 
-    private ElementActor isElement(int x, int y, ElementActorType type)
+    private ElementActor isElement(int _x, int _y, ElementActorType _type)
     {
-        return elementActorGrid[y][x][type.getValue()];
+        return elementActorGrid[_y][_x][_type.getValue()];
     }
 
-    public Boolean isOnElement(float x, float y, ElementActor actor)
+    public Boolean isOnElement(float _x, float _y, ElementActor _actor)
     {
-        return (castInCase(x) == castInCase(actor.getX())) && (castInCase(y) == castInCase(actor.getY()));
+        return (castInCase(_x) == castInCase(_actor.getX())) && (castInCase(_y) == castInCase(_actor.getY()));
     }
 
-    public ElementActor checkRadial(float x, float y, int radius, ElementActorType type)
+    public ElementActor checkRadial(float _x, float _y, int _radius, ElementActorType _type)
     {
         ElementActor res = null;
         float distance = 0;
-        int xCase = castInCase(x);
-        int yCase = castInCase(y);
+        int xCase = castInCase(_x);
+        int yCase = castInCase(_y);
         for (int i = -1; i <= 1; i++)
         {
             for (int j = -1; j <= 1; j++)
             {
-                ElementActor v = checkRadialLine(xCase, yCase, radius, i, j, type);
+                ElementActor v = checkRadialLine(xCase, yCase, _radius, i, j, _type);
                 if (v != null) {
-                    float d = (float)(Math.pow(x - v.getX(), 2) + Math.pow(y - v.getY(), 2));
+                    float d = (float)(Math.pow(_x - v.getX(), 2) + Math.pow(_y - v.getY(), 2));
                     if (res == null || (res != null && d < distance))
                     {
                         distance = d;
@@ -163,14 +163,14 @@ public class Ecosystem extends Stage
         
     }
 
-    private ElementActor checkRadialLine(int x, int y, int radius, int dx, int dy, ElementActorType type)
+    private ElementActor checkRadialLine(int _x, int _y, int _radius, int _dx, int _dy, ElementActorType _type)
     {
-        for (int i = 1; i <= radius; i++)
+        for (int i = 1; i <= _radius; i++)
         {
-            int xi = x + i * dx;
-            int yi = y + i * dy;
+            int xi = _x + i * _dx;
+            int yi = _y + i * _dy;
             //addActor(new Pheromone(xi * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
-            ElementActor actor = isElement(xi, yi, type);
+            ElementActor actor = isElement(xi, yi, _type);
             if (actor != null)
             {
                 return actor;
@@ -181,26 +181,26 @@ public class Ecosystem extends Stage
             }
             else
             {
-                if (Math.abs(dx) == Math.abs(dy))
+                if (Math.abs(_dx) == Math.abs(_dy))
                 {
-                    ElementActor actor2 = isElement(xi + dx, yi, type);
+                    ElementActor actor2 = isElement(xi + _dx, yi, _type);
                     //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
                     if (actor2 != null)
                     {
                         return actor2;   
                     }
-                    ElementActor actor3 = isElement(xi, yi + dy, type);
+                    ElementActor actor3 = isElement(xi, yi + _dy, _type);
                     //addActor(new Pheromone(xi * caseSize, (yi+dy) * caseSize, PheromoneType.HOME, null, 0));
                     if (actor3 != null)
                     {
                         return actor3;   
                     } 
                     
-                    if (isElement(xi + dx, yi, ElementActorType.OBSTACLE) != null)
+                    if (isElement(xi + _dx, yi, ElementActorType.OBSTACLE) != null)
                     {
                         return null;
                     }
-                    if (isElement(xi, yi + dy, ElementActorType.OBSTACLE) != null)
+                    if (isElement(xi, yi + _dy, ElementActorType.OBSTACLE) != null)
                     {
                         return null;
                     }
@@ -210,7 +210,7 @@ public class Ecosystem extends Stage
         return null;
     }
 
-    public Pheromone checkRadialPheromone(float x, float y, int radius, PheromoneType type, Pheromone pheromone)
+    public Pheromone checkRadialPheromone(float _x, float _y, int _radius, PheromoneType _type, Pheromone _pheromone)
     {
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
@@ -218,15 +218,15 @@ public class Ecosystem extends Stage
         {
             resStepFrom = pheromone.getStepFrom();
         }*/
-        int xCase = castInCase(x);
-        int yCase = castInCase(y);
+        int xCase = castInCase(_x);
+        int yCase = castInCase(_y);
         for (int i = -1; i <= 1; i++)
         {
             for (int j = -1; j <= 1; j++)
             {
                 //if (!(j == 0 && i == 0))
                 {
-                    Pheromone actor = checkRadialLinePheromone(xCase, yCase, radius, i, j, toActorType(type), pheromone);
+                    Pheromone actor = checkRadialLinePheromone(xCase, yCase, _radius, i, j, toActorType(_type), _pheromone);
                     //Pheromone actor = (Pheromone)isElement(xi, yi, type);
                     if (actor != null)
                     {
@@ -244,13 +244,13 @@ public class Ecosystem extends Stage
         
     }
 
-    public Pheromone checkRadialPheromone(float x, float y, int radius, PheromoneType type)
+    public Pheromone checkRadialPheromone(float _x, float _y, int _radius, PheromoneType _type)
     {
-        return checkRadialPheromone(x, y, radius, type, null);
+        return checkRadialPheromone(_x, _y, _radius, _type, null);
     }
 
 
-    private Pheromone checkRadialLinePheromone(int x, int y, int radius, int dx, int dy, ElementActorType type, Pheromone pheromone)
+    private Pheromone checkRadialLinePheromone(int _x, int _y, int _radius, int _dx, int _dy, ElementActorType _type, Pheromone _pheromone)
     {
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
@@ -259,12 +259,12 @@ public class Ecosystem extends Stage
             resStepFrom = pheromone.getStepFrom();
         }*/
 
-        for (int i = 1; i <= radius; i++)
+        for (int i = 1; i <= _radius; i++)
         {
-            int xi = x + i * dx;
-            int yi = y + i * dy;
+            int xi = _x + i * _dx;
+            int yi = _y + i * _dy;
             //addActor(new Pheromone(xi * caseSize, yi * caseSize, PheromoneType.HOME));
-            Pheromone actor = (Pheromone)isElement(xi, yi, type);
+            Pheromone actor = (Pheromone)isElement(xi, yi, _type);
             if (actor != null)
             {
                 if(actor.getStepFrom() < resStepFrom)
@@ -279,9 +279,9 @@ public class Ecosystem extends Stage
                 return res;
             }
 
-            if (Math.abs(dx) == Math.abs(dy))
+            if (Math.abs(_dx) == Math.abs(_dy))
             {
-                Pheromone actor2 = (Pheromone)isElement(xi + dx, yi, type);
+                Pheromone actor2 = (Pheromone)isElement(xi + _dx, yi, _type);
                 //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
                 if (actor2 != null)
                 {
@@ -292,7 +292,7 @@ public class Ecosystem extends Stage
                     }
                     
                 }
-                Pheromone actor3 = (Pheromone)isElement(xi + dx, yi, type);
+                Pheromone actor3 = (Pheromone)isElement(xi + _dx, yi, _type);
                 //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
                 if (actor3 != null)
                 {
@@ -304,11 +304,11 @@ public class Ecosystem extends Stage
                     
                 }
 
-                if (isElement(xi + dx, yi, ElementActorType.OBSTACLE) != null)
+                if (isElement(xi + _dx, yi, ElementActorType.OBSTACLE) != null)
                 {
                     return res;
                 }
-                if (isElement(xi, yi + dy, ElementActorType.OBSTACLE) != null)
+                if (isElement(xi, yi + _dy, ElementActorType.OBSTACLE) != null)
                 {
                     return res;
                 }
@@ -318,28 +318,28 @@ public class Ecosystem extends Stage
         return res;
     }
 
-    public int takeResource(float x, float y, int quantity) {
-        int xCase = castInCase(x);
-        int yCase = castInCase(y);
-        return ((Resource)elementActorGrid[yCase][xCase][1]).decrease(quantity);
+    public int takeResource(float _x, float _y, int _quantity) {
+        int xCase = castInCase(_x);
+        int yCase = castInCase(_y);
+        return ((Resource)elementActorGrid[yCase][xCase][1]).decrease(_quantity);
     }
 
-    public void removeResource(float x, float y) {
-        elementActorGrid[castInCase(y)][castInCase(x)][1] = null;
+    public void removeResource(float _x, float _y) {
+        elementActorGrid[castInCase(_y)][castInCase(_x)][1] = null;
 
     }
 
-    public void addPheromone(float x, float y, PheromoneType type, Ant ant, int stepFrom) {
+    public void addPheromone(float _x, float _y, PheromoneType _type, Ant _ant, int _stepFrom) {
       
-        int i = toActorType(type).getValue();
-        int caseX = castInCase(x);
-        int caseY = castInCase(y);
+        int i = toActorType(_type).getValue();
+        int caseX = castInCase(_x);
+        int caseY = castInCase(_y);
         Pheromone currentPheromoneCase = (Pheromone)elementActorGrid[caseY][caseX][i];
         if (currentPheromoneCase != null) {
-            if (currentPheromoneCase.getStepFrom() > stepFrom)
+            if (currentPheromoneCase.getStepFrom() > _stepFrom)
             {
                 currentPheromoneCase.remove();
-                Pheromone p = new Pheromone(x, y, type, ant, stepFrom);
+                Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
                 elementActorGrid[caseY][caseX][i] = p;
                 addActor(p);
             }
@@ -350,7 +350,7 @@ public class Ecosystem extends Stage
             
         }
         else{
-            Pheromone p = new Pheromone(x, y, type, ant, stepFrom);
+            Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
             elementActorGrid[caseY][caseX][i] = p;
             addActor(p);
         }
@@ -363,27 +363,27 @@ public class Ecosystem extends Stage
         }*/
     }
 
-    public void removePheromone(float x, float y, PheromoneType type) {
-        elementActorGrid[castInCase(y)][castInCase(x)][toActorType(type).getValue()] = null;
+    public void removePheromone(float _x, float _y, PheromoneType _type) {
+        elementActorGrid[castInCase(_y)][castInCase(_x)][toActorType(_type).getValue()] = null;
 
     }
 
-    public int castInCase(float f)
+    public int castInCase(float _f)
     {
-        return MathUtils.round(f / getCaseSize());
+        return MathUtils.round(_f / getCaseSize());
     }
 
-    private ElementActorType toActorType(PheromoneType type)
+    private ElementActorType toActorType(PheromoneType _type)
     {
-        if (type == PheromoneType.HOME) {
+        if (_type == PheromoneType.HOME) {
             return ElementActorType.HOME_PHEROMONE;
         }
 
-        if (type == PheromoneType.RESSOURCE) {
+        if (_type == PheromoneType.RESSOURCE) {
             return ElementActorType.FOOD_PHEROMONE;
         }
 
-        if (type == PheromoneType.DANGER) {
+        if (_type == PheromoneType.DANGER) {
             return ElementActorType.DANGER_PHEROMONE;
         }
 

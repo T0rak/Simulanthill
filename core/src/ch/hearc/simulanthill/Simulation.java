@@ -21,8 +21,8 @@ public class Simulation implements Screen {
 	private Viewport vp;
 	SimInterface sm;
    
-	public Simulation(Game game) {
-		this.game = game;
+	public Simulation(Game _game) {
+		this.game = _game;
 		//manager = new AssetManager();
 	}
   
@@ -51,7 +51,7 @@ public class Simulation implements Screen {
 	}
    
 	@Override
-	public void render(float delta) {
+	public void render(float _delta) {
 		Gdx.gl.glClearColor(100, 100, 100, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -76,16 +76,15 @@ public class Simulation implements Screen {
 	}
    
 	@Override
-	public void resize(int width, int height) {
+	public void resize(int _width, int _height) {
 
-		vp.update(width, height);
+		vp.update(_width, _height);
 		//sm.getViewport().apply();
 		Vector2 v = sm.simulation.localToStageCoordinates(new Vector2(0,0));
 		Vector2 v2 = sm.stageToScreenCoordinates(v);
 
-		viewport.update(width/2, height/2);
-		viewport.setScreenPosition((int)(v2.x), height-(int)(v2.y));
-
+		viewport.update(_width/2, _height/2);
+		viewport.setScreenPosition((int)(v2.x), _height-(int)(v2.y));
 		
 	}
    

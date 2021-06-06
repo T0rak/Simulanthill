@@ -23,18 +23,18 @@ public class Ant extends ElementActor
     private int countLastPhero;
     private boolean blocked;
 
-    public Ant(float x, float y, int width, int height, Anthill anthill)
+    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
-        super(x, y, Asset.ant(), "ant");
+        super(_x, _y, Asset.ant(), "ant");
 
-        sprite.setOrigin(width / 2, height / 2);
-        setSize(width, height);
+        sprite.setOrigin(_width / 2, _height / 2);
+        setSize(_width, _height);
         this.capacity = 0;
         this.viewSpanAngle = 15;
         //this.direction = 90;
         this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
-        this.anthill = anthill;
+        this.anthill = _anthill;
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         this.stepFrom = 0;
         this.goalIsPassed = true;
@@ -44,9 +44,9 @@ public class Ant extends ElementActor
     }
 
     @Override
-    public void act(float delta)
+    public void act(float _delta)
     {
-        super.act(delta);
+        super.act(_delta);
 
         if (capacity < MAX_CAPACITY)
         {
@@ -140,11 +140,11 @@ public class Ant extends ElementActor
         return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
     }
 
-    public ElementActor searchPheromone(PheromoneType type)
+    public ElementActor searchPheromone(PheromoneType _type)
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
-        Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, type);
+        Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, _type);
 
 
         if (res != null && (res.getStepFrom() < lastStepFrom || countLastPhero == 200))
@@ -198,9 +198,9 @@ public class Ant extends ElementActor
         }
     }
 
-    public void changeGoal(ElementActor newGoal)
+    public void changeGoal(ElementActor _newGoal)
     {
-        goal = newGoal;
+        goal = _newGoal;
         goalIsPassed = false;
     }
 
@@ -238,13 +238,13 @@ public class Ant extends ElementActor
         }
     }
     
-    public void releasePheromone(PheromoneType type) {
+    public void releasePheromone(PheromoneType _type) {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isElement(getX(), getY(), ElementActorType.OBSTACLE) == null)
         {
             if (pheromoneCountdown < 0)
             {
-                ecosystem.addPheromone(getX(), getY(), type, this, stepFrom);
+                ecosystem.addPheromone(getX(), getY(), _type, this, stepFrom);
                 pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
             }
         }
