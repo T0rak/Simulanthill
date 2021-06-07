@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -55,8 +56,18 @@ public class Ecosystem extends Stage
         addActor(_ant);
     }
 
+    public void reset()
+    {
+        
+        removeAllActor();
+
+        worldMap.reset();
+        addElementActorGridToStage();
+    }
+
     public void loadMap()
     {
+        removeAllActor();
         worldMap = new WorldMap(getViewport().getWorldWidth(), getViewport().getWorldHeight());
         addElementActorGridToStage();
     }
@@ -86,6 +97,21 @@ public class Ecosystem extends Stage
                     }
                 }
             }
+		}
+    }
+
+    private void removeAllActor()
+    {
+
+        for (Ant ant : ants) {
+            ant.remove();
+        }
+
+        ants.clear();
+
+        for (Actor actor: getActors()) 
+        {
+            actor.remove();
 		}
     }
 
@@ -126,7 +152,8 @@ public class Ecosystem extends Stage
             for (int j = -1; j <= 1; j++)
             {
                 ElementActor v = checkRadialLine(xCase, yCase, _radius, i, j, _type);
-                if (v != null) {
+                if (v != null) 
+                {
                     float d = (float)(Math.pow(_x - v.getX(), 2) + Math.pow(_y - v.getY(), 2));
                     if (res == null || (res != null && d < distance))
                     {
@@ -295,24 +322,28 @@ public class Ecosystem extends Stage
         return res;
     }
 
-    public int takeResource(float _x, float _y, int _quantity) {
+    public int takeResource(float _x, float _y, int _quantity) 
+    {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
         return ((Resource)worldMap.getElementActorGrid()[yCase][xCase][1]).decrease(_quantity);
     }
 
-    public void removeResource(float _x, float _y) {
+    public void removeResource(float _x, float _y) 
+    {
         worldMap.getElementActorGrid()[castInCase(_y)][castInCase(_x)][1] = null;
 
     }
 
-    public void addPheromone(float _x, float _y, PheromoneType _type, Ant _ant, int _stepFrom) {
+    public void addPheromone(float _x, float _y, PheromoneType _type, Ant _ant, int _stepFrom) 
+    {
       
         int i = toActorType(_type).getValue();
         int caseX = castInCase(_x);
         int caseY = castInCase(_y);
         Pheromone currentPheromoneCase = (Pheromone)worldMap.getElementActorGrid()[caseY][caseX][i];
-        if (currentPheromoneCase != null) {
+        if (currentPheromoneCase != null) 
+        {
             if (currentPheromoneCase.getStepFrom() > _stepFrom)
             {
                 currentPheromoneCase.remove();
@@ -326,21 +357,16 @@ public class Ecosystem extends Stage
             }
             
         }
-        else{
+        else
+        {
             Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
             worldMap.getElementActorGrid()[caseY][caseX][i] = p;
             addActor(p);
         }
-        /*if (currentPheromoneCase == null) {
-            Pheromone p = new Pheromone(x, y, type, ant);
-            elementActorGrid[caseY][caseX][i] = p;
-            addActor(p);
-        } else {
-            currentPheromoneCase.reinforce();
-        }*/
     }
 
-    public void removePheromone(float _x, float _y, PheromoneType _type) {
+    public void removePheromone(float _x, float _y, PheromoneType _type) 
+    {
         worldMap.getElementActorGrid()[castInCase(_y)][castInCase(_x)][toActorType(_type).getValue()] = null;
 
     }
@@ -352,15 +378,18 @@ public class Ecosystem extends Stage
 
     private ElementActorType toActorType(PheromoneType _type)
     {
-        if (_type == PheromoneType.HOME) {
+        if (_type == PheromoneType.HOME) 
+        {
             return ElementActorType.HOME_PHEROMONE;
         }
 
-        if (_type == PheromoneType.RESSOURCE) {
+        if (_type == PheromoneType.RESSOURCE) 
+        {
             return ElementActorType.FOOD_PHEROMONE;
         }
 
-        if (_type == PheromoneType.DANGER) {
+        if (_type == PheromoneType.DANGER) 
+        {
             return ElementActorType.DANGER_PHEROMONE;
         }
 

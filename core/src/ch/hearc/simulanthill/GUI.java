@@ -2,6 +2,7 @@ package ch.hearc.simulanthill;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.kotcrab.vis.ui.widget.VisImageButton;
@@ -9,11 +10,21 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSlider;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.file.FileChooser;
+import com.kotcrab.vis.ui.widget.file.SingleFileChooserListener;
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import java.awt.*;
+import java.io.File;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GUI extends Stage
 {
@@ -57,7 +68,8 @@ public class GUI extends Stage
 	public Actor simulation;
 
     
-	public GUI (Viewport _vp) {
+	public GUI (Viewport _vp) 
+	{
 		super(_vp);
 		
 		
@@ -103,6 +115,8 @@ public class GUI extends Stage
 		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(5, 0, 5));
 		spinAntIndependence =	new Spinner("Indépendance", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
 		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
+		
+
 		
 
 		//Fill main layout
@@ -167,11 +181,59 @@ public class GUI extends Stage
 		lytMain.setFillParent(true);
 
 		addActor(lytMain);
-		//sim.setFillParent(true);
-		//stage.addActor(sim);
 
 		lytMain.setDebug(true); // This is optional, but enables debug lines for tables.
 
+
+		// control
+		btnLoadMap.addListener(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) 
+				{
+					new Thread(new Runnable() {             
+						@Override
+						public void run() {
+							JFileChooser chooser = new JFileChooser();
+							chooser.setCurrentDirectory(new File("..\\..\\maps\\testmap1.txt"));
+        					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+							chooser.addChoosableFileFilter(new FileNameExtensionFilter("TXT file", "txt"));
+							chooser.setAcceptAllFileFilterUsed(true);
+							JFrame f = new JFrame();
+							f.setVisible(true);
+							f.toFront();
+							f.setVisible(false);
+							int res = chooser.showOpenDialog(f);
+							f.dispose();
+
+							Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+							if (ecosystem != null)
+							{
+								ecosystem.loadMap(chooser.getSelectedFile().getAbsolutePath());
+							}
+							
+						}
+					}).start();
+					}
+			}
+		);
+
+		btnReset.addListener(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) 
+				{
+					Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+					if (ecosystem != null)
+					{
+						ecosystem.reset();
+					}
+
+				}
+			}
+		);
 
 		/*Skin skin = new Skin();
 

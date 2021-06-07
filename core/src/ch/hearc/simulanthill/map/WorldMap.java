@@ -89,7 +89,7 @@ public class WorldMap
 	{
 		width = 0;
 		height = 0;
-
+		filename = "";
 		worldWidth = _worldWidth;
 		worldHeight = _worldHeight;
 
@@ -308,7 +308,7 @@ public class WorldMap
 		height =(int) worldHeight/10;
 		size = Math.min(worldWidth/width, worldHeight/height);
 
-		System.out.println("SIZE : "+size);
+		//System.out.println("SIZE : "+size);
 
 		Random r = new Random();
 
@@ -383,7 +383,8 @@ public class WorldMap
 		//Last thing to do is to place the anthill in a spot where's nothing
 		int xCoord = 0 ;
 		int yCoord = 0 ;
-		do {
+		do 
+		{
 			yCoord = r.nextInt(width-1) + 1;
 			xCoord = r.nextInt(height-1) + 1; 
 
@@ -391,6 +392,12 @@ public class WorldMap
 
 		elementActorCharGrid[xCoord][yCoord][0] = 'O';
 
+		loadCharGrid();
+
+	}
+
+	public void loadCharGrid() 
+	{
 		elementActorGrid = new ElementActor[height][width][6];
 		for (int i = 0; i < height; i++)
 		{
@@ -410,21 +417,31 @@ public class WorldMap
 						elementActorGrid[i][j][1] = new Resource(j*size, i*size, size, size);
 						break;
 				}
-
 			}
-			//System.out.println();
 		}
-
-		//Ecosystem.getCurrentEcosystem().setElementActorGrid(ELEMENT_ACTOR_3D);
-		//Ecosystem.getCurrentEcosystem().setCaseSize(SIZE);
-
 	}
 
-	public ElementActor[][][] getElementActorGrid() {
+	public void reset() 
+	{
+		elementActorGrid = null;
+		if (filename.isBlank()) 
+		{
+			loadCharGrid();
+		}
+		else
+		{
+			validate();
+			convert();
+		}
+	}
+
+	public ElementActor[][][] getElementActorGrid() 
+	{
 		return elementActorGrid;
 	}
 
-	public float getCaseSize() {
+	public float getCaseSize()
+	{
 		return size;
 	}
 }

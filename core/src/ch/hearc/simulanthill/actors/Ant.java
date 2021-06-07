@@ -54,7 +54,8 @@ public class Ant extends ElementActor
             tryCollectFood();
             
         }
-        else{
+        else
+        {
             
             tryDepositFood();
             
@@ -76,7 +77,8 @@ public class Ant extends ElementActor
         {
             releasePheromone(PheromoneType.RESSOURCE);
             newGoal = searchAnthill();
-            if (newGoal == null) {
+            if (newGoal == null) 
+            {
                 //newGoal = this.anthill;
                 newGoal = searchPheromone(PheromoneType.HOME);
             }
@@ -93,7 +95,8 @@ public class Ant extends ElementActor
         {
             explore();
         }
-        else{
+        else
+        {
             followGoal();
         }
         move();
@@ -105,7 +108,8 @@ public class Ant extends ElementActor
     public void tryCollectFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isElement(getX(), getY(), ElementActorType.RESSOURCE) != null) {
+        if (ecosystem.isElement(getX(), getY(), ElementActorType.RESSOURCE) != null) 
+        {
             capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
             if (capacity >= MAX_CAPACITY)
             {
@@ -120,7 +124,8 @@ public class Ant extends ElementActor
     public void tryDepositFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) {
+        if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) 
+        {
             capacity = 0;
             stepFrom = 0;
             goal = null;
@@ -231,14 +236,16 @@ public class Ant extends ElementActor
             blocked = true;
 
         }
-        else {
+        else
+        {
             blocked = false;
             setPosition(nextPosX, nextPosY);
 
         }
     }
     
-    public void releasePheromone(PheromoneType _type) {
+    public void releasePheromone(PheromoneType _type) 
+    {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isElement(getX(), getY(), ElementActorType.OBSTACLE) == null)
         {

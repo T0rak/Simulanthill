@@ -12,16 +12,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
+import java.awt.*;
 
-public class SimulathillScreen implements Screen {
- 
+public class SimulathillScreen implements Screen 
+{
 	private final Game game;
 	private Ecosystem ecosystem;
 	private Viewport ecosystemViewport;
 	private Viewport GUIViewport;
 	GUI gui;
    
-	public SimulathillScreen(Game _game) {
+	public SimulathillScreen(Game _game) 
+	{
 		this.game = _game;
 		//manager = new AssetManager();
 	}
@@ -50,6 +52,7 @@ public class SimulathillScreen implements Screen {
 		Gdx.input.setInputProcessor(multiPlexer);
 	}
    
+
 	@Override
 	public void render(float _delta)
 	{
@@ -88,7 +91,8 @@ public class SimulathillScreen implements Screen {
 	}
    
 	@Override
-	public void pause() {
+	public void pause() 
+	{
    
 	}
    

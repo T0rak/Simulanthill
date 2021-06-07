@@ -2,7 +2,8 @@ package ch.hearc.simulanthill.actors;
 
 import ch.hearc.simulanthill.Ecosystem;
 
-public class Pheromone extends ElementActor {
+public class Pheromone extends ElementActor 
+{
     
     private static int INIT_LIFE_TIME = 200;
 	private int lifeTime;
@@ -29,12 +30,14 @@ public class Pheromone extends ElementActor {
 	public void decreaseLifeTime()
 	{
 		this.lifeTime--;
-		if (lifeTime <= 0) {
+		if (lifeTime <= 0) 
+		{
 			remove();
 		}
 	}
 
-	public PheromoneType getType() {
+	public PheromoneType getType() 
+	{
 		return pheromoneType;
 	}
 
@@ -48,25 +51,30 @@ public class Pheromone extends ElementActor {
 	{
 		lifeTime = INIT_LIFE_TIME;
 	}
-	public int getStepFrom() {
+	public int getStepFrom() 
+	{
 		return stepFrom;
 	}
 
-	public void act(float _delta) {
+	public void act(float _delta) 
+	{
 		super.act(_delta);
 		decreaseLifeTime();
 	}
 	
-	public Ant getAnt() {
+	public Ant getAnt() 
+	{
 		return ant;
 	}
 	
-	public int getLifeTime() {
+	public int getLifeTime() 
+	{
 		return lifeTime;
 	}
 
 	@Override
-	public boolean remove() {
+	public boolean remove() 
+	{
 		Ecosystem.getCurrentEcosystem().removePheromone(getX(), getY(), pheromoneType);
 		return super.remove();
 	}

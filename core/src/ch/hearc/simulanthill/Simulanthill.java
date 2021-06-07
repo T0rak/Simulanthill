@@ -7,7 +7,8 @@ public class Simulanthill extends Game
 {
 
     @Override
-    public void create() {
+    public void create() 
+    {
         Screen screen = new SimulathillScreen(this);
         setScreen(screen);
         

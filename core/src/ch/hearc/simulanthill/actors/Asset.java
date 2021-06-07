@@ -4,7 +4,8 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
-public class Asset {
+public class Asset 
+{
     static public AssetManager manager = new AssetManager();
     static private AssetDescriptor<Texture> ant = new AssetDescriptor<Texture>("ant.png", Texture.class);
     static private AssetDescriptor<Texture> anthill = new AssetDescriptor<Texture>("anthill.png", Texture.class);
@@ -13,7 +14,8 @@ public class Asset {
     static private AssetDescriptor<Texture> homePheromone = new AssetDescriptor<Texture>("homePheromone.png", Texture.class);
     static private AssetDescriptor<Texture> foodPheromone = new AssetDescriptor<Texture>("foodPheromone.png", Texture.class);
     static private AssetDescriptor<Texture> marker = new AssetDescriptor<Texture>("marker.png", Texture.class);
-    static public void loadAssets() {
+    static public void loadAssets() 
+    {
 		manager.load(Asset.ant);
         manager.load(Asset.anthill);
         manager.load(Asset.obstacle);
@@ -57,5 +59,4 @@ public class Asset {
     {
         return manager.get(marker);
     }
-
 }

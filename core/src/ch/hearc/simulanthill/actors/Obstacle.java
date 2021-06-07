@@ -1,6 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
-public class Obstacle extends ElementActor {
+public class Obstacle extends ElementActor
+{
 
 	public Obstacle(float _posX, float _posY, float _width, float _height)
 	{
@@ -11,11 +12,13 @@ public class Obstacle extends ElementActor {
         this.sprite.setOrigin(_width / 2, _height / 2);
     }
 
-    public Obstacle(float _x, float _y) {
+    public Obstacle(float _x, float _y) 
+    {
         this(_x, _y, 30, 30);
     }
 
-    public Obstacle() {
+    public Obstacle() 
+    {
         this(0, 0);
     }
 }
