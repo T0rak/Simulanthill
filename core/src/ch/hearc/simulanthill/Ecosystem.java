@@ -13,33 +13,25 @@ import ch.hearc.simulanthill.actors.ElementActorType;
 import ch.hearc.simulanthill.actors.Pheromone;
 import ch.hearc.simulanthill.actors.PheromoneType;
 import ch.hearc.simulanthill.actors.Resource;
-import ch.hearc.simulanthill.map.MapConvertor;
+import ch.hearc.simulanthill.map.WorldMap;
 
 public class Ecosystem extends Stage
 {
     private static Ecosystem instance = null;
-    private ElementActor[][][] elementActorGrid;
-    private float caseSize;
-    private MapConvertor mapC;
+    //private ElementActor[][][] elementActorGrid;
+    //private float caseSize;
+    private WorldMap worldMap;
     private List<Ant> ants;
 
     private Ecosystem(Viewport _viewport)
     {
         super(_viewport);
         ants = new ArrayList<>();
-		
-
-        //loadMap(filepath, 1600, 900);
-
     }
 
     private Ecosystem()
     {
         super();
-        
-
-        //loadMap(filepath, 1600, 900);
-
     }
 
     public static Ecosystem getInstance(Viewport _viewport)
@@ -59,36 +51,25 @@ public class Ecosystem extends Stage
 
     public void addAnt(Ant _ant)
     {
-        /*int nbAnts = 5000;
-		Ant tab[] = new Ant[nbAnts];
-		
-		for (int i = 0; i < nbAnts; i++) {
-			tab[i] = new Ant(MathUtils.random((float)Gdx.graphics.getWidth()), MathUtils.random((float)Gdx.graphics.getHeight()), 12, 12);
-		}
-
-		for (int i = 0; i < nbAnts; i++) {
-			addActor(tab[i]);
-		}*/
         ants.add(_ant);
         addActor(_ant);
-
     }
 
-    public void loadMap(String _filepath, float _width, float _height)
+    public void loadMap()
     {
-        System.out.println("TEST");
+        worldMap = new WorldMap(getViewport().getWorldWidth(), getViewport().getWorldHeight());
+        addElementActorGridToStage();
+    }
 
-        //MapConvertor map = new MapConvertor(filepath, width, height);
-        //MapConvertor.generate(filepath, width, height);
-        mapC = new MapConvertor(_filepath, _width, _height);
-        //MapConvertor.generate_random(_width, _height, 40);
-        //map.convert(1);
-        //float size = width / map.getWidth();
-        //Gdx.app.log("Y TEST", String.valueOf(map.getWidth()));
-        //map.convert(size);
-        setElementActorGrid(MapConvertor.getElementActorGrid());
-        setCaseSize(mapC.getCaseSize());
-		for (ElementActor[][] elementA: elementActorGrid) 
+    public void loadMap(String _filepath)
+    {
+        worldMap = new WorldMap(_filepath, getViewport().getWorldWidth(), getViewport().getWorldHeight());
+        addElementActorGridToStage();
+    }
+
+    private void addElementActorGridToStage()
+    {
+        for (ElementActor[][] elementA: worldMap.getElementActorGrid()) 
         {
             for (ElementActor[] elementB: elementA) 
             {
@@ -106,34 +87,27 @@ public class Ecosystem extends Stage
                 }
             }
 		}
-        
     }
 
-    public void setElementActorGrid(ElementActor[][][] _elementActorGrid)
-    {
-        this.elementActorGrid = _elementActorGrid;
-    }
+    
 
-    public void setCaseSize(float _caseSize)
-    {
-        this.caseSize = _caseSize;
-    }
+    
 
-    public float getCaseSize()
+    /*public float getCaseSize()
     {
-        return this.caseSize;
-    }
+        return this.mapC.getCaseSize();
+    }*/
 
     public ElementActor isElement(float _x, float _y, ElementActorType _type)
     {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
-        return elementActorGrid[yCase][xCase][_type.getValue()];
+        return worldMap.getElementActorGrid()[yCase][xCase][_type.getValue()];
     }
 
     private ElementActor isElement(int _x, int _y, ElementActorType _type)
     {
-        return elementActorGrid[_y][_x][_type.getValue()];
+        return worldMap.getElementActorGrid()[_y][_x][_type.getValue()];
     }
 
     public Boolean isOnElement(float _x, float _y, ElementActor _actor)
@@ -324,11 +298,11 @@ public class Ecosystem extends Stage
     public int takeResource(float _x, float _y, int _quantity) {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
-        return ((Resource)elementActorGrid[yCase][xCase][1]).decrease(_quantity);
+        return ((Resource)worldMap.getElementActorGrid()[yCase][xCase][1]).decrease(_quantity);
     }
 
     public void removeResource(float _x, float _y) {
-        elementActorGrid[castInCase(_y)][castInCase(_x)][1] = null;
+        worldMap.getElementActorGrid()[castInCase(_y)][castInCase(_x)][1] = null;
 
     }
 
@@ -337,13 +311,13 @@ public class Ecosystem extends Stage
         int i = toActorType(_type).getValue();
         int caseX = castInCase(_x);
         int caseY = castInCase(_y);
-        Pheromone currentPheromoneCase = (Pheromone)elementActorGrid[caseY][caseX][i];
+        Pheromone currentPheromoneCase = (Pheromone)worldMap.getElementActorGrid()[caseY][caseX][i];
         if (currentPheromoneCase != null) {
             if (currentPheromoneCase.getStepFrom() > _stepFrom)
             {
                 currentPheromoneCase.remove();
                 Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-                elementActorGrid[caseY][caseX][i] = p;
+                worldMap.getElementActorGrid()[caseY][caseX][i] = p;
                 addActor(p);
             }
             else
@@ -354,7 +328,7 @@ public class Ecosystem extends Stage
         }
         else{
             Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-            elementActorGrid[caseY][caseX][i] = p;
+            worldMap.getElementActorGrid()[caseY][caseX][i] = p;
             addActor(p);
         }
         /*if (currentPheromoneCase == null) {
@@ -367,13 +341,13 @@ public class Ecosystem extends Stage
     }
 
     public void removePheromone(float _x, float _y, PheromoneType _type) {
-        elementActorGrid[castInCase(_y)][castInCase(_x)][toActorType(_type).getValue()] = null;
+        worldMap.getElementActorGrid()[castInCase(_y)][castInCase(_x)][toActorType(_type).getValue()] = null;
 
     }
 
     public int castInCase(float _f)
     {
-        return MathUtils.round(_f / getCaseSize());
+        return MathUtils.round(_f / worldMap.getCaseSize());
     }
 
     private ElementActorType toActorType(PheromoneType _type)

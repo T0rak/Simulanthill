@@ -17,20 +17,20 @@ import ch.hearc.simulanthill.actors.Resource;
 /**
  * 
  */
-public class MapConvertor 
+public class WorldMap 
 {
 	public int width;
 	public int height;
-	private float parent_width;
-	private float parent_height;
+	private float worldWidth;
+	private float worldHeight;
 	public float size;
 	public String filename;
 
-	private static int WIDTH;
-	private static int HEIGHT;
-	private static float SIZE;
+	private ElementActor[][][] elementActorGrid;
+	private Character[][][] elementActorCharGrid;
 	
-	private static final Character[] ACCEPTED_CHAR_LIST = {
+	private static final Character[] ACCEPTED_CHAR_LIST = 
+	{
 		Character.toUpperCase(' '),
 		Character.toUpperCase('#'),
 		Character.toUpperCase('R'),
@@ -38,7 +38,9 @@ public class MapConvertor
 		Character.toUpperCase('O'),
 		Character.toUpperCase('\n')
 	};
-	private static final String[] MAP_RESOURCES_STRUCTURES = {
+
+	private static final String[] MAP_RESOURCES_STRUCTURES = 
+	{
 		"R\n  RR\n   R\nRRR\n  RR\nRR\nRR\nRR\nRRRRR\n  RRR\n  RRR\n  RR\n",
 		"  RRR\nRRRRRR\n  RRRRRRRR\n  RRRRR\n  RRR\n  R\n",
 		"RRRRR RRRRRR RRRRR           RRRRRRRR\n    RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\n                      RRRR\n",
@@ -51,7 +53,8 @@ public class MapConvertor
 		"   RRRR\nRRRRR\n  RRRRRR\n    RRRR\n    RR  RRRR\n",
 	};
 
-	private static final String[] MAP_OBSTACLES_STRUCTURES = {
+	private static final String[] MAP_OBSTACLES_STRUCTURES = 
+	{
 		"#####################\n",
 		"#\n#\n#\n#\n#\n#\n#\n",
 		"#### ###### #####           ########\n    ##############################\n                      ####\n",
@@ -59,23 +62,38 @@ public class MapConvertor
 		"  ###\n######\n  ########\n  #####\n  ###\n  #\n"
 	};
 
-	/////////////////////////////////////////////////////
-	private static ElementActor[][][] ELEMENT_ACTOR_3D;
 	
-	private static Character[][][] ELEMENT_ACTOR_3D_char_temp;
-	/////////////////////////////////////////////////////
 
-	public MapConvertor(String _filename, float _width, float _height) {
+	public WorldMap(String _filename, float _worldWidth, float _worldHeight) 
+	{
 		width = 0;
 		height = 0;
+
 		filename = _filename;
+
+		worldWidth = _worldWidth;
+		worldHeight = _worldHeight;
+		
 		if (validate())
 		{
 			convert();
-		} else {
+		} 
+		else 
+		{
 			System.out.println("ERROR : unable to convert map : map is not valid");
 		}
 
+	}
+
+	public WorldMap(float _worldWidth, float _worldHeight)
+	{
+		width = 0;
+		height = 0;
+
+		worldWidth = _worldWidth;
+		worldHeight = _worldHeight;
+
+		random(40);
 	}
 
 /*
@@ -93,19 +111,19 @@ public class MapConvertor
 
 	}
 */
-	public static void generate_random(float _parentWidth, float _parentHeight, int _nbElements)
+	/*public void generate_random(float _parentWidth, float _parentHeight, int _nbElements)
 	{
 		random((int)_parentWidth, (int)_parentHeight, _nbElements);
+	}*/
+
+	public int getWidth()
+	{
+		return width;
 	}
 
-	public static int getWidth()
+	public int getHeight()
 	{
-		return WIDTH;
-	}
-
-	public static int getHeight()
-	{
-		return HEIGHT;
+		return height;
 	}
 
 	 /**
@@ -224,9 +242,9 @@ public class MapConvertor
 				--> size = 6
 			*/
 
-			size = Math.min(Ecosystem.getCurrentEcosystem().getWidth() / width, Ecosystem.getCurrentEcosystem().getHeight() / height);
+			size = Math.min(worldWidth / width, worldHeight / height);
 
-			ELEMENT_ACTOR_3D = new ElementActor[height][width][6];
+			elementActorGrid = new ElementActor[height][width][6];
 
 			Character character = ' ';
 
@@ -241,15 +259,15 @@ public class MapConvertor
 					switch(character) 
 					{
 						case 'R':
-							ELEMENT_ACTOR_3D[line][column][1] = new Resource(column*size, line*size, size, size);
+							elementActorGrid[line][column][1] = new Resource(column*size, line*size, size, size);
 							break;
 
 						case '#':
-							ELEMENT_ACTOR_3D[line][column][0] = new Obstacle(column*size, line*size, size, size);
+							elementActorGrid[line][column][0] = new Obstacle(column*size, line*size, size, size);
 							break;
 
 						case 'O':
-							ELEMENT_ACTOR_3D[line][column][2] = new Anthill(column*size, line*size, size, size);
+							elementActorGrid[line][column][2] = new Anthill(column*size, line*size, size, size);
 							break;
 					
 						default:
@@ -283,34 +301,34 @@ public class MapConvertor
 	/**
 	 * Generates a valid random map 
 	 */
-	public static void random(int _width, int _height, int _nbElements) 
+	public void random(int _nbElements) 
 	{
 
-		WIDTH = _width/10;		
-		HEIGHT = _height/10;
-		SIZE = Math.min(Ecosystem.getCurrentEcosystem().getWidth()/WIDTH, Ecosystem.getCurrentEcosystem().getHeight()/HEIGHT);
+		width = (int) worldWidth/10;		
+		height =(int) worldHeight/10;
+		size = Math.min(worldWidth/width, worldHeight/height);
 
-		System.out.println("SIZE : "+SIZE);
+		System.out.println("SIZE : "+size);
 
 		Random r = new Random();
 
-		ELEMENT_ACTOR_3D_char_temp = new Character[HEIGHT][WIDTH][1];
+		elementActorCharGrid = new Character[height][width][1];
 
 		//The map must be rounded by obstacles.
-		for(int i = 0 ; i < HEIGHT ; i++ )
+		for(int i = 0 ; i < height ; i++ )
 		{
-			for(int j = 0 ; j < WIDTH ; j++ )
+			for(int j = 0 ; j < width ; j++ )
 			{
 				if(i == 0 
-				|| i == HEIGHT - 1
+				|| i == height - 1
 				|| j == 0
-				|| j == WIDTH - 1)  //this means that it's the first line or the last one or an edge
+				|| j == width - 1)  //this means that it's the first line or the last one or an edge
 				{
-					ELEMENT_ACTOR_3D_char_temp[i][j][0] = '#';
+					elementActorCharGrid[i][j][0] = '#';
 				}
 				else
 				{
-					ELEMENT_ACTOR_3D_char_temp[i][j][0] = ' ';
+					elementActorCharGrid[i][j][0] = ' ';
 				}
 			}
 
@@ -319,8 +337,8 @@ public class MapConvertor
 		//Lets popout max spots where to add the patterns:
 		for (int i = 0 ; i < _nbElements ; i++)
 		{
-			int xCoord = r.nextInt(WIDTH-1) + 1;
-			int yCoord = r.nextInt(HEIGHT-1) + 1; 
+			int xCoord = r.nextInt(width-1) + 1;
+			int yCoord = r.nextInt(height-1) + 1; 
 
 			//We have now the x and y coords where to start the pattern
 
@@ -353,9 +371,9 @@ public class MapConvertor
 				}
 				else
 				{
-					if ( (xCoord + w ) < WIDTH - 1 && (yCoord + h ) < HEIGHT - 1 )
+					if ( (xCoord + w ) < width - 1 && (yCoord + h ) < height - 1 )
 					{
-						ELEMENT_ACTOR_3D_char_temp[yCoord + h][xCoord + w][0] = character;
+						elementActorCharGrid[yCoord + h][xCoord + w][0] = character;
 					}
 					w++;
 				}
@@ -366,30 +384,30 @@ public class MapConvertor
 		int xCoord = 0 ;
 		int yCoord = 0 ;
 		do {
-			yCoord = r.nextInt(WIDTH-1) + 1;
-			xCoord = r.nextInt(HEIGHT-1) + 1; 
+			yCoord = r.nextInt(width-1) + 1;
+			xCoord = r.nextInt(height-1) + 1; 
 
-		} while (ELEMENT_ACTOR_3D_char_temp[xCoord][yCoord][0] != ' ');
+		} while (elementActorCharGrid[xCoord][yCoord][0] != ' ');
 
-		ELEMENT_ACTOR_3D_char_temp[xCoord][yCoord][0] = 'O';
+		elementActorCharGrid[xCoord][yCoord][0] = 'O';
 
-		ELEMENT_ACTOR_3D = new ElementActor[HEIGHT][WIDTH][6];
-		for (int i = 0; i < HEIGHT; i++)
+		elementActorGrid = new ElementActor[height][width][6];
+		for (int i = 0; i < height; i++)
 		{
-			for (int j = 0; j < WIDTH; j++)
+			for (int j = 0; j < width; j++)
 			{
 				//System.out.print(ELEMENT_ACTOR_3D_char_temp[i][j][0]);
 
-				switch(ELEMENT_ACTOR_3D_char_temp[i][j][0])
+				switch(elementActorCharGrid[i][j][0])
 				{
 					case '#' : 
-						ELEMENT_ACTOR_3D[i][j][0] = new Obstacle(j*SIZE, i*SIZE, SIZE, SIZE);
+						elementActorGrid[i][j][0] = new Obstacle(j*size, i*size, size, size);
 						break;
 					case 'O' :
-						ELEMENT_ACTOR_3D[i][j][2] = new Anthill(j*SIZE, i*SIZE, SIZE, SIZE);
+						elementActorGrid[i][j][2] = new Anthill(j*size, i*size, size, size);
 						break;
 					case 'R':
-						ELEMENT_ACTOR_3D[i][j][1] = new Resource(j*SIZE, i*SIZE, SIZE, SIZE);
+						elementActorGrid[i][j][1] = new Resource(j*size, i*size, size, size);
 						break;
 				}
 
@@ -402,8 +420,8 @@ public class MapConvertor
 
 	}
 
-	public static ElementActor[][][] getElementActorGrid() {
-		return ELEMENT_ACTOR_3D;
+	public ElementActor[][][] getElementActorGrid() {
+		return elementActorGrid;
 	}
 
 	public float getCaseSize() {

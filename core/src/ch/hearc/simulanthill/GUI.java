@@ -15,7 +15,7 @@ import com.kotcrab.vis.ui.widget.spinner.Spinner;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class SimInterface extends Stage
+public class GUI extends Stage
 {
 
 	private VisTable lytMain;
@@ -57,7 +57,7 @@ public class SimInterface extends Stage
 	public Actor simulation;
 
     
-	public SimInterface (Viewport _vp) {
+	public GUI (Viewport _vp) {
 		super(_vp);
 		
 		
