@@ -6,6 +6,7 @@ import ch.hearc.simulanthill.Ecosystem;
 public class Ant extends ElementActor
 {
     private static int PHEROMONE_RELEASE_COUNTDOWN = 5;
+    private static int NEXT_CHECK_COUNTDOWN = 10;
     private static final int MAX_CAPACITY = 1;
     private static int FIELD_OF_VIEW = 3;
 
@@ -16,6 +17,7 @@ public class Ant extends ElementActor
 	private int capacity;
     private Anthill anthill;
     private int pheromoneCountdown;
+    private int checkCountdown;
     private int stepFrom;
     private ElementActor goal;
     private boolean goalIsPassed;
@@ -41,6 +43,7 @@ public class Ant extends ElementActor
         this.lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         blocked = false;
+        checkCountdown = NEXT_CHECK_COUNTDOWN;
     }
 
     @Override
@@ -61,34 +64,47 @@ public class Ant extends ElementActor
             
         }
 
-        ElementActor newGoal = null;
-        
         if (capacity < MAX_CAPACITY)
         {
-            releasePheromone(PheromoneType.HOME);
-            newGoal = searchFood();
             
-            if (newGoal == null)
-            {
-                newGoal = searchPheromone(PheromoneType.RESSOURCE);
-            }
+            releasePheromone(PheromoneType.HOME);
+            
         }
         else
         {
             releasePheromone(PheromoneType.RESSOURCE);
-            newGoal = searchAnthill();
-            if (newGoal == null) 
-            {
-                //newGoal = this.anthill;
-                newGoal = searchPheromone(PheromoneType.HOME);
-            }
         }
 
-        if (newGoal != null)
+        if (checkCountdown < 0)
         {
-           goal = newGoal;
+            ElementActor newGoal = null;
+            
+            if (capacity < MAX_CAPACITY)
+            {
+                
+                newGoal = searchFood();
+                
+                if (newGoal == null)
+                {
+                    newGoal = searchPheromone(PheromoneType.RESSOURCE);
+                }
+            }
+            else
+            {
+                
+                newGoal = searchAnthill();
+                if (newGoal == null) 
+                {
+                    //newGoal = this.anthill;
+                    newGoal = searchPheromone(PheromoneType.HOME);
+                }
+            }
+
+            if (newGoal != null)
+            {
+            goal = newGoal;
+            }
         }
-        
         
         
         if (goal == null)
@@ -97,13 +113,26 @@ public class Ant extends ElementActor
         }
         else
         {
-            followGoal();
+            if (checkCountdown < 0)
+            {
+                followGoal();
+                checkCountdown = NEXT_CHECK_COUNTDOWN;
+            }
+            else
+            {
+                explore();
+            }
+            
         }
         move();
         
+
+        checkCountdown --;
         pheromoneCountdown--;
         stepFrom++;
+
     }
+    
 
     public void tryCollectFood()
     {
@@ -228,7 +257,6 @@ public class Ant extends ElementActor
             direction = (float)(direction + deltaDirection) % 360f;
             sprite.rotate(deltaDirection);
         }
-        
         float directionRad = (float) Math.toRadians(this.direction);
         float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
@@ -276,5 +304,15 @@ public class Ant extends ElementActor
     public static void setReleasePheromoneTime(int releasePheromoneTime)
     {
         PHEROMONE_RELEASE_COUNTDOWN = releasePheromoneTime;
+    }
+
+    public static  void setSpeed(float _speed)
+    {
+        speed = _speed;
+    }
+
+    public static void setAutonomy(int _autonomy)
+    {
+        NEXT_CHECK_COUNTDOWN = _autonomy;
     }
 }

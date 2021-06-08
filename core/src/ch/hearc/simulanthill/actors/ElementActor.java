@@ -42,7 +42,8 @@ public class ElementActor extends Actor
     {
       super.act(_delta);
     }
-   
+
+       
     @Override
     public void draw(Batch _batch, float _parentAlpha) 
     {

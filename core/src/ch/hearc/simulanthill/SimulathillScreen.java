@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 
 import ch.hearc.simulanthill.actors.Asset;
-//import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -77,7 +76,7 @@ public class SimulathillScreen implements Screen
 		
 		if (ecosystem.getIsPlaying())
 		{
-			ecosystem.act(Gdx.graphics.getDeltaTime());
+			ecosystem.act(/*Gdx.graphics.getDeltaTime()*/);
 		}
 		ecosystem.draw();	
 	}

@@ -35,6 +35,7 @@ public class Ecosystem extends Stage
         super(_viewport);
         ants = new ArrayList<>();
         isPlaying = false;
+        nbAntMax = 500;
     }
 
     private Ecosystem()

@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.awt.*;
 import java.io.File;
+import java.math.BigDecimal;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -69,6 +70,7 @@ public class GUI extends Stage
 	private VisSlider sliSpeed;
 
 	private Spinner spinLifeTime;
+	
 	private Spinner spinRadius;
 	private Spinner spinFrequence;
 	private Spinner spinAntNumber;
@@ -77,6 +79,12 @@ public class GUI extends Stage
 
 	public Actor simulation;
 
+	private static final int DEFAULT_RADIUS 		= 3;
+	private static final int DEFAULT_LIFETIME 		= 150;
+	private static final int DEFAULT_FREQUENCE 		= 0;
+	private static final float DEFAULT_SPEED 		= 1;
+	private static final int DEFAULT_INDEPENDENCE 	= 10;
+	private static final int DEFAULT_ANT_NUMBER 	= 500;
     
 	public GUI (Viewport _vp) 
 	{
@@ -114,24 +122,21 @@ public class GUI extends Stage
 		btnReset =	new VisTextButton("Reset");
 		btnPlay =	new VisTextButton("Play");
 
-		sliSpeed = new VisSlider(0.1f, 10f, 0.1f, false);
+		sliSpeed = new VisSlider(0f, 1f, 0.1f, false);
 
 	
-		lblSpeed = 		new VisLabel("Speed");
+		lblSpeed = 		new VisLabel("Pheromone opacity");
 		lblPheromone = 	new VisLabel("Phéromones");
 		lblAnt = 		new VisLabel("Fourmis");
 
 	
-		spinRadius =			new Spinner("Rayon", new IntSpinnerModel(3, 0, 5));
-		spinFrequence =			new Spinner("Fréquence", new IntSpinnerModel(0, 0, 20));
-		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(500, 1, 10000));
-		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(0, 0, 10));
-		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(150, 0, 3000));
-		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		
-
-		
-
+		spinRadius =			new Spinner("Rayon", new IntSpinnerModel(DEFAULT_RADIUS, 0, 5));
+		spinFrequence =			new Spinner("Période entre 2", new IntSpinnerModel(DEFAULT_FREQUENCE, 0, 20));
+		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(DEFAULT_ANT_NUMBER, 1, 10000));
+		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(DEFAULT_INDEPENDENCE,0, 100));
+		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(DEFAULT_LIFETIME, 0, 3000));
+		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "2", "0.1", 1));
+	
 		//Fill main layout
 		lytMain.add(lytSimulation);
 		lytMain.add(lytParameters);
@@ -174,8 +179,8 @@ public class GUI extends Stage
 		lytAntParameters.defaults().left().width(200);
 		
 		lytAntParameters.add(lblAnt);
-		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinRadius);
+		lytAntParameters.row();
+		lytAntParameters.add(spinRadius);
 		lytAntParameters.row();
 		lytAntParameters.add(spinAntNumber);
 		lytAntParameters.row();
@@ -286,17 +291,17 @@ public class GUI extends Stage
 						{
 							btnPlay.setText("Play");
 						}
-
 					}
-
 				}
 			}
 		);
 
-		spinRadius.addListener(new ChangeListener(){
+		spinRadius.addListener(new ChangeListener()
+		{
 
 			@Override
-			public void changed(ChangeEvent event, Actor actor) {
+			public void changed(ChangeEvent event, Actor actor) 
+			{
 				Ant.setFielOfView(((IntSpinnerModel)spinRadius.getModel()).getValue());
 				
 			}
@@ -306,32 +311,93 @@ public class GUI extends Stage
 		spinFrequence.addListener(new ChangeListener(){
 
 			@Override
-			public void changed(ChangeEvent event, Actor actor) {
+			public void changed(ChangeEvent event, Actor actor) 
+			{
 				Ant.setReleasePheromoneTime(((IntSpinnerModel)spinFrequence.getModel()).getValue());
 				
 			}
 			
 		});
 
-		spinLifeTime.addListener(new ChangeListener(){
+		spinLifeTime.addListener(new ChangeListener()
+		{
 
 			@Override
-			public void changed(ChangeEvent event, Actor actor) {
+			public void changed(ChangeEvent event, Actor actor) 
+			{
 				Pheromone.setLifetimeInit(((IntSpinnerModel)spinLifeTime.getModel()).getValue());
 				
 			}
 			
 		});
 
-		spinAntNumber.addListener(new ChangeListener(){
+		spinAntNumber.addListener(new ChangeListener()
+		{
 
 			@Override
-			public void changed(ChangeEvent event, Actor actor) {
+			public void changed(ChangeEvent event, Actor actor) 
+			{
 				Ecosystem.getCurrentEcosystem().setNbAntMax(((IntSpinnerModel)spinAntNumber.getModel()).getValue());
 				
 			}
 			
 		});
+
+		spinAntSpeed.addListener(new ChangeListener()
+		{
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) 
+			{
+				Ant.setSpeed(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
+				
+			}
+			
+		});
+
+		spinAntIndependence.addListener(new ChangeListener()
+		{
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) 
+			{
+				Ant.setAutonomy(((IntSpinnerModel)spinAntIndependence.getModel()).getValue());
+				
+			}
+			
+		});
+
+		sliSpeed.addListener(new ChangeListener()
+		{
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) 
+			{
+				//System.out.println(sliSpeed.getValue());
+				Pheromone.setOpacityFactor(sliSpeed.getValue());
+			}
+			
+		});
+
+		btnResetParameters.addListener(
+			new ClickListener()
+		{
+			@Override
+				public void clicked(InputEvent event, float x, float y)
+				{
+
+					((IntSpinnerModel)(spinRadius.getModel())).setValue(DEFAULT_RADIUS);
+ 
+					((IntSpinnerModel)(spinLifeTime.getModel())).setValue(DEFAULT_LIFETIME); 
+					((IntSpinnerModel)(spinAntNumber.getModel())).setValue(DEFAULT_ANT_NUMBER);
+					((IntSpinnerModel)(spinFrequence.getModel())).setValue(DEFAULT_FREQUENCE); 	
+					((IntSpinnerModel)(spinAntIndependence.getModel())).setValue(DEFAULT_INDEPENDENCE);
+					((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(DEFAULT_SPEED));; 	
+					
+				}
+			
+		});
+
 		/*Skin skin = new Skin();
 
 		// Generate a 1x1 white texture and store it in the skin named "white".

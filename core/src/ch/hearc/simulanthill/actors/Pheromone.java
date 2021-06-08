@@ -10,6 +10,7 @@ public class Pheromone extends ElementActor
 	private PheromoneType pheromoneType;
 	private int stepFrom;
 	private Ant ant;
+	private static float opacityFactor= 0;
 
 	public Pheromone(float _posX, float _posY, PheromoneType _type, Ant _ant, int _stepFrom)
 	{
@@ -34,6 +35,8 @@ public class Pheromone extends ElementActor
 		{
 			remove();
 		}
+		//System.out.println(opacityFactor);
+		sprite.setAlpha(opacityFactor * (lifeTime/(float)INIT_LIFE_TIME));
 	}
 
 	public PheromoneType getType() 
@@ -77,6 +80,11 @@ public class Pheromone extends ElementActor
 	{
 		Ecosystem.getCurrentEcosystem().removePheromone(getX(), getY(), pheromoneType);
 		return super.remove();
+	}
+
+	public static void setOpacityFactor(float _opacityFactor)
+	{
+		opacityFactor = _opacityFactor;
 	}
 
 }
