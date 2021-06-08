@@ -1,5 +1,6 @@
 package ch.hearc.simulanthill;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -15,6 +16,13 @@ import com.kotcrab.vis.ui.widget.file.SingleFileChooserListener;
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
+import com.kotcrab.vis.ui.widget.spinner.Spinner.SpinnerStyle;
+
+import ch.hearc.simulanthill.actors.Ant;
+import ch.hearc.simulanthill.actors.Asset;
+import ch.hearc.simulanthill.actors.Pheromone;
+
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -51,6 +59,8 @@ public class GUI extends Stage
 	private VisImageButton btnObstacle;
 	private VisImageButton btnAnt;
 	private VisImageButton btnAnthill;
+	private VisImageButton btnFoodPheromone;
+	private VisImageButton btnHomePheromone;
 	 
 	private VisLabel lblSpeed;
 	private VisLabel lblAnt;
@@ -87,17 +97,18 @@ public class GUI extends Stage
 
 		//Create Vis Attribute
 
-		simulationText =	new Texture("badlogic.jpg");
-		simulationImage =	new Image(simulationText);
-		drwbInteractible = simulationImage.getDrawable();	
+		
 		
 		btnLoadMap = 		new VisTextButton("Load Map");
 		btnGenerateMap = 	new VisTextButton("Generate Map");
 		
-		btnFood =		new VisImageButton(drwbInteractible);
-		btnObstacle =	new VisImageButton(drwbInteractible);
-		btnAnt =		new VisImageButton(drwbInteractible);
-		btnAnthill =	new VisImageButton(drwbInteractible);
+		btnFood =		new VisImageButton(new Image(Asset.resourceLegend()).getDrawable());
+		btnObstacle =	new VisImageButton(new Image(Asset.obstacleLegend()).getDrawable());
+		btnAnt =		new VisImageButton(new Image(Asset.antLegend()).getDrawable());
+		btnAnthill =	new VisImageButton(new Image(Asset.anthillLegend()).getDrawable());
+		btnHomePheromone =	new VisImageButton(new Image(Asset.homePheromoneLegend()).getDrawable());
+		btnFoodPheromone =	new VisImageButton(new Image(Asset.foodPheromoneLegend()).getDrawable());
+
 		btnResetParameters = new VisTextButton("Reset Parameters");
 		
 		btnReset =	new VisTextButton("Reset");
@@ -105,15 +116,17 @@ public class GUI extends Stage
 
 		sliSpeed = new VisSlider(0.1f, 10f, 0.1f, false);
 
+	
 		lblSpeed = 		new VisLabel("Speed");
 		lblPheromone = 	new VisLabel("Phéromones");
 		lblAnt = 		new VisLabel("Fourmis");
 
-		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(5, 0, 5));
-		spinRadius =			new Spinner("Rayon", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		spinFrequence =			new Spinner("Fréquence", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
-		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(5, 0, 5));
-		spinAntIndependence =	new Spinner("Indépendance", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
+	
+		spinRadius =			new Spinner("Rayon", new IntSpinnerModel(3, 0, 5));
+		spinFrequence =			new Spinner("Fréquence", new IntSpinnerModel(0, 0, 20));
+		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(500, 1, 10000));
+		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(0, 0, 10));
+		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(150, 0, 3000));
 		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel("1", "0", "10", "0.5", 2));
 		
 
@@ -155,14 +168,14 @@ public class GUI extends Stage
 		lytPheromonesParameters.row();
 		lytPheromonesParameters.add(spinLifeTime);
 		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinRadius);
-		lytPheromonesParameters.row();
 		lytPheromonesParameters.add(spinFrequence);
 
 		//Fill ant layout
 		lytAntParameters.defaults().left().width(200);
 		
 		lytAntParameters.add(lblAnt);
+		lytPheromonesParameters.row();
+		lytPheromonesParameters.add(spinRadius);
 		lytAntParameters.row();
 		lytAntParameters.add(spinAntNumber);
 		lytAntParameters.row();
@@ -176,13 +189,15 @@ public class GUI extends Stage
 		lytInteractibles.add(btnAnt).size(100,100);
 		lytInteractibles.row();
 		lytInteractibles.add(btnAnthill).size(100,100);
+		lytInteractibles.add(btnFoodPheromone).size(100,100);
+		lytInteractibles.add(btnHomePheromone).size(100,100);
 		
 		//sim.setFillParent(true);
 		lytMain.setFillParent(true);
 
 		addActor(lytMain);
 
-		lytMain.setDebug(true); // This is optional, but enables debug lines for tables.
+		//lytMain.setDebug(true); // This is optional, but enables debug lines for tables.
 
 
 		// control
@@ -215,7 +230,23 @@ public class GUI extends Stage
 							
 						}
 					}).start();
+				}
+			}
+		);
+
+		btnGenerateMap.addListener(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) 
+				{
+					Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+					if (ecosystem != null)
+					{
+						ecosystem.loadMap();
 					}
+
+				}
 			}
 		);
 
@@ -235,6 +266,72 @@ public class GUI extends Stage
 			}
 		);
 
+
+		btnPlay.addListener(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) 
+				{
+					Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+					if (ecosystem != null)
+					{
+						ecosystem.swicthIsPlaying();
+
+						if (ecosystem.getIsPlaying())
+						{
+							btnPlay.setText("Pause");
+						}
+						else
+						{
+							btnPlay.setText("Play");
+						}
+
+					}
+
+				}
+			}
+		);
+
+		spinRadius.addListener(new ChangeListener(){
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				Ant.setFielOfView(((IntSpinnerModel)spinRadius.getModel()).getValue());
+				
+			}
+			
+		});
+
+		spinFrequence.addListener(new ChangeListener(){
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				Ant.setReleasePheromoneTime(((IntSpinnerModel)spinFrequence.getModel()).getValue());
+				
+			}
+			
+		});
+
+		spinLifeTime.addListener(new ChangeListener(){
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				Pheromone.setLifetimeInit(((IntSpinnerModel)spinLifeTime.getModel()).getValue());
+				
+			}
+			
+		});
+
+		spinAntNumber.addListener(new ChangeListener(){
+
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				Ecosystem.getCurrentEcosystem().setNbAntMax(((IntSpinnerModel)spinAntNumber.getModel()).getValue());
+				
+			}
+			
+		});
 		/*Skin skin = new Skin();
 
 		// Generate a 1x1 white texture and store it in the skin named "white".

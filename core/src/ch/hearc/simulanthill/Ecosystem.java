@@ -3,12 +3,15 @@ package ch.hearc.simulanthill;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.actors.Ant;
+import ch.hearc.simulanthill.actors.Asset;
 import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.ElementActorType;
 import ch.hearc.simulanthill.actors.Pheromone;
@@ -19,20 +22,27 @@ import ch.hearc.simulanthill.map.WorldMap;
 public class Ecosystem extends Stage
 {
     private static Ecosystem instance = null;
+    private int nbAntMax;
     //private ElementActor[][][] elementActorGrid;
     //private float caseSize;
     private WorldMap worldMap;
     private List<Ant> ants;
 
+    private boolean isPlaying;
+
     private Ecosystem(Viewport _viewport)
     {
         super(_viewport);
         ants = new ArrayList<>();
+        isPlaying = false;
     }
 
     private Ecosystem()
     {
         super();
+        ants = new ArrayList<>();
+        isPlaying = false;
+        nbAntMax = 500;
     }
 
     public static Ecosystem getInstance(Viewport _viewport)
@@ -56,6 +66,16 @@ public class Ecosystem extends Stage
         addActor(_ant);
     }
 
+    public void swicthIsPlaying()
+    {
+        isPlaying = !isPlaying;
+    }
+
+    public boolean getIsPlaying()
+    {
+        return isPlaying;
+    }
+
     public void reset()
     {
         
@@ -74,8 +94,26 @@ public class Ecosystem extends Stage
 
     public void loadMap(String _filepath)
     {
+        removeAllActor();
         worldMap = new WorldMap(_filepath, getViewport().getWorldWidth(), getViewport().getWorldHeight());
         addElementActorGridToStage();
+    }
+
+    @Override
+    public void draw() 
+    {
+        getBatch().begin();
+        if (worldMap == null)
+        {
+            getBatch().draw(Asset.backgound(), 0, 0, getViewport().getWorldWidth(), getViewport().getWorldHeight());
+            
+        }
+        else
+        {
+            getBatch().draw(Asset.backgound(), 0, 0, worldMap.getWidth() * worldMap.getCaseSize(), worldMap.getHeight() * worldMap.getCaseSize());
+        }
+        getBatch().end();
+        super.draw();
     }
 
     private void addElementActorGridToStage()
@@ -102,17 +140,8 @@ public class Ecosystem extends Stage
 
     private void removeAllActor()
     {
-
-        for (Ant ant : ants) {
-            ant.remove();
-        }
-
         ants.clear();
-
-        for (Actor actor: getActors()) 
-        {
-            actor.remove();
-		}
+        this.clear();
     }
 
     
@@ -394,6 +423,27 @@ public class Ecosystem extends Stage
         }
 
         return null;
+    }
+
+    public void setNbAntMax(int _nbAntMax)
+    {
+        nbAntMax = _nbAntMax;
+    }
+
+    public int getNbAntMax()
+    {
+        return nbAntMax;
+    }
+
+    public int getNbAnt()
+    {
+        return ants.size();
+    }
+
+    public void removeAnt(Ant ant)
+    {
+        ants.remove(ant);
+        ant.remove();
     }
 
 }

@@ -14,6 +14,13 @@ public class Asset
     static private AssetDescriptor<Texture> homePheromone = new AssetDescriptor<Texture>("homePheromone.png", Texture.class);
     static private AssetDescriptor<Texture> foodPheromone = new AssetDescriptor<Texture>("foodPheromone.png", Texture.class);
     static private AssetDescriptor<Texture> marker = new AssetDescriptor<Texture>("marker.png", Texture.class);
+    static private AssetDescriptor<Texture> antLegend = new AssetDescriptor<Texture>("antLegend.png", Texture.class);
+    static private AssetDescriptor<Texture> anthillLegend = new AssetDescriptor<Texture>("anthillLegend.png", Texture.class);
+    static private AssetDescriptor<Texture> obstacleLegend = new AssetDescriptor<Texture>("obstacleLegend.png", Texture.class);
+    static private AssetDescriptor<Texture> resourceLegend = new AssetDescriptor<Texture>("resourceLegend.png", Texture.class);
+    static private AssetDescriptor<Texture> homePheromoneLegend = new AssetDescriptor<Texture>("homePheromoneLegend.png", Texture.class);
+    static private AssetDescriptor<Texture> foodPheromoneLegend = new AssetDescriptor<Texture>("foodPheromoneLegend.png", Texture.class);
+    static private AssetDescriptor<Texture> backgound = new AssetDescriptor<Texture>("background.png", Texture.class);
     static public void loadAssets() 
     {
 		manager.load(Asset.ant);
@@ -23,6 +30,13 @@ public class Asset
         manager.load(Asset.homePheromone);
         manager.load(Asset.foodPheromone);
         manager.load(Asset.marker);
+        manager.load(Asset.backgound);
+        manager.load(Asset.antLegend);
+        manager.load(Asset.anthillLegend);
+        manager.load(Asset.obstacleLegend);
+        manager.load(Asset.resourceLegend);
+        manager.load(Asset.homePheromoneLegend);
+        manager.load(Asset.foodPheromoneLegend);
 		manager.finishLoading();
 	}
 
@@ -58,5 +72,40 @@ public class Asset
     static public Texture marker()
     {
         return manager.get(marker);
+    }
+
+    static public Texture backgound()
+    {
+        return manager.get(backgound);
+    }
+
+    static public Texture antLegend()
+    {
+        return manager.get(antLegend);
+    }
+
+    static public Texture anthillLegend()
+    {
+        return manager.get(anthillLegend);
+    }
+
+    static public Texture obstacleLegend()
+    {
+        return manager.get(obstacleLegend);
+    }
+
+    static public Texture resourceLegend()
+    {
+        return manager.get(resourceLegend);
+    }
+
+    static public Texture homePheromoneLegend()
+    {
+        return manager.get(homePheromoneLegend);
+    }
+
+    static public Texture foodPheromoneLegend()
+    {
+        return manager.get(foodPheromoneLegend);
     }
 }

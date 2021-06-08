@@ -19,10 +19,10 @@ public class Pheromone extends ElementActor
 		pheromoneType = _type;
 		stepFrom = _stepFrom;
 		setSize(4, 4);
-		sprite.setAlpha(0);
+		//sprite.setAlpha(0);
 	}
 
-	public void setLifetimeInit(int _lifeTimeInit)
+	public static void setLifetimeInit(int _lifeTimeInit)
 	{
 		INIT_LIFE_TIME = _lifeTimeInit;
 	}

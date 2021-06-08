@@ -5,9 +5,9 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Ant extends ElementActor
 {
-    private static final int PHEROMONE_RELEASE_COUNTDOWN = 5;
+    private static int PHEROMONE_RELEASE_COUNTDOWN = 5;
     private static final int MAX_CAPACITY = 1;
-    private static final int FIELD_OF_VIEW = 3;
+    private static int FIELD_OF_VIEW = 3;
 
 	private static double speed = 1;
     
@@ -130,6 +130,10 @@ public class Ant extends ElementActor
             stepFrom = 0;
             goal = null;
             lastStepFrom = Integer.MAX_VALUE;
+            if (ecosystem.getNbAnt() > ecosystem.getNbAntMax())
+            {
+                anthill.removeAnt(this);
+            }
         }
     }
 
@@ -262,5 +266,15 @@ public class Ant extends ElementActor
     public String toString()
     {
         return "Fourmi !";
+    }
+
+    public static void setFielOfView(int _fieldOfView)
+    {
+        FIELD_OF_VIEW = _fieldOfView;
+    }
+
+    public static void setReleasePheromoneTime(int releasePheromoneTime)
+    {
+        PHEROMONE_RELEASE_COUNTDOWN = releasePheromoneTime;
     }
 }

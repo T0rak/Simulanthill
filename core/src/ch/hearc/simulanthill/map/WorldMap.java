@@ -395,6 +395,7 @@ public class WorldMap
 		loadCharGrid();
 
 	}
+	
 
 	public void loadCharGrid() 
 	{

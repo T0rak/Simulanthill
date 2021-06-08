@@ -3,8 +3,6 @@ import ch.hearc.simulanthill.Ecosystem;
 
 public class Anthill extends ElementActor
 {
-    private int nbLimit = 1000;
-    private int nbAnts;
 
     public Anthill(float _x, float _y, float _width, float _height) 
     {
@@ -27,20 +25,19 @@ public class Anthill extends ElementActor
     public void act(float _delta)
     {
         super.act(_delta);
-        if (nbAnts < nbLimit)
+        if (Ecosystem.getCurrentEcosystem().getNbAnt() < Ecosystem.getCurrentEcosystem().getNbAntMax())
         {
-            int nbCreated = 1;
-            for (int i = 0; i < nbCreated; i++) 
-            {
-                createAnt();
-            }
-            
+            createAnt();
         }
     }
 
     public void createAnt()
     {
-        nbAnts++;
         Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX(), this.getY(), 12, 12, this));
+    }
+
+    public void removeAnt(Ant ant)
+    {
+        Ecosystem.getCurrentEcosystem().removeAnt(ant);
     }
 }

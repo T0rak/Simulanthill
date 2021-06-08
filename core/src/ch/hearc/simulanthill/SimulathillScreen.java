@@ -57,7 +57,7 @@ public class SimulathillScreen implements Screen
 	public void render(float _delta)
 	{
 
-		Gdx.gl.glClearColor(100, 100, 100, 1);
+		Gdx.gl.glClearColor(0.12f, 0.12f, 0.12f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		gui.getViewport().apply();
@@ -74,7 +74,11 @@ public class SimulathillScreen implements Screen
 		}
 
 		ecosystem.getViewport().apply();
-		ecosystem.act(Gdx.graphics.getDeltaTime());
+		
+		if (ecosystem.getIsPlaying())
+		{
+			ecosystem.act(Gdx.graphics.getDeltaTime());
+		}
 		ecosystem.draw();	
 	}
    
