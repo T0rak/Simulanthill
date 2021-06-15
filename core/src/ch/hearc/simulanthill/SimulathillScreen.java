@@ -2,17 +2,16 @@ package ch.hearc.simulanthill;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.kotcrab.vis.ui.VisUI;
-
-import ch.hearc.simulanthill.actors.Asset;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
-import java.awt.*;
 
+/**
+ * Class of the screen that handles the simulator. 
+ */
 public class SimulathillScreen implements Screen 
 {
 	private final Game game;
@@ -21,18 +20,23 @@ public class SimulathillScreen implements Screen
 	private Viewport GUIViewport;
 	GUI gui;
    
+    /**
+     * Constructor
+     * @param _game handler of the content of AboutScreen
+     */
 	public SimulathillScreen(Game _game) 
 	{
 		this.game = _game;
 		//manager = new AssetManager();
 	}
   
+    /**
+     * Will load the screen on the programm.
+     */
 	@Override
 	public void show()
 	{
-		VisUI.load();
-		Asset.loadAssets();
-		
+		// multiple stage
 		InputMultiplexer multiPlexer = new InputMultiplexer();
 
 		GUIViewport = new FitViewport(1600,900);
@@ -40,7 +44,6 @@ public class SimulathillScreen implements Screen
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
 
-		//ecosystem.loadMap("..\\..\\maps\\testmap1.txt");
 		ecosystem.loadMap();
 
 		gui = new GUI(GUIViewport); 
@@ -51,7 +54,10 @@ public class SimulathillScreen implements Screen
 		Gdx.input.setInputProcessor(multiPlexer);
 	}
    
-
+    /**
+     * Function that is called each time that it needs to re redraw.
+     * @param _delta interval of each redraw
+     */
 	@Override
 	public void render(float _delta)
 	{
@@ -63,6 +69,7 @@ public class SimulathillScreen implements Screen
 		gui.act(Gdx.graphics.getDeltaTime());
 		gui.draw();
 
+		// for the first render
 		if(ecosystemViewport.getScreenX() == 0)
 		{
 			Vector2 v = gui.simulation.localToStageCoordinates(new Vector2(0,0));
@@ -81,6 +88,11 @@ public class SimulathillScreen implements Screen
 		ecosystem.draw();	
 	}
    
+    /**
+     * Resizes the window.
+     * @param _width width wanted.
+     * @param height width wanted. 
+     */
 	@Override
 	public void resize(int _width, int _height)
 	{
@@ -111,6 +123,9 @@ public class SimulathillScreen implements Screen
 		dispose();
 	}
    
+    /**
+     * Release all source of the object
+     */
 	@Override
 	public void dispose()
 	{

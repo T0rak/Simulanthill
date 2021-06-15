@@ -4,6 +4,10 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
+/**
+ * Holds all assets used in Simulanthill.
+ * When a new asset has to be used, it has to be imported here.
+ */
 public class Asset 
 {
     static public AssetManager manager = new AssetManager();
@@ -13,7 +17,6 @@ public class Asset
     static private AssetDescriptor<Texture> resource = new AssetDescriptor<Texture>("resource.png", Texture.class);
     static private AssetDescriptor<Texture> homePheromone = new AssetDescriptor<Texture>("homePheromone.png", Texture.class);
     static private AssetDescriptor<Texture> foodPheromone = new AssetDescriptor<Texture>("foodPheromone.png", Texture.class);
-    static private AssetDescriptor<Texture> marker = new AssetDescriptor<Texture>("marker.png", Texture.class);
     static private AssetDescriptor<Texture> antLegend = new AssetDescriptor<Texture>("antLegend.png", Texture.class);
     static private AssetDescriptor<Texture> anthillLegend = new AssetDescriptor<Texture>("anthillLegend.png", Texture.class);
     static private AssetDescriptor<Texture> obstacleLegend = new AssetDescriptor<Texture>("obstacleLegend.png", Texture.class);
@@ -21,6 +24,12 @@ public class Asset
     static private AssetDescriptor<Texture> homePheromoneLegend = new AssetDescriptor<Texture>("homePheromoneLegend.png", Texture.class);
     static private AssetDescriptor<Texture> foodPheromoneLegend = new AssetDescriptor<Texture>("foodPheromoneLegend.png", Texture.class);
     static private AssetDescriptor<Texture> backgound = new AssetDescriptor<Texture>("background.png", Texture.class);
+    static private AssetDescriptor<Texture> icon = new AssetDescriptor<Texture>("icon.png", Texture.class);
+    static private AssetDescriptor<Texture> logo = new AssetDescriptor<Texture>("logo.png", Texture.class);
+
+    /**
+     * Loads all the needed assets.
+     */
     static public void loadAssets() 
     {
 		manager.load(Asset.ant);
@@ -29,7 +38,6 @@ public class Asset
         manager.load(Asset.resource);
         manager.load(Asset.homePheromone);
         manager.load(Asset.foodPheromone);
-        manager.load(Asset.marker);
         manager.load(Asset.backgound);
         manager.load(Asset.antLegend);
         manager.load(Asset.anthillLegend);
@@ -37,6 +45,8 @@ public class Asset
         manager.load(Asset.resourceLegend);
         manager.load(Asset.homePheromoneLegend);
         manager.load(Asset.foodPheromoneLegend);
+        manager.load(Asset.icon);
+        manager.load(Asset.logo);
 		manager.finishLoading();
 	}
 
@@ -68,10 +78,6 @@ public class Asset
     static public Texture foodPheromone()
     {
         return manager.get(foodPheromone);
-    }
-    static public Texture marker()
-    {
-        return manager.get(marker);
     }
 
     static public Texture backgound()
@@ -107,5 +113,13 @@ public class Asset
     static public Texture foodPheromoneLegend()
     {
         return manager.get(foodPheromoneLegend);
+    }
+    static public Texture icon()
+    {
+        return manager.get(icon);
+    }
+    static public Texture logo()
+    {
+        return manager.get(logo);
     }
 }

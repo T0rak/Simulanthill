@@ -3,6 +3,9 @@ import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.Ecosystem;
 
+/**
+ * The ant actor that contains it's behaviour
+ */
 public class Ant extends ElementActor
 {
     private static int PHEROMONE_RELEASE_COUNTDOWN = 5;
@@ -20,11 +23,20 @@ public class Ant extends ElementActor
     private int checkCountdown;
     private int stepFrom;
     private ElementActor goal;
-    private boolean goalIsPassed;
     private int lastStepFrom;
     private int countLastPhero;
     private boolean blocked;
 
+    
+    
+	/**
+	 * Constructor
+	 * @param  _x the initial x position of the ant 
+     * @param  _y the initial y position of the ant
+     * @param  _width the width of the ant
+     * @param  _height the height of the ant
+     * @param  _anthill the anthill to which one an ant belongs
+	 */
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
         super(_x, _y, Asset.ant(), "ant");
@@ -39,13 +51,16 @@ public class Ant extends ElementActor
         this.anthill = _anthill;
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         this.stepFrom = 0;
-        this.goalIsPassed = true;
         this.lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         blocked = false;
         checkCountdown = NEXT_CHECK_COUNTDOWN;
     }
 
+    /**
+	 * Behaviour of an ant
+	 * @param _delta  the time passed since the last act call
+	 */
     @Override
     public void act(float _delta)
     {
@@ -53,22 +68,16 @@ public class Ant extends ElementActor
 
         if (capacity < MAX_CAPACITY)
         {
-            
             tryCollectFood();
-            
         }
         else
-        {
-            
-            tryDepositFood();
-            
+        {     
+            tryDepositFood();   
         }
 
         if (capacity < MAX_CAPACITY)
-        {
-            
-            releasePheromone(PheromoneType.HOME);
-            
+        {   
+            releasePheromone(PheromoneType.HOME);   
         }
         else
         {
@@ -81,7 +90,6 @@ public class Ant extends ElementActor
             
             if (capacity < MAX_CAPACITY)
             {
-                
                 newGoal = searchFood();
                 
                 if (newGoal == null)
@@ -90,8 +98,7 @@ public class Ant extends ElementActor
                 }
             }
             else
-            {
-                
+            {       
                 newGoal = searchAnthill();
                 if (newGoal == null) 
                 {
@@ -104,8 +111,7 @@ public class Ant extends ElementActor
             {
             goal = newGoal;
             }
-        }
-        
+        }    
         
         if (goal == null)
         {
@@ -122,18 +128,17 @@ public class Ant extends ElementActor
             {
                 explore();
             }
-            
         }
         move();
-        
-
+    
         checkCountdown --;
         pheromoneCountdown--;
         stepFrom++;
-
     }
     
-
+    /**
+	 * Pick some food if there is a resource on ant's position
+	 */
     public void tryCollectFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
@@ -149,7 +154,9 @@ public class Ant extends ElementActor
             
         }
     }
-
+    /**
+	 * Drop the in the anthill if it is on ant's position
+	 */
     public void tryDepositFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
@@ -165,25 +172,37 @@ public class Ant extends ElementActor
             }
         }
     }
-
+    
+    /**
+	 * Returns the closest anthill
+     * @return the closest anthill if there is one in the field of view else returns null
+	 */
     public ElementActor searchAnthill()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.ANTHILL);
     }
 
+    /**
+	 * Returns the closest resource
+     * @return the closest resource if there is one in the field of view else returns null
+	 */
     public ElementActor searchFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
     }
 
+    /**
+	 * Returns the closest pheromone
+     * @param _type type of the pheromone
+     * @return the closest pheromone if there is one in the field of view else returns null
+	 */
     public ElementActor searchPheromone(PheromoneType _type)
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
         Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, _type);
-
 
         if (res != null && (res.getStepFrom() < lastStepFrom || countLastPhero == 200))
         {
@@ -198,8 +217,7 @@ public class Ant extends ElementActor
                 countLastPhero ++;
             }
             goal = null;
-        }
-        
+        }        
         
         if (res == null)
         {
@@ -208,10 +226,10 @@ public class Ant extends ElementActor
         }
 
         return null;
-
-       
     }
-
+    /**
+	 * Turns the ant in the direction of it's goal
+	 */
     public void followGoal()
     {
         if (goal != null && blocked == false)
@@ -225,23 +243,10 @@ public class Ant extends ElementActor
         }
     }
 
-    public void checkOnGoal()
-    {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (goal != null && goalIsPassed == false)
-        {
-            goalIsPassed = ecosystem.isOnElement(getX(),getY(), goal);
-            System.out.println("("+ecosystem.castInCase(getX())+";"+ecosystem.castInCase(goal.getX())+")");
-            System.out.println("("+ecosystem.castInCase(getY())+";"+ecosystem.castInCase(goal.getY())+")");
-        }
-    }
 
-    public void changeGoal(ElementActor _newGoal)
-    {
-        goal = _newGoal;
-        goalIsPassed = false;
-    }
-
+    /**
+	 * Makes the ant turning "randomly"  on itself
+	 */
     public void explore()
     {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
@@ -249,6 +254,9 @@ public class Ant extends ElementActor
         sprite.rotate(deltaDirection);
     }
 
+    /**
+	 * Moves the ant in the direction it is looking to
+	 */
     public void move()
     {
         if (blocked)
@@ -276,6 +284,10 @@ public class Ant extends ElementActor
         }
     }
     
+    /**
+	 * Drops a pheromone on the ant position
+     * @param _type type of the pheromone to release
+	 */
     public void releasePheromone(PheromoneType _type) 
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
@@ -290,27 +302,37 @@ public class Ant extends ElementActor
         
     }
 
-    @Override
-    public String toString()
-    {
-        return "Fourmi !";
-    }
-
+    /**
+	 * Changes the field of view of the ant
+     @param _fieldOfView new field of view
+	 */    
     public static void setFielOfView(int _fieldOfView)
     {
         FIELD_OF_VIEW = _fieldOfView;
     }
 
-    public static void setReleasePheromoneTime(int releasePheromoneTime)
+    /**
+	 * Changes the pheromone release frequency
+     * @param  _releasePheromoneTime the number of cycles before the ant releases an new pheromone
+	 */
+    public static void setReleasePheromoneTime(int _releasePheromoneTime)
     {
-        PHEROMONE_RELEASE_COUNTDOWN = releasePheromoneTime;
+        PHEROMONE_RELEASE_COUNTDOWN = _releasePheromoneTime;
     }
 
+    /**
+	 * Changes the movement speed of the ant
+     * @param _speed new speed
+	 */
     public static  void setSpeed(float _speed)
     {
         speed = _speed;
     }
 
+    /**
+	 * Changes the autonomy of the ant (how often it follows pheromones, resources)
+     * @param  _releasePheromoneTime the number of cycles before the ant checks for goals
+	 */
     public static void setAutonomy(int _autonomy)
     {
         NEXT_CHECK_COUNTDOWN = _autonomy;

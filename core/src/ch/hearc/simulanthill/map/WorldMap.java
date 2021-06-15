@@ -9,13 +9,13 @@ import java.util.Random;
 import java.util.Stack;
 
 import ch.hearc.simulanthill.actors.ElementActor;
-import ch.hearc.simulanthill.Ecosystem;
 import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Obstacle;
 import ch.hearc.simulanthill.actors.Resource;
 
 /**
- * 
+ * Class that links a .txt file map to SimulantHill.
+ * Can Handle Imported files or random generated maps.
  */
 public class WorldMap 
 {
@@ -63,7 +63,12 @@ public class WorldMap
 	};
 
 	
-
+	/**
+	 * Constructor for importer files
+	 * @param _filename the map filename to import
+	 * @param _worldWidth the width in pixel wanted of the map
+	 * @param _worldHeight the height in pixel wanted of the map
+	 */
 	public WorldMap(String _filename, float _worldWidth, float _worldHeight) 
 	{
 		width = 0;
@@ -85,6 +90,11 @@ public class WorldMap
 
 	}
 
+	/**
+	 * Constructor for random maps.
+	 * @param _worldWidth the width in pixel wanted of the map
+	 * @param _worldHeight the height in pixel wanted of the map
+	 */
 	public WorldMap(float _worldWidth, float _worldHeight)
 	{
 		width = 0;
@@ -96,31 +106,19 @@ public class WorldMap
 		random(40);
 	}
 
-/*
-	public static void generate(String _filename, float _parentWidth, float _parentHeight) 
-	{
-		WIDTH = 0;
-		HEIGHT = 0;
-
-		if(validate(_filename))
-		{
-			convert();
-		} else {
-			System.out.println("ERROR : unable to convert map : map is not valid");
-		}
-
-	}
-*/
-	/*public void generate_random(float _parentWidth, float _parentHeight, int _nbElements)
-	{
-		random((int)_parentWidth, (int)_parentHeight, _nbElements);
-	}*/
-
+	/**
+	 * Getter of the map width (number on cases)
+	 * @return the map width
+	 */
 	public int getWidth()
 	{
 		return width;
 	}
 
+	/**
+	 * Getter of the map height (number on cases)
+	 * @return the map height
+	 */
 	public int getHeight()
 	{
 		return height;
@@ -129,7 +127,7 @@ public class WorldMap
 	 /**
 	  * Checks whether a map is valid or not. 
 	  * The map is selected through a fileDialog.
-	  * @param _fileName //absolute path fileName
+	  * @return returns true if it's valid or false if not. 
 	  */
 	private boolean validate() 
 	{
@@ -169,7 +167,6 @@ public class WorldMap
 					if (!Arrays.asList(ACCEPTED_CHAR_LIST).contains(character))
 					{
 						System.out.println("\n\nInvalid character : " + character );
-						//TODO : Throw a character message error
 						br.close();
 						fr.close();
 						return false;
@@ -193,7 +190,6 @@ public class WorldMap
 			} 
 			catch(IOException e)
 			{
-				//TODO : Throw a IO error message
 				e.printStackTrace();
 				System.out.println("Unable to read the file");
 			}   
@@ -202,7 +198,6 @@ public class WorldMap
 		else
 		{
 			System.out.println("The file does NOT exists");
-			//TODO : Throw a no file message or extension error
 		}
 		return false;
 	}
@@ -292,7 +287,6 @@ public class WorldMap
 		}
 		catch(IOException e)
 		{
-			//TODO : Throw a IO error message
 			e.printStackTrace();
 			System.out.println("Unable to read the file");
 		} 		
@@ -300,6 +294,7 @@ public class WorldMap
 
 	/**
 	 * Generates a valid random map 
+	 * @param _nbElements number of random elements to pu in the map
 	 */
 	public void random(int _nbElements) 
 	{
@@ -396,7 +391,10 @@ public class WorldMap
 
 	}
 	
-
+	/**
+	 * Will create the objects found in elementActorCharGrid in the 
+	 * grid used my the Ecosystem.
+	 */
 	public void loadCharGrid() 
 	{
 		elementActorGrid = new ElementActor[height][width][6];
@@ -422,6 +420,10 @@ public class WorldMap
 		}
 	}
 
+	/**
+	 * Resests the map. It will bring the map to the same state as at the beginning.
+	 * Can be used with both random and imported maps.
+	 */
 	public void reset() 
 	{
 		elementActorGrid = null;
@@ -436,11 +438,20 @@ public class WorldMap
 		}
 	}
 
+	/**
+	 * Returns the Actor grid (getter) 
+	 * 
+	 */
 	public ElementActor[][][] getElementActorGrid() 
 	{
 		return elementActorGrid;
 	}
 
+	/**
+	 * Returns the size of a case in the ElementActorGrid.
+	 * The case is a square.
+	 * @return the size of the case.
+	 */
 	public float getCaseSize()
 	{
 		return size;

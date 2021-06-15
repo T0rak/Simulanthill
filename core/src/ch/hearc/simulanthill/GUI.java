@@ -1,7 +1,5 @@
 package ch.hearc.simulanthill;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -11,12 +9,9 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSlider;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.file.FileChooser;
-import com.kotcrab.vis.ui.widget.file.SingleFileChooserListener;
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
-import com.kotcrab.vis.ui.widget.spinner.Spinner.SpinnerStyle;
 
 import ch.hearc.simulanthill.actors.Ant;
 import ch.hearc.simulanthill.actors.Asset;
@@ -24,10 +19,8 @@ import ch.hearc.simulanthill.actors.Pheromone;
 
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.awt.*;
 import java.io.File;
 import java.math.BigDecimal;
 
@@ -35,6 +28,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * The stage that contains input
+ */
 public class GUI extends Stage
 {
 
@@ -45,10 +41,6 @@ public class GUI extends Stage
 	private VisTable lytPheromonesParameters;
 	private VisTable lytAntParameters;
 	private VisTable lytInteractibles;
-
-	private Texture simulationText;
-	private Image simulationImage;
-	private Drawable drwbInteractible;
 	
 	private VisTextButton btnReset;
 	private VisTextButton btnPlay;
@@ -86,6 +78,10 @@ public class GUI extends Stage
 	private static final int DEFAULT_INDEPENDENCE 	= 10;
 	private static final int DEFAULT_ANT_NUMBER 	= 500;
     
+	/**
+	 * Constructor
+	 * @param _vp location where the stage can be drawed
+	 */
 	public GUI (Viewport _vp) 
 	{
 		super(_vp);
@@ -105,8 +101,6 @@ public class GUI extends Stage
 
 		//Create Vis Attribute
 
-		
-		
 		btnLoadMap = 		new VisTextButton("Load Map");
 		btnGenerateMap = 	new VisTextButton("Generate Map");
 		
@@ -197,13 +191,9 @@ public class GUI extends Stage
 		lytInteractibles.add(btnFoodPheromone).size(100,100);
 		lytInteractibles.add(btnHomePheromone).size(100,100);
 		
-		//sim.setFillParent(true);
+		
 		lytMain.setFillParent(true);
-
 		addActor(lytMain);
-
-		//lytMain.setDebug(true); // This is optional, but enables debug lines for tables.
-
 
 		// control
 		btnLoadMap.addListener(
@@ -224,7 +214,7 @@ public class GUI extends Stage
 							f.setVisible(true);
 							f.toFront();
 							f.setVisible(false);
-							int res = chooser.showOpenDialog(f);
+							chooser.showOpenDialog(f);
 							f.dispose();
 
 							Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
@@ -397,26 +387,6 @@ public class GUI extends Stage
 				}
 			
 		});
-
-		/*Skin skin = new Skin();
-
-		// Generate a 1x1 white texture and store it in the skin named "white".
-		Pixmap pixmap = new Pixmap(1, 1, Format.RGBA8888);
-		pixmap.setColor(Color.WHITE);
-		pixmap.fill();
-		skin.add("white", new Texture(pixmap));
-
-		// Store the default libgdx font under the name "default".
-		skin.add("default", new BitmapFont());
-
-		// Configure a TextButtonStyle and name it "default". Skin resources are stored by type, so this doesn't overwrite the font.
-		TextButtonStyle textButtonStyle = new TextButtonStyle();
-		textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-		textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-		textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
-		textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-		textButtonStyle.font = skin.getFont("default");
-		skin.add("default", textButtonStyle);*/
 
 	}
 }
