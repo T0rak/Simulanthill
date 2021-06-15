@@ -440,7 +440,7 @@ public class WorldMap
 
 	/**
 	 * Returns the Actor grid (getter) 
-	 * 
+	 * @return the grid containing the actors
 	 */
 	public ElementActor[][][] getElementActorGrid() 
 	{

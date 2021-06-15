@@ -22,8 +22,8 @@ public class Anthill extends ElementActor
     
     /**
     * Constructor
-    * @param _posX the initial x position
-    * @param _posY the initial y position 
+    * @param _x the initial x position
+    * @param _y the initial y position 
     */
     public Anthill(float _x, float _y) 
     {
@@ -60,6 +60,7 @@ public class Anthill extends ElementActor
     
     /**
      * Removes an ant
+     * @param ant  the ant that will removed
      */
     public void removeAnt(Ant ant)
     {

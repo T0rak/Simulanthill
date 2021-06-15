@@ -91,7 +91,7 @@ public class SimulathillScreen implements Screen
     /**
      * Resizes the window.
      * @param _width width wanted.
-     * @param height width wanted. 
+     * @param _height width wanted. 
      */
 	@Override
 	public void resize(int _width, int _height)

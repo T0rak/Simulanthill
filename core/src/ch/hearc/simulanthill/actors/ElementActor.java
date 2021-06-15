@@ -28,6 +28,8 @@ public class ElementActor extends Actor
 
     /**
      * Constructor of ElementActor with coordinates to 0x 0y
+     * @param _actorName name of the actor
+     * @param _texture texture of the element
      */
     public ElementActor(Texture _texture, final String _actorName) 
     {

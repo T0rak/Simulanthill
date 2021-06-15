@@ -331,7 +331,7 @@ public class Ant extends ElementActor
 
     /**
 	 * Changes the autonomy of the ant (how often it follows pheromones, resources)
-     * @param  _releasePheromoneTime the number of cycles before the ant checks for goals
+     * @param _autonomy the number of cycles before the ant checks for goals
 	 */
     public static void setAutonomy(int _autonomy)
     {
