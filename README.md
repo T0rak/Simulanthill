@@ -11,12 +11,6 @@ Pour pouvoir utiliser SimulantHill, votre ordinateur doit être doté de :
 
 ### Lancement de l’application
 Pour lancer SimulantHill, ouvrez un terminal et utilisez la commande ‘’java -jar ‘’ suivi de l’emplacement et du nom du fichier jar « simulanthill.jar ». 
-Exemple avec Windows Power Shell: 
-
-
-
-NB : cet exemple sous-entend que le .jar se trouve dans le dossier « Soft » sur le disque « C: »
-
 
 ### Interface du simulateur
 L’interface du simulateur peut se décomposer en deux parties : une partie d’affichage du simulateur et une partie de gestion des commandes.
