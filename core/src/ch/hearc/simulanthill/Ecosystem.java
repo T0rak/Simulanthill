@@ -101,8 +101,10 @@ public class Ecosystem extends Stage
     { 
         removeAllActor();
 
-        worldMap.reset();
-        addElementActorGridToStage();
+        if(worldMap.reset())
+        {
+            addElementActorGridToStage();
+        }
     }
 
     /**

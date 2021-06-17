@@ -423,8 +423,9 @@ public class WorldMap
 	/**
 	 * Resests the map. It will bring the map to the same state as at the beginning.
 	 * Can be used with both random and imported maps.
+	 * @return if the reset has succeeded or not.
 	 */
-	public void reset() 
+	public boolean reset() 
 	{
 		elementActorGrid = null;
 		if (filename.isBlank()) 
@@ -433,9 +434,16 @@ public class WorldMap
 		}
 		else
 		{
-			validate();
-			convert();
+			if (validate())
+			{
+				convert();
+			}
+			else
+			{
+				return false;
+			}
 		}
+		return true;
 	}
 
 	/**
