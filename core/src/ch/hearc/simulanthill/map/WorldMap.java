@@ -138,7 +138,8 @@ public class WorldMap
 			int line = 0;
 			int column = 0;
 
-			//We need to check if all characters are valid : provided by https://www.candidjava.com/tutorial/program-to-read-a-file-character-by-character/ 
+			//We need to check if all characters are valid.
+			//provided by https://www.candidjava.com/tutorial/program-to-read-a-file-character-by-character/ 
 			try 
 			{
 				FileReader fr = new FileReader(f);
@@ -157,6 +158,16 @@ public class WorldMap
 						if(width == 0)
 						{
 							width = column-1;
+						}
+						else //column must have the same length
+						{
+							if (width != column -1)
+							{
+								System.out.println("\n\nInvalid map sizes : some lines are bigger than others");
+								br.close();
+								fr.close();
+								return false;
+							}
 						}
 						line++;
 						column = -1;
