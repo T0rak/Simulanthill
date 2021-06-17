@@ -44,12 +44,12 @@ Pour lancer la simulation, il suffit d’appuyer sur le bouton « Play » dans l
 
 ### Modifier les paramètres du simulateur
 Que ce soit avant ou pendant une simulation en cours, vous pouvez modifier les paramètres du simulateur avec les éléments présents dans la partie de gestion des commandes. Parmi ces éléments, il vous est possible de :
-•	Modifier la durée de vie des phéromones (temps en millisecondes entre 0 et 3000).
-•	Modifier le temps de création d’une nouvelle phéromone par les fourmis (temps en millisecondes entre 0 et 20).
-•	Déterminer la distance à laquelle une fourmi peut détecter des phéromones (en unité logique entre 0 et 5). Plus le nombre est grand, plus la fourmi pourra détecter des phéromones distantes mais aura un impact sur la fluidité du simulateur.
-•	Déterminer le nombre de fourmis (entre 1 et 10’000).
-•	Déterminer l’indépendance d’une fourmi (sur une échelle entre 0 et 100). Plus l’indépendance est grande, plus elle est à même d’ignorer les ressources et phéromones.
-•	Déterminer la vitesse de déplacement des fourmis (entre 0.0 et 2.0 avec comme valeur par défaut 1.0).
+- Modifier la durée de vie des phéromones (temps en millisecondes entre 0 et 3000).
+- Modifier le temps de création d’une nouvelle phéromone par les fourmis (temps en millisecondes entre 0 et 20).
+- Déterminer la distance à laquelle une fourmi peut détecter des phéromones (en unité logique entre 0 et 5). Plus le nombre est grand, plus la fourmi pourra détecter des phéromones distantes mais aura un impact sur la fluidité du simulateur.
+- Déterminer le nombre de fourmis (entre 1 et 10’000).
+- Déterminer l’indépendance d’une fourmi (sur une échelle entre 0 et 100). Plus l’indépendance est grande, plus elle est à même d’ignorer les ressources et phéromones.
+- Déterminer la vitesse de déplacement des fourmis (entre 0.0 et 2.0 avec comme valeur par défaut 1.0).
 Dans le cas où vous souhaiteriez revenir aux paramètres par défaut, le bouton « Reset Parameters » permet de réinitialiser les valeurs des commandes.
 Par défaut, les phéromones ne sont pas visibles sur la partie d’affichage du simulateur. Il est possible de les rendre visible en modifiant leur opacité avec le curseur de défilement « Pheromone opacity ».
 
