@@ -4,8 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
 
-import ch.hearc.simulanthill.actors.Asset;
-
 /**
  * Is the class that handle the whole simulation.
  */

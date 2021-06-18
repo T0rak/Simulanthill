@@ -81,11 +81,16 @@ public class WorldMap
 		
 		if (validate())
 		{
+			
 			convert();
 		} 
 		else 
 		{
+			filename = "../../maps/mapLoad.txt";
 			System.out.println("ERROR : unable to convert map : map is not valid");
+			validate();
+			convert();
+			
 		}
 
 	}
@@ -250,7 +255,7 @@ public class WorldMap
 
 			size = Math.min(worldWidth / width, worldHeight / height);
 
-			elementActorGrid = new ElementActor[height][width][6];
+			elementActorGrid = new ElementActor[height][width][5];
 
 			Character character = ' ';
 
@@ -451,6 +456,10 @@ public class WorldMap
 			}
 			else
 			{
+				filename = "../../maps/mapLoad.txt";
+				System.out.println("ERROR : unable to convert map : map is not valid");
+				validate();
+				convert();
 				return false;
 			}
 		}

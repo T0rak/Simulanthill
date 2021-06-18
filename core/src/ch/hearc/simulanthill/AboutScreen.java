@@ -11,8 +11,6 @@ import com.kotcrab.vis.ui.widget.VisImage;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 
-import ch.hearc.simulanthill.actors.Asset;
-
 /**
  * Gives information about the institution and students that worked on the simulator
  */

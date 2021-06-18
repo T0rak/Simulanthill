@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
+import ch.hearc.simulanthill.Asset;
+
 /**
  * The class representing the obstacles
  */

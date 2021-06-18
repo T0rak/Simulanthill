@@ -1,4 +1,5 @@
 package ch.hearc.simulanthill.actors;
+import ch.hearc.simulanthill.Asset;
 import ch.hearc.simulanthill.Ecosystem;
 /**
  * The anthill actor that makes ants spawning

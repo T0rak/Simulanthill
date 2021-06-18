@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.actors.Ant;
-import ch.hearc.simulanthill.actors.Asset;
 import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.ElementActorType;
 import ch.hearc.simulanthill.actors.Pheromone;
@@ -238,14 +237,17 @@ public class Ecosystem extends Stage
         {
             for (int j = -1; j <= 1; j++)
             {
-                ElementActor v = checkRadialLine(xCase, yCase, _radius, i, j, _type);
-                if (v != null) 
+                if (!(i==0 && j==0))
                 {
-                    float d = (float)(Math.pow(_x - v.getX(), 2) + Math.pow(_y - v.getY(), 2));
-                    if (res == null || (res != null && d < distance))
+                    ElementActor v = checkRadialLine(xCase, yCase, _radius, i, j, _type);
+                    if (v != null) 
                     {
-                        distance = d;
-                        res = v;   
+                        float d = (float)(Math.pow(_x - v.getX(), 2) + Math.pow(_y - v.getY(), 2));
+                        if (res == null || (res != null && d < distance))
+                        {
+                            distance = d;
+                            res = v;   
+                        }
                     }
                 }
             }
@@ -330,7 +332,7 @@ public class Ecosystem extends Stage
         {
             for (int j = -1; j <= 1; j++)
             {
-                //if (!(j == 0 && i == 0))
+                if (!(j == 0 && i == 0))
                 {
                     Pheromone actor = checkRadialLinePheromone(xCase, yCase, _radius, i, j, toActorType(_type));
                     //Pheromone actor = (Pheromone)isElement(xi, yi, type);
@@ -529,11 +531,6 @@ public class Ecosystem extends Stage
         if (_type == PheromoneType.RESSOURCE) 
         {
             return ElementActorType.FOOD_PHEROMONE;
-        }
-
-        if (_type == PheromoneType.DANGER) 
-        {
-            return ElementActorType.DANGER_PHEROMONE;
         }
 
         return null;

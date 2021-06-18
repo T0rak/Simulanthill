@@ -1,5 +1,6 @@
 package ch.hearc.simulanthill.actors;
 
+import ch.hearc.simulanthill.Asset;
 import ch.hearc.simulanthill.Ecosystem;
 
 /**
