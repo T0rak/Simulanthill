@@ -13,6 +13,8 @@ import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Obstacle;
 import ch.hearc.simulanthill.actors.Resource;
 
+import com.badlogic.gdx.Gdx;
+
 /**
  * Class that links a .txt file map to SimulantHill.
  * Can Handle Imported files or random generated maps.
@@ -28,6 +30,9 @@ public class WorldMap
 
 	private ElementActor[][][] elementActorGrid;
 	private Character[][][] elementActorCharGrid;
+
+	private static final int errorMapWidth = 125 ;
+	private static final int errorMapHeight = 58 ;
 	
 	private static final Character[] ACCEPTED_CHAR_LIST = 
 	{
@@ -62,7 +67,8 @@ public class WorldMap
 		"  ###\n######\n  ########\n  #####\n  ###\n  #\n"
 	};
 
-	
+	private static final String INVALID_MAP = "#############################################################################################################################\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                      #   #   ###   ####      #####   ###   #   #  #   #   ###  #####    ####   #####                      #\n#                      ## ##  #   #  #   #     #      #   #  ##  #  ##  #  #   #   #      #   #  #                          #\n#                      # # #  #####  ####      #      #####  # # #  # # #  #   #   #      ####   ####                       #\n#                      #   #  #   #  #         #      #   #  #  ##  #  ##  #   #   #      #   #  #                          #\n#                      #   #  #   #  #         #####  #   #  #   #  #   #   ###    #      ####   #####                      #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                         #       ###   #####  ####   #####  ####                                           #\n#                                         #      #   #  #   #  #   #  #      #   #                                          #\n#                                         #      #   #  #####  #   #  ####   #   #                                          #\n#                                         #      #   #  #   #  #   #  #      #   #                                          #\n#                                         #####   ###   #   #  ####   #####  ####                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                            O                                                              #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#                                                                                                                           #\n#############################################################################################################################";
+
 	/**
 	 * Constructor for importer files
 	 * @param _filename the map filename to import
@@ -81,16 +87,15 @@ public class WorldMap
 		
 		if (validate())
 		{
-			
 			convert();
 		} 
 		else 
 		{
-			filename = "../../maps/mapLoad.txt";
-			System.out.println("ERROR : unable to convert map : map is not valid");
-			validate();
-			convert();
-			
+			//filename = Gdx.files.internal("mapLoad.txt");
+			//System.out.println("ERROR : unable to convert map : map is not valid");
+			//validate();
+			//convert();
+			useErrorMap();
 		}
 
 	}
@@ -127,6 +132,53 @@ public class WorldMap
 	public int getHeight()
 	{
 		return height;
+	}
+
+	private void useErrorMap()
+	{
+		String[] test = INVALID_MAP.split("\n");
+
+		width = errorMapWidth;
+		height = errorMapHeight;
+
+		size = Math.min(worldWidth/width, worldHeight/height);
+
+		System.out.println("size :"+size);
+
+		elementActorCharGrid = new Character[height][width][1];
+		elementActorGrid = new ElementActor[height][width][6];
+		Character c;
+
+		for (int i = height - 1; i >=0 ; i-- )
+		{
+			for (int j = 0; j < test[i].length() ; j++)
+			{
+				c = test[i].charAt(j);
+				elementActorCharGrid[height-i-1][j][0] = c;
+			}
+		}
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				//System.out.print(ELEMENT_ACTOR_3D_char_temp[i][j][0]);
+
+				switch(elementActorCharGrid[i][j][0])
+				{
+					case '#' : 
+						elementActorGrid[i][j][0] = new Obstacle(j*size, i*size, size, size);
+						break;
+					case 'O' :
+						elementActorGrid[i][j][2] = new Anthill(j*size, i*size, size, size);
+						break;
+					case 'R':
+						elementActorGrid[i][j][1] = new Resource(j*size, i*size, size, size);
+						break;
+				}
+			}
+		}
+
 	}
 
 	 /**
@@ -456,11 +508,12 @@ public class WorldMap
 			}
 			else
 			{
-				filename = "../../maps/mapLoad.txt";
-				System.out.println("ERROR : unable to convert map : map is not valid");
-				validate();
-				convert();
-				return false;
+				//filename = Gdx.files.internal("mapLoad.txt");
+				//System.out.println("ERROR : unable to convert map : map is not valid");
+				//validate();
+				//convert();
+				//return false;
+				useErrorMap();
 			}
 		}
 		return true;
