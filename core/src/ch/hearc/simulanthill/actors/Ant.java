@@ -338,4 +338,12 @@ public class Ant extends ElementActor
     {
         NEXT_CHECK_COUNTDOWN = _autonomy;
     }
+
+
+    @Override
+    public void setPosition(float _x, float _y) 
+    {
+        super.setPosition(_x, _y);
+        sprite.setPosition(_x - getWidth()/2, _y - getHeight()/2);
+    }
 }

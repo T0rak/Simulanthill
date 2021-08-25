@@ -366,7 +366,6 @@ public class WorldMap
 	 */
 	public void random(int _nbElements) 
 	{
-
 		width = (int) worldWidth/10;		
 		height =(int) worldHeight/10;
 		size = Math.min(worldWidth/width, worldHeight/height);

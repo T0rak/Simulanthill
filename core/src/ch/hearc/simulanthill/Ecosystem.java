@@ -513,7 +513,7 @@ public class Ecosystem extends Stage
      */
     public int castInCase(float _f)
     {
-        return MathUtils.round(_f / worldMap.getCaseSize());
+        return MathUtils.floor(_f / worldMap.getCaseSize());
     }
 
     /**
