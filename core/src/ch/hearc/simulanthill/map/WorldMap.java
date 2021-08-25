@@ -13,8 +13,6 @@ import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Obstacle;
 import ch.hearc.simulanthill.actors.Resource;
 
-import com.badlogic.gdx.Gdx;
-
 /**
  * Class that links a .txt file map to SimulantHill.
  * Can Handle Imported files or random generated maps.
@@ -369,8 +367,6 @@ public class WorldMap
 		width = (int) worldWidth/10;		
 		height =(int) worldHeight/10;
 		size = Math.min(worldWidth/width, worldHeight/height);
-
-		//System.out.println("SIZE : "+size);
 
 		Random r = new Random();
 

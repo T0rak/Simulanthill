@@ -66,7 +66,6 @@ public class Ant extends ElementActor
     public void act(float _delta)
     {
         super.act(_delta);
-
         if (capacity < MAX_CAPACITY)
         {
             tryCollectFood();
@@ -103,7 +102,6 @@ public class Ant extends ElementActor
                 newGoal = searchAnthill();
                 if (newGoal == null) 
                 {
-                    //newGoal = this.anthill;
                     newGoal = searchPheromone(PheromoneType.HOME);
                 }
             }
@@ -235,8 +233,7 @@ public class Ant extends ElementActor
     {
         if (goal != null && blocked == false)
         {
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() - getY(), goal.getX() - getX());
-            //System.out.println(newDirection);
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getY(), goal.getX() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getX());
             float deltaDirection = (float)(newDirection - this.direction) % 360f;
 
             direction = newDirection;
@@ -344,6 +341,7 @@ public class Ant extends ElementActor
     public void setPosition(float _x, float _y) 
     {
         super.setPosition(_x, _y);
-        sprite.setPosition(_x - getWidth()/2, _y - getHeight()/2);
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        sprite.setPosition(_x - getWidth()/2 + ecosystem.getMapCaseSize()/2, _y - getHeight()/2 + ecosystem.getMapCaseSize()/2);
     }
 }

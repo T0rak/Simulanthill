@@ -32,15 +32,15 @@ public class Resource extends ElementActor
     public int decrease(int _quantity) 
     {
         int ret = 0;
-        if (this.capacity < _quantity) 
+        if (this.capacity <= _quantity) 
         {
             ret = this.capacity;
             remove();
         } else {
-            this.capacity -= _quantity;
             ret = _quantity;
-            
         }
+
+        this.capacity -= _quantity;
         return ret;
     }
 
@@ -52,7 +52,8 @@ public class Resource extends ElementActor
     public void act(float _delta) 
     {
         super.act(_delta);
-        sprite.setAlpha((float)capacity / INIT_CAPACITY);
+        //sprite.setAlpha((float)capacity / INIT_CAPACITY);
+        sprite.setAlpha(1);
     }
 
     /**
