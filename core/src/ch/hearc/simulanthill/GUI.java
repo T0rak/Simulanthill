@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill;
 
+
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,6 +34,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class GUI extends Stage
 {
+	private final Game game;
 
 	private VisTable lytMain;
 	private VisTable lytSimulation;
@@ -81,10 +84,10 @@ public class GUI extends Stage
 	 * Constructor
 	 * @param _vp location where the stage can be drawed
 	 */
-	public GUI (Viewport _vp) 
+	public GUI (Viewport _vp, Game _game) 
 	{
 		super(_vp);
-		
+		game = _game;
 		
 		simulation = new Actor();
 		
@@ -238,8 +241,9 @@ public class GUI extends Stage
 					Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 					if (ecosystem != null)
 					{
-						ecosystem.loadMap();
-						Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
+						((Simulanthill) game).displayMapDimensionsScreen();
+						//ecosystem.loadMap();
+						//Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
 					}
 
 				}

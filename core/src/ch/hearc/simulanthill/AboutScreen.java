@@ -39,9 +39,7 @@ public class AboutScreen implements Screen
      */
     @Override
     public void show() 
-    {
-        
-		
+    {		
         stage = new Stage(new FitViewport(1600, 900));
 		Gdx.input.setInputProcessor(stage);
 
@@ -60,9 +58,7 @@ public class AboutScreen implements Screen
         lytMain.row();
         lytMain.add(allRightsReserved).pad(10f);
 
-        
         //lytMain.setDebug(true);
-
 
         lytMain.setFillParent(true);
 
@@ -86,7 +82,8 @@ public class AboutScreen implements Screen
         time += _delta;
         if(time > 3)
         {
-            game.setScreen(new SimulathillScreen(game));
+            time = 0;
+            ((Simulanthill)game).displaySimulanthillScreen();
         }
     }
 

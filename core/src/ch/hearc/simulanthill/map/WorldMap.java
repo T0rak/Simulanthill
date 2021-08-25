@@ -105,11 +105,13 @@ public class WorldMap
 	 * @param _worldWidth the width in pixel wanted of the map
 	 * @param _worldHeight the height in pixel wanted of the map
 	 */
-	public WorldMap(float _worldWidth, float _worldHeight)
+	public WorldMap(float _worldWidth, float _worldHeight, int _width, int _height)
 	{
-		width = 0;
-		height = 0;
 		filename = "";
+
+		width = _width;
+		height = _height;
+
 		worldWidth = _worldWidth;
 		worldHeight = _worldHeight;
 
@@ -366,12 +368,6 @@ public class WorldMap
 	 */
 	public void random(int _nbElements) 
 	{
-		width = (int) worldWidth/10;		
-		height =(int) worldHeight/10;
-
-		width = MathUtils.random(10, 100);
-		height = (int)(1.5f * width);
-
 		size = Math.min(worldWidth/width, worldHeight/height);
 
 		Random r = new Random();
@@ -538,4 +534,5 @@ public class WorldMap
 	{
 		return size;
 	}
+
 }

@@ -9,7 +9,10 @@ import com.kotcrab.vis.ui.VisUI;
  */
 public class Simulanthill extends Game
 {
-
+    private Screen aboutScreen;
+    private Screen simulanthillScreen;
+    private Screen mapDimensionsScreen;
+ 
     /**
      * Launches the creation process. Loads the main screen.
      */
@@ -18,10 +21,23 @@ public class Simulanthill extends Game
     {
         Asset.loadAssets();
         VisUI.load();
-        //Screen screen = new SimulathillScreen(this);
-        Screen screen = new AboutScreen(this);
-        setScreen(screen);
-        
+
+        aboutScreen = new AboutScreen(this);
+        simulanthillScreen = new SimulathillScreen(this);
+        mapDimensionsScreen = new MapDimensionsScreen(this);
+
+        displayAboutScreen();
     }
-    
+
+    public void displayAboutScreen() {
+        setScreen(aboutScreen);
+    }
+
+    public void displaySimulanthillScreen() {
+        setScreen(simulanthillScreen);
+    }
+
+    public void displayMapDimensionsScreen() {
+        setScreen(mapDimensionsScreen);
+    }
 }

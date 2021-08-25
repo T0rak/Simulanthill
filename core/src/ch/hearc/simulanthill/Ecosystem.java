@@ -109,10 +109,10 @@ public class Ecosystem extends Stage
     /**
      * Generate a random map
      */
-    public void loadMap()
+    public void loadMap(int _width, int _height)
     {
         removeAllActor();
-        worldMap = new WorldMap(getViewport().getWorldWidth(), getViewport().getWorldHeight());
+        worldMap = new WorldMap(getViewport().getWorldWidth(), getViewport().getWorldHeight(), _width, _height);
         addElementActorGridToStage();
     }
 

@@ -2,6 +2,9 @@ package ch.hearc.simulanthill;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import ch.hearc.simulanthill.actors.Ant;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -18,6 +21,7 @@ public class SimulathillScreen implements Screen
 	private Ecosystem ecosystem;
 	private Viewport ecosystemViewport;
 	private Viewport GUIViewport;
+	private InputMultiplexer multiPlexer;
 	GUI gui;
    
     /**
@@ -28,6 +32,17 @@ public class SimulathillScreen implements Screen
 	{
 		this.game = _game;
 		//manager = new AssetManager();
+		// multiple stage
+		multiPlexer = new InputMultiplexer();
+
+		GUIViewport = new FitViewport(1600,900);
+		ecosystemViewport = new FitViewport(1600,900);
+
+		ecosystem = Ecosystem.getInstance(ecosystemViewport);
+		ecosystem.loadMap(124, 70);
+		Ant.setSpeedFactor(1);
+		gui = new GUI(GUIViewport, game); 
+			
 	}
   
     /**
@@ -36,21 +51,9 @@ public class SimulathillScreen implements Screen
 	@Override
 	public void show()
 	{
-		// multiple stage
-		InputMultiplexer multiPlexer = new InputMultiplexer();
-
-		GUIViewport = new FitViewport(1600,900);
-		ecosystemViewport = new FitViewport(1600,900);
-
-		ecosystem = Ecosystem.getInstance(ecosystemViewport);
-
-		ecosystem.loadMap();
-
-		gui = new GUI(GUIViewport); 
-
 		multiPlexer.addProcessor(gui);
 		multiPlexer.addProcessor(ecosystem);
-   
+	
 		Gdx.input.setInputProcessor(multiPlexer);
 	}
    
@@ -120,7 +123,7 @@ public class SimulathillScreen implements Screen
 	@Override
 	public void hide()
 	{
-		dispose();
+		//dispose();
 	}
    
     /**
