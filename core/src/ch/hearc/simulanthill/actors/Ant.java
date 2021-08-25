@@ -267,11 +267,10 @@ public class Ant extends ElementActor
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        
-        if (ecosystem.isElement(nextPosX, nextPosY, ElementActorType.OBSTACLE) != null)
+
+        if (!ecosystem.canMove(getX(), getY(), nextPosX, nextPosY))
         {
             blocked = true;
-
         }
         else
         {

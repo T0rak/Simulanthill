@@ -369,8 +369,8 @@ public class WorldMap
 		width = (int) worldWidth/10;		
 		height =(int) worldHeight/10;
 
-		width = MathUtils.random(10, 200);
-		height = MathUtils.random(10, 200);
+		width = MathUtils.random(10, 100);
+		height = (int)(1.5f * width);
 
 		size = Math.min(worldWidth/width, worldHeight/height);
 

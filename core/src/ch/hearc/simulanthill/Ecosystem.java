@@ -433,6 +433,43 @@ public class Ecosystem extends Stage
     }
 
     /**
+     * Checks if an ant can move to a destination from it's current position (avoids diagonal moves)
+     * @param _initX current x position (scene coordinates)
+     * @param _initY current y position (scene coordinates)
+     * @param _destinationX destination x position (scene coordinates)
+     * @param _destinationY destination y position (scene coordinates)
+     * @return true if the move is possible else false
+     */
+    public boolean canMove(float _initX, float _initY, float _destinationX, float _destinationY) {
+        int destinationXCase = castInCase(_destinationX);
+        int destinationYCase = castInCase(_destinationY);
+
+        int initXCase = castInCase(_initX);
+        int initYCase = castInCase(_initY);
+
+        int dx = destinationXCase - initXCase;
+        int dy = destinationYCase - initYCase;
+        
+
+        if (isElement(destinationXCase, destinationYCase, ElementActorType.OBSTACLE) != null) 
+        {
+            return false;
+        }
+        
+        if (dx != 0 && dy != 0) 
+        {
+            if (isElement(initXCase, initYCase + dy, ElementActorType.OBSTACLE) != null &&
+             isElement(initXCase + dx, initYCase, ElementActorType.OBSTACLE) != null)
+            {
+                return false;
+            }
+            
+        }
+        
+        return true;
+    }
+
+    /**
      * Take a resource
      * @param _x start y position of point (scene coordinates)
      * @param _y start x position of point (scene coordinates)
