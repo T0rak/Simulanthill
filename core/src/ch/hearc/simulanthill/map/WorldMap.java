@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Stack;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Obstacle;
@@ -366,6 +368,10 @@ public class WorldMap
 	{
 		width = (int) worldWidth/10;		
 		height =(int) worldHeight/10;
+
+		width = MathUtils.random(10, 200);
+		height = MathUtils.random(10, 200);
+
 		size = Math.min(worldWidth/width, worldHeight/height);
 
 		Random r = new Random();

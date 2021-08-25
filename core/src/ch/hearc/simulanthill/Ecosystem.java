@@ -173,7 +173,7 @@ public class Ecosystem extends Stage
     }
 
     /**
-     * Remove all acotr from stage
+     * Remove all actor from stage
      */
     private void removeAllActor()
     {

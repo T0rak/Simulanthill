@@ -128,7 +128,7 @@ public class GUI extends Stage
 		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(DEFAULT_ANT_NUMBER, 1, 10000));
 		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(DEFAULT_INDEPENDENCE,0, 100));
 		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(DEFAULT_LIFETIME, 0, 3000));
-		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "2", "0.1", 1));
+		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "9", "0.5", 1));
 	
 		//Fill main layout
 		lytMain.add(lytSimulation);
@@ -220,6 +220,7 @@ public class GUI extends Stage
 							if (ecosystem != null)
 							{
 								ecosystem.loadMap(chooser.getSelectedFile().getAbsolutePath());
+								Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
 							}
 							
 						}
@@ -238,6 +239,7 @@ public class GUI extends Stage
 					if (ecosystem != null)
 					{
 						ecosystem.loadMap();
+						Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
 					}
 
 				}
@@ -338,7 +340,7 @@ public class GUI extends Stage
 			@Override
 			public void changed(ChangeEvent event, Actor actor) 
 			{
-				Ant.setSpeed(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
+				Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
 				
 			}
 			
@@ -381,7 +383,7 @@ public class GUI extends Stage
 					((IntSpinnerModel)(spinAntNumber.getModel())).setValue(DEFAULT_ANT_NUMBER);
 					((IntSpinnerModel)(spinFrequence.getModel())).setValue(DEFAULT_FREQUENCE); 	
 					((IntSpinnerModel)(spinAntIndependence.getModel())).setValue(DEFAULT_INDEPENDENCE);
-					((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(DEFAULT_SPEED));; 	
+					((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(DEFAULT_SPEED));
 					
 				}
 			

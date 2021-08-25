@@ -52,8 +52,7 @@ public class Resource extends ElementActor
     public void act(float _delta) 
     {
         super.act(_delta);
-        //sprite.setAlpha((float)capacity / INIT_CAPACITY);
-        sprite.setAlpha(1);
+        sprite.setAlpha((float)capacity / INIT_CAPACITY);
     }
 
     /**

@@ -14,7 +14,7 @@ public class Ant extends ElementActor
     private static final int MAX_CAPACITY = 1;
     private static int FIELD_OF_VIEW = 3;
 
-	private static double speed = 1;
+	private static double speed = 0;
     
     private float direction;
     private int viewSpanAngle;
@@ -41,7 +41,6 @@ public class Ant extends ElementActor
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
         super(_x, _y, Asset.ant(), "ant");
-
         sprite.setOrigin(_width / 2, _height / 2);
         setSize(_width, _height);
         this.capacity = 0;
@@ -322,9 +321,9 @@ public class Ant extends ElementActor
 	 * Changes the movement speed of the ant
      * @param _speed new speed
 	 */
-    public static  void setSpeed(float _speed)
+    public static  void setSpeedFactor(float _speedFactor)
     {
-        speed = _speed;
+        speed = _speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize()/10;
     }
 
     /**
