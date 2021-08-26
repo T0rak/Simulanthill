@@ -12,6 +12,9 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
+
+import ch.hearc.simulanthill.actors.Ant;
+
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 
 /**
@@ -60,7 +63,7 @@ public class MapDimensionsScreen implements Screen
         lblDimensions = new VisLabel("Dimensions:");
 
         spinWidth = new Spinner("Width", new IntSpinnerModel(DEFAULT_WIDTH, MIN_WIDTH, MAX_WIDTH));
-        spinHeight = new Spinner("Width", new IntSpinnerModel(DEFAULT_HEIGHT, MIN_HEIGHT, MAX_HEIGHT));
+        spinHeight = new Spinner("Height", new IntSpinnerModel(DEFAULT_HEIGHT, MIN_HEIGHT, MAX_HEIGHT));
 
         btnValidate = new VisTextButton("Valider");
         btnCancel = new VisTextButton("Annuler");
@@ -99,6 +102,7 @@ public class MapDimensionsScreen implements Screen
 
                         ecosystem.loadMap(newWidth, newHeight);
                         //Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
+                        Ant.updateSpeed();
                     }
                     ((Simulanthill)MapDimensionsScreen.this.game).displaySimulanthillScreen();
                             

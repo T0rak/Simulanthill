@@ -15,6 +15,7 @@ public class Ant extends ElementActor
     private static int FIELD_OF_VIEW = 3;
 
 	private static double speed = 0;
+    private static float speedFactor = 1f;
     
     private float direction;
     private int viewSpanAngle;
@@ -322,7 +323,16 @@ public class Ant extends ElementActor
 	 */
     public static  void setSpeedFactor(float _speedFactor)
     {
-        speed = _speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize()/10;
+        speedFactor = _speedFactor;
+        Ant.updateSpeed();
+    }
+    /**
+    * Changes the movement speed of the ant
+    * @param _speed new speed
+    */
+    public static  void updateSpeed()
+    {
+        speed = speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize() / 10;
     }
 
     /**
