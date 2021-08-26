@@ -234,18 +234,6 @@ public class Ecosystem extends Stage
         return worldMap.getElementActorGrid()[_y][_x][_type.getValue()];
     }
 
-    /**
-     * Checks if the given position is in the given actor
-     * @param _x position x of point (scene coordinates)
-     * @param _y position y of point (scene coordinates)
-     * @param _actor actor
-     * @return true if are on the same case
-     */
-    public Boolean isOnElement(float _x, float _y, ElementActor _actor)
-    {
-        return (castInCase(_x) == castInCase(_actor.getX())) && (castInCase(_y) == castInCase(_actor.getY()));
-    }
-
      /**
      * Checks around a position if there is an actor of a given type and returns it 
      * @param _x position x of point (scene coordinates)
@@ -258,8 +246,10 @@ public class Ecosystem extends Stage
     {
         ElementActor res = null;
         float distance = 0;
+        
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
+
         for (int i = -1; i <= 1; i++)
         {
             for (int j = -1; j <= 1; j++)
@@ -298,7 +288,33 @@ public class Ecosystem extends Stage
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
             //addActor(new Pheromone(xi * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
+            
+            if (Math.abs(_dx) == Math.abs(_dy))
+            {
+                ElementActor actor2 = isElement(xi - _dx, yi, _type);
+                //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
+                if (actor2 != null)
+                {
+                    return actor2;   
+                }
+                ElementActor actor3 = isElement(xi, yi - _dy, _type);
+                //addActor(new Pheromone(xi * caseSize, (yi+dy) * caseSize, PheromoneType.HOME, null, 0));
+                if (actor3 != null)
+                {
+                    return actor3;   
+                } 
+                
+                if (isElement(xi - _dx, yi, ElementActorType.OBSTACLE) != null)
+                {
+                    return null;
+                }
+                if (isElement(xi, yi - _dy, ElementActorType.OBSTACLE) != null)
+                {
+                    return null;
+                }
+            }
             ElementActor actor = isElement(xi, yi, _type);
+
             if (actor != null)
             {
                 return actor;
@@ -306,33 +322,6 @@ public class Ecosystem extends Stage
             else if (isElement(xi, yi, ElementActorType.OBSTACLE) != null)
             {
                 return null;
-            }
-            else
-            {
-                if (Math.abs(_dx) == Math.abs(_dy))
-                {
-                    ElementActor actor2 = isElement(xi + _dx, yi, _type);
-                    //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
-                    if (actor2 != null)
-                    {
-                        return actor2;   
-                    }
-                    ElementActor actor3 = isElement(xi, yi + _dy, _type);
-                    //addActor(new Pheromone(xi * caseSize, (yi+dy) * caseSize, PheromoneType.HOME, null, 0));
-                    if (actor3 != null)
-                    {
-                        return actor3;   
-                    } 
-                    
-                    if (isElement(xi + _dx, yi, ElementActorType.OBSTACLE) != null)
-                    {
-                        return null;
-                    }
-                    if (isElement(xi, yi + _dy, ElementActorType.OBSTACLE) != null)
-                    {
-                        return null;
-                    }
-                }
             }
         }
         return null;
@@ -377,9 +366,7 @@ public class Ecosystem extends Stage
         }
         return res;
         
-    }
-
-    
+    }    
 
     /**
      * Checks on a line if a pheromone of a given type is present
@@ -395,16 +382,12 @@ public class Ecosystem extends Stage
     {
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
-        /*if (pheromone != null)
-        {
-            resStepFrom = pheromone.getStepFrom();
-        }*/
 
         for (int i = 1; i <= _radius; i++)
         {
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
-            //addActor(new Pheromone(xi * caseSize, yi * caseSize, PheromoneType.HOME));
+
             Pheromone actor = (Pheromone)isElement(xi, yi, _type);
             if (actor != null)
             {
@@ -423,26 +406,25 @@ public class Ecosystem extends Stage
             if (Math.abs(_dx) == Math.abs(_dy))
             {
                 Pheromone actor2 = (Pheromone)isElement(xi + _dx, yi, _type);
-                //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
+                
                 if (actor2 != null)
                 {
-                    if(actor2.getStepFrom() < resStepFrom)
+                    if (actor2.getStepFrom() < resStepFrom)
                     {
                         res = actor2;
                         resStepFrom = actor2.getStepFrom();
                     }
                     
                 }
-                Pheromone actor3 = (Pheromone)isElement(xi + _dx, yi, _type);
-                //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null));
+                Pheromone actor3 = (Pheromone)isElement(xi, yi + _dy, _type);
+
                 if (actor3 != null)
                 {
-                    if(actor3.getStepFrom() < resStepFrom)
+                    if (actor3.getStepFrom() < resStepFrom)
                     {
                         res = actor3;
                         resStepFrom = actor3.getStepFrom();
                     }
-                    
                 }
 
                 if (isElement(xi + _dx, yi, ElementActorType.OBSTACLE) != null)
