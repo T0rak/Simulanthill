@@ -1,21 +1,18 @@
 package ch.hearc.simulanthill;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 
 import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.ElementActor;
+import ch.hearc.simulanthill.actors.SpriteActor;
+import ch.hearc.simulanthill.actors.ColorActor;
 
 public class AnthillDetails extends Group {
 
@@ -26,8 +23,8 @@ public class AnthillDetails extends Group {
     private VisLabel lblRessourceNumber;
 
     private Anthill anthill;
-    private ElementActor hoverAnthill;
-    private ElementActor background;
+    private SpriteActor hoverAnthill;
+    private ColorActor background;
 
     public AnthillDetails(Anthill _anthill)
     {
@@ -37,57 +34,46 @@ public class AnthillDetails extends Group {
         setPosition(anthill.getX(), anthill.getY());
 
         info = new VisTable();
-        info. align(Align.bottomLeft);
+        info.align(Align.bottomLeft);
         info.setPosition(anthill.getWidth()+10, 0);
         
         lblAntNumberInf = new VisLabel("Nombre de fourmis : ");
-        lblAntNumberInf.setColor(Color.RED);
-        lblAntNumberInf.setFontScale(1.2f);
-        
-
-
         lblAntNumber = new VisLabel("0");
-        lblAntNumber.setColor(Color.RED);
-        lblAntNumber.setFontScale(1.2f);
 
         lblRessourceNumberInf = new VisLabel("Nombre de ressource : ");
-        lblRessourceNumberInf.setColor(Color.RED);
-        lblRessourceNumberInf.setFontScale(1.2f);
-
         lblRessourceNumber = new VisLabel("0");
-        lblRessourceNumber.setColor(Color.RED);
-        lblRessourceNumber.setFontScale(1.2f);
 
         info.add(lblAntNumberInf).fillX();
-        info.add(lblAntNumber);
+        info.add(lblAntNumber).fillX();
         info.row();
         info.add(lblRessourceNumberInf).fillX();
-        info.add(lblRessourceNumber);
+        info.add(lblRessourceNumber).fillX();
 
-        info.setVisible(false);
+        for (Actor element : info.getChildren()) {
+            element.setColor(Color.WHITE);
+            if(element.getClass() == VisLabel.class)
+            {
+                ((VisLabel)element).setFontScale(1.5f);
+            }
+        }
 
-        hoverAnthill = new ElementActor(0,0, Asset.anthill(), "hoverAnthill");
-        hoverAnthill.setSize(anthill.getWidth(), anthill.getHeight());
-
-        background = new ElementActor(anthill.getWidth()+10, 0, Asset.obstacle(), "hoverAnthill");
-        background.setSize(250,75);
-        background.setVisible(false);
+        hoverAnthill = new SpriteActor(0,0,anthill.getWidth(), anthill.getHeight(), Asset.anthill());
+        background = new ColorActor(anthill.getWidth()+10, 0, info.getMinWidth(), info.getMinHeight(), Color.BLACK);
+        
+        setVisible(false);
 
         hoverAnthill.addListener(new ClickListener()
         {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                hoverAnthill.setSprite(Asset.anthillSelection(), anthill.getWidth(), anthill.getHeight());
-                info.setVisible(true);
+                
+                setVisible(true);
                 super.enter(event, x, y, pointer, fromActor);
-                background.setVisible(true);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                hoverAnthill.setSprite(Asset.anthill(), anthill.getWidth(), anthill.getHeight());
-                info.setVisible(false);
-                background.setVisible(false);
+                setVisible(false);
                 super.enter(event, x, y, pointer, fromActor);
             }
         });
@@ -98,9 +84,25 @@ public class AnthillDetails extends Group {
     }
 
     @Override
+    public void setVisible(boolean _visible) {
+        if (!_visible)
+        {
+            hoverAnthill.setSprite(Asset.anthill());
+        }
+        else
+        {
+            hoverAnthill.setSprite(Asset.anthillSelection());
+        }
+        
+        info.setVisible(_visible);
+        background.setVisible(_visible);
+    }
+
+    @Override
     public void act(float delta) {
         lblAntNumber.setText(anthill.getNbAnts());
         lblRessourceNumber.setText(anthill.getNbResource());
+        background.setSize(info.getMinWidth(), info.getMinHeight());
         super.act(delta);
     }
 

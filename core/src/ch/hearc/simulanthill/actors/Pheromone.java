@@ -27,13 +27,11 @@ public class Pheromone extends ElementActor
 	 */
 	public Pheromone(float _posX, float _posY, PheromoneType _type, Ant _ant, int _stepFrom)
 	{
-		super(_posX, _posY, (_type == PheromoneType.HOME ? Asset.homePheromone() : Asset.foodPheromone()), "pheromone");
+		super(_posX, _posY, 4, 4, (_type == PheromoneType.HOME ? Asset.homePheromone() : Asset.foodPheromone()));
 		ant = _ant;
 		lifeTime = INIT_LIFE_TIME;
 		pheromoneType = _type;
 		stepFrom = _stepFrom;
-		setSize(4, 4);
-		//sprite.setAlpha(0);
 	}
 
 	/**
@@ -68,12 +66,7 @@ public class Pheromone extends ElementActor
 		return pheromoneType;
 	}
 
-	/*
-	public int getId()
-	{
-		return -1;
-	}
-	*/
+
 
 	/**
 	 * Reinforces the lifetime of a pheromone

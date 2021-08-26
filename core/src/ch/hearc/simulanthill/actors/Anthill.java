@@ -19,9 +19,7 @@ public class Anthill extends ElementActor
 	 */
     public Anthill(float _x, float _y, float _width, float _height) 
     {
-        super(_x, _y, Asset.anthill(), "anthill");
-        setSize(_width, _height);
-        this.sprite.setOrigin(_width/2, _height/2);
+        super(_x, _y, _width, _height, Asset.anthill());
     }
     
     /**

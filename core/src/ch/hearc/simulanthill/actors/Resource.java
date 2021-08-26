@@ -19,8 +19,7 @@ public class Resource extends ElementActor
     */
     public Resource(float _x, float _y, float _width, float _height) 
     {
-        super(_x, _y, Asset.resource(), "food");
-        setSize(_width, _height);
+        super(_x, _y, _width, _height, Asset.resource());
         this.capacity = INIT_CAPACITY;
     }
 
