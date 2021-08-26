@@ -47,16 +47,8 @@ public class MapDimensionsScreen implements Screen
 	public MapDimensionsScreen(Game _game) 
 	{
         this.game = _game;
-	}
 
-    /**
-     * Will load the screen on the programm.
-     */
-    @Override
-    public void show() 
-    {
         stage = new Stage(new FitViewport(1600, 900));
-		Gdx.input.setInputProcessor(stage);
 
         lytMain = new VisTable();
 
@@ -113,7 +105,15 @@ public class MapDimensionsScreen implements Screen
         lytMain.setFillParent(true);
 
 		stage.addActor(lytMain);
-        
+	}
+
+    /**
+     * Will load the screen on the programm.
+     */
+    @Override
+    public void show() 
+    {
+        Gdx.input.setInputProcessor(stage);
     }
 
     /**
