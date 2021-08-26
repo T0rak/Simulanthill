@@ -4,9 +4,10 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -14,13 +15,14 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisList;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.VisTextField;
 
 import ch.hearc.simulanthill.actors.Ant;
 
 import java.io.File;
 
 /**
- * Gives information about the institution and students that worked on the simulator
+ * Screen for map selection
  */
 public class MapSelectionScreen implements Screen
 {
@@ -29,7 +31,10 @@ public class MapSelectionScreen implements Screen
     private VisTable lytMain;
 
     private VisLabel lblMaps;
+    private VisTextField txtFolderPath;
     private VisList<String> lstMapFiles;
+    
+    private String mapFolderPath = "C:/simulanthillMaps";
 
     private VisTextButton btnValidate;
 	private VisTextButton btnCancel;
@@ -46,28 +51,31 @@ public class MapSelectionScreen implements Screen
         lytMain = new VisTable();
 
         lblMaps = new VisLabel("Choix de carte:");
-
-        lstMapFiles = new VisList<String>();
+        txtFolderPath = new VisTextField("Map folder");
         
-        Array<String> fileArray = new Array<String>(); 
-        File[] files = new File("D:/thierry.fluck/Documents/He-Arc/HES_ETE/simulanthill/maps").listFiles();
-        for (File file : files) {
-            if (!file.isDirectory()) {
-                fileArray.add(file.getName());
-            }
-        }
-
-        lstMapFiles.setItems(fileArray);
+        lstMapFiles = new VisList<String>();
 
         btnValidate = new VisTextButton("Valider");
         btnCancel = new VisTextButton("Annuler");
 
         lytMain.add(lblMaps);
         lytMain.row();
+        lytMain.add(txtFolderPath);
+        lytMain.row();
         lytMain.add(lstMapFiles);
         lytMain.row();
         lytMain.add(btnValidate);
         lytMain.add(btnCancel);
+        
+        txtFolderPath.addListener(new ChangeListener()
+		{
+			@Override
+			public void changed(ChangeEvent event, Actor actor) 
+			{
+				mapFolderPath = txtFolderPath.getText();
+                reloadFileList();
+			}			
+		});
 
         btnCancel.addListener(
             new ClickListener()
@@ -91,7 +99,7 @@ public class MapSelectionScreen implements Screen
                     {
                         String selectedFileName = lstMapFiles.getSelected();
                         System.out.println(selectedFileName);
-                        ecosystem.loadMap("D:/thierry.fluck/Documents/He-Arc/HES_ETE/simulanthill/maps/" + selectedFileName);
+                        ecosystem.loadMap(mapFolderPath + "/" + selectedFileName);
                         Ant.updateSpeed();
                     }
                     ((Simulanthill)MapSelectionScreen.this.game).displaySimulanthillScreen();
@@ -101,7 +109,7 @@ public class MapSelectionScreen implements Screen
         );
 
         lytMain.setFillParent(true);
-
+        
 		stage.addActor(lytMain);
 	}
 
@@ -111,9 +119,28 @@ public class MapSelectionScreen implements Screen
     @Override
     public void show() 
     {
+        txtFolderPath.setText(mapFolderPath);
+        reloadFileList();
         Gdx.input.setInputProcessor(stage);
     }
 
+    private void reloadFileList() {
+        Array<String> fileArray = new Array<String>(); 
+
+        File[] files = new File(mapFolderPath).listFiles();
+        
+        if (files != null) 
+        {
+            for (File file : files) 
+            {
+                if (!file.isDirectory()) 
+                {
+                    fileArray.add(file.getName());
+                }
+            }
+        }
+        lstMapFiles.setItems(fileArray);
+    }
     /**
      * Function that is called each time that it needs to re redrawn.
      * @param _delta interval of each redrawn
