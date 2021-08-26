@@ -26,6 +26,7 @@ public class Asset
     static private AssetDescriptor<Texture> backgound = new AssetDescriptor<Texture>("background.png", Texture.class);
     static private AssetDescriptor<Texture> icon = new AssetDescriptor<Texture>("icon.png", Texture.class);
     static private AssetDescriptor<Texture> logo = new AssetDescriptor<Texture>("logo.png", Texture.class);
+    static private AssetDescriptor<Texture> anthillSelection = new AssetDescriptor<Texture>("anthillSelection.png", Texture.class);
 
     /**
      * Loads all the needed assets.
@@ -47,6 +48,7 @@ public class Asset
         manager.load(Asset.foodPheromoneLegend);
         manager.load(Asset.icon);
         manager.load(Asset.logo);
+        manager.load(Asset.anthillSelection);
 		manager.finishLoading();
 	}
 
@@ -121,5 +123,10 @@ public class Asset
     static public Texture logo()
     {
         return manager.get(logo);
+    }
+
+    static public Texture anthillSelection()
+    {
+        return manager.get(anthillSelection);
     }
 }

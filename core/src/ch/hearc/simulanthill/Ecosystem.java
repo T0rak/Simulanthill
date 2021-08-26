@@ -1,6 +1,7 @@
 package ch.hearc.simulanthill;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.actors.Ant;
+import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.ElementActorType;
 import ch.hearc.simulanthill.actors.Pheromone;
@@ -26,9 +28,13 @@ public class Ecosystem extends Stage
     private WorldMap worldMap;
 
     private List<Ant> ants;
+    private List<Anthill> anthills;
+
     private int nbAntMax;
 
     private boolean isPlaying;
+
+    private List<MapListener> MapListeners;
 
     /**
      * Constructor
@@ -37,9 +43,11 @@ public class Ecosystem extends Stage
     private Ecosystem(Viewport _viewport)
     {
         super(_viewport);
-        ants = new ArrayList<>();
+        ants = new ArrayList<Ant>();
+        anthills = new ArrayList<Anthill>();
         isPlaying = false;
         nbAntMax = 500;
+        MapListeners = new LinkedList<MapListener>();
     }
 
     /**
@@ -158,11 +166,6 @@ public class Ecosystem extends Stage
             {
                 for (ElementActor elementC: elementB)
                 {
-                    //element.setPos(element.getPosX()*size, element.getPosY()*size);
-                    //element.setPos(element.getPosX(), element.getPosY());
-                    //Gdx.app.log("X TEST", String.valueOf(element.getPosX()));
-                    //Gdx.app.log("Y TEST", String.valueOf(element.getPosX()));
-                    //element.setSize(size, size);
                     if (elementC != null)
                     {
                         addActor(elementC);
@@ -170,6 +173,29 @@ public class Ecosystem extends Stage
                 }
             }
 		}
+        refreshAnthills();
+        informChangeMap();
+    }
+
+
+    private void refreshAnthills()
+    {
+        anthills.clear();
+        for (ElementActor[][] elementA: worldMap.getElementActorGrid()) 
+        {
+            for (ElementActor[] elementB: elementA) 
+            {
+                    if (elementB[ElementActorType.ANTHILL.getValue()] != null)
+                    {
+                        anthills.add((Anthill)elementB[ElementActorType.ANTHILL.getValue()]);
+                    }
+            }
+		}
+    }
+
+    public List<Anthill> getAnthills()
+    {
+        return anthills;
     }
 
     /**
@@ -177,6 +203,7 @@ public class Ecosystem extends Stage
      */
     private void removeAllActor()
     {
+        anthills.clear();
         ants.clear();
         this.clear();
     }
@@ -600,6 +627,19 @@ public class Ecosystem extends Stage
 
     public float getMapCaseSize() {
         return worldMap.getCaseSize();
+    }
+
+
+    public void addMapListener(MapListener mapListener)
+    {
+        MapListeners.add(mapListener);
+    }
+
+    private void informChangeMap()
+    {
+        for (MapListener mapListener : MapListeners) {
+            mapListener.change();
+        }
     }
 
 }
