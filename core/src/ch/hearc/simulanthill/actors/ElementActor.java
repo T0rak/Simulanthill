@@ -78,6 +78,13 @@ public class ElementActor extends Actor
     {
       sprite.draw(_batch);
     }
+
+    public void setSprite(Texture _texture, float _width, float _height)
+    {
+      sprite = new Sprite(_texture);
+      sprite.setSize(getWidth(), getHeight());
+
+    }
   /*
     @Override
     public String toString() 

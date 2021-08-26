@@ -160,6 +160,7 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) 
         {
+            anthill.addRessource(capacity);
             capacity = 0;
             stepFrom = 0;
             goal = null;

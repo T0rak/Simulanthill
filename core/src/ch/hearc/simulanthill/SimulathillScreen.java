@@ -19,10 +19,11 @@ public class SimulathillScreen implements Screen
 {
 	private final Game game;
 	private Ecosystem ecosystem;
+	private EcosystemGUI guiEco;
 	private Viewport ecosystemViewport;
 	private Viewport GUIViewport;
 	private InputMultiplexer multiPlexer;
-	GUI gui;
+	private GUI gui;
    
     /**
      * Constructor
@@ -40,8 +41,13 @@ public class SimulathillScreen implements Screen
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
 		ecosystem.loadMap(124, 70);
+
+
 		Ant.setSpeedFactor(1);
 		gui = new GUI(GUIViewport, game); 
+
+		guiEco = new EcosystemGUI(ecosystem);
+
 			
 	}
   
@@ -53,6 +59,7 @@ public class SimulathillScreen implements Screen
 	{
 		multiPlexer.addProcessor(gui);
 		multiPlexer.addProcessor(ecosystem);
+		multiPlexer.addProcessor(guiEco);
 	
 		Gdx.input.setInputProcessor(multiPlexer);
 	}
@@ -68,9 +75,6 @@ public class SimulathillScreen implements Screen
 		Gdx.gl.glClearColor(0.12f, 0.12f, 0.12f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		gui.getViewport().apply();
-		gui.act(Gdx.graphics.getDeltaTime());
-		gui.draw();
 
 		// for the first render
 		if(ecosystemViewport.getScreenX() == 0)
@@ -88,7 +92,13 @@ public class SimulathillScreen implements Screen
 		{
 			ecosystem.act(/*Gdx.graphics.getDeltaTime()*/);
 		}
-		ecosystem.draw();	
+		ecosystem.draw();
+		guiEco.act();
+		guiEco.draw();	
+
+		gui.getViewport().apply();
+		gui.act(Gdx.graphics.getDeltaTime());
+		gui.draw();
 	}
    
     /**
