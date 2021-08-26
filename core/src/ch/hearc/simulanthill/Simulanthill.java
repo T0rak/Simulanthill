@@ -12,7 +12,7 @@ public class Simulanthill extends Game
     private Screen aboutScreen;
     private Screen simulanthillScreen;
     private Screen mapDimensionsScreen;
- 
+    private Screen mapSelectionScreen;
     /**
      * Launches the creation process. Loads the main screen.
      */
@@ -25,6 +25,7 @@ public class Simulanthill extends Game
         aboutScreen = new AboutScreen(this);
         simulanthillScreen = new SimulathillScreen(this);
         mapDimensionsScreen = new MapDimensionsScreen(this);
+        mapSelectionScreen = new MapSelectionScreen(this);
 
         displayAboutScreen();
     }
@@ -39,5 +40,8 @@ public class Simulanthill extends Game
 
     public void displayMapDimensionsScreen() {
         setScreen(mapDimensionsScreen);
+    }
+    public void displayMapSelectionScreen() {
+        setScreen(mapSelectionScreen);
     }
 }

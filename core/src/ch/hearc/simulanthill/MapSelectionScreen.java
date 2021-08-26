@@ -4,47 +4,40 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisList;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.spinner.Spinner;
 
 import ch.hearc.simulanthill.actors.Ant;
 
-import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
+import java.io.File;
 
 /**
  * Gives information about the institution and students that worked on the simulator
  */
-public class MapDimensionsScreen implements Screen
+public class MapSelectionScreen implements Screen
 {
     private final Game game;
     private Stage stage;
     private VisTable lytMain;
 
-    private VisLabel lblDimensions;
-    
-    private Spinner spinWidth;
-    private Spinner spinHeight;
+    private VisLabel lblMaps;
+    private VisList<String> lstMapFiles;
 
     private VisTextButton btnValidate;
 	private VisTextButton btnCancel;
-
-    private static final int DEFAULT_WIDTH = 70;
-    private static final int DEFAULT_HEIGHT = 70;
-    private static final int MIN_WIDTH = 15;
-    private static final int MIN_HEIGHT = 15;
-    private static final int MAX_WIDTH = 150;
-    private static final int MAX_HEIGHT = 150;
     /**
      * Constructor
      * @param _game handler of the content of AboutScreen
      */
-	public MapDimensionsScreen(Game _game) 
+	public MapSelectionScreen(Game _game) 
 	{
         this.game = _game;
 
@@ -52,19 +45,26 @@ public class MapDimensionsScreen implements Screen
 
         lytMain = new VisTable();
 
-        lblDimensions = new VisLabel("Dimensions:");
+        lblMaps = new VisLabel("Choix de carte:");
 
-        spinWidth = new Spinner("Width", new IntSpinnerModel(DEFAULT_WIDTH, MIN_WIDTH, MAX_WIDTH));
-        spinHeight = new Spinner("Height", new IntSpinnerModel(DEFAULT_HEIGHT, MIN_HEIGHT, MAX_HEIGHT));
+        lstMapFiles = new VisList<String>();
+        
+        Array<String> fileArray = new Array<String>(); 
+        File[] files = new File("C:/").listFiles();
+        for (File file : files) {
+            if (!file.isDirectory()) {
+                fileArray.add(file.getName());
+            }
+        }
+
+        lstMapFiles.setItems(fileArray);
 
         btnValidate = new VisTextButton("Valider");
         btnCancel = new VisTextButton("Annuler");
 
-        lytMain.add(lblDimensions);
+        lytMain.add(lblMaps);
         lytMain.row();
-        lytMain.add(spinWidth);
-        lytMain.row();
-        lytMain.add(spinHeight);
+        lytMain.add(lstMapFiles);
         lytMain.row();
         lytMain.add(btnValidate);
         lytMain.add(btnCancel);
@@ -75,7 +75,7 @@ public class MapDimensionsScreen implements Screen
                 @Override
                 public void clicked(InputEvent event, float x, float y) 
                 {           
-                    ((Simulanthill)MapDimensionsScreen.this.game).displaySimulanthillScreen();
+                    ((Simulanthill)MapSelectionScreen.this.game).displaySimulanthillScreen();
                 }
             }
         );
@@ -89,14 +89,12 @@ public class MapDimensionsScreen implements Screen
                     Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
                     if (ecosystem != null)
                     {
-                        int newWidth = ((IntSpinnerModel)spinWidth.getModel()).getValue();
-                        int newHeight = ((IntSpinnerModel)spinHeight.getModel()).getValue();
-
-                        ecosystem.loadMap(newWidth, newHeight);
-                        //Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
+                        String selectedFileName = lstMapFiles.getSelected();
+                        System.out.println(selectedFileName);
+                        ecosystem.loadMap("D:/thierry.fluck/Documents/He-Arc/HES_ETE/simulanthill/maps/" + selectedFileName);
                         Ant.updateSpeed();
                     }
-                    ((Simulanthill)MapDimensionsScreen.this.game).displaySimulanthillScreen();
+                    ((Simulanthill)MapSelectionScreen.this.game).displaySimulanthillScreen();
                             
                 }
             }
@@ -168,3 +166,4 @@ public class MapDimensionsScreen implements Screen
     }
 
 }
+

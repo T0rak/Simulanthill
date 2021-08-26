@@ -24,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.io.File;
 import java.math.BigDecimal;
 
 
@@ -207,30 +206,7 @@ public class GUI extends Stage
 				@Override
 				public void clicked(InputEvent event, float x, float y) 
 				{
-					new Thread(new Runnable() {             
-						@Override
-						public void run() {
-							JFileChooser chooser = new JFileChooser();
-							chooser.setCurrentDirectory(new File("..\\..\\maps\\testmap1.txt"));
-        					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-							chooser.addChoosableFileFilter(new FileNameExtensionFilter("TXT file", "txt"));
-							chooser.setAcceptAllFileFilterUsed(true);
-							JFrame f = new JFrame();
-							f.setVisible(true);
-							f.toFront();
-							f.setVisible(false);
-							chooser.showOpenDialog(f);
-							f.dispose();
-
-							Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-							if (ecosystem != null)
-							{
-								ecosystem.loadMap(chooser.getSelectedFile().getAbsolutePath());
-								Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
-							}
-							
-						}
-					}).start();
+					((Simulanthill)game).displayMapSelectionScreen();
 				}
 			}
 		);
@@ -348,7 +324,6 @@ public class GUI extends Stage
 			public void changed(ChangeEvent event, Actor actor) 
 			{
 				Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
-				
 			}
 			
 		});
