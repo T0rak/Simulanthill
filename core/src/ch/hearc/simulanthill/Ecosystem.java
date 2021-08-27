@@ -301,7 +301,7 @@ public class Ecosystem extends Stage
                 //addActor(new Pheromone(xi * caseSize, (yi+dy) * caseSize, PheromoneType.HOME, null, 0));
                 if (actor3 != null)
                 {
-                    return actor3;   
+                    return actor3;
                 } 
                 
                 if (isElement(xi - _dx, yi, ElementActorType.OBSTACLE) != null)
@@ -388,24 +388,9 @@ public class Ecosystem extends Stage
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
 
-            Pheromone actor = (Pheromone)isElement(xi, yi, _type);
-            if (actor != null)
-            {
-                if(actor.getStepFrom() < resStepFrom)
-                {
-                    res = actor;
-                    resStepFrom = actor.getStepFrom();
-                }
-                
-            }
-            else if (isElement(xi, yi, ElementActorType.OBSTACLE) != null)
-            {
-                return res;
-            }
-
             if (Math.abs(_dx) == Math.abs(_dy))
             {
-                Pheromone actor2 = (Pheromone)isElement(xi + _dx, yi, _type);
+                Pheromone actor2 = (Pheromone)isElement(xi - _dx, yi, _type);
                 
                 if (actor2 != null)
                 {
@@ -416,7 +401,7 @@ public class Ecosystem extends Stage
                     }
                     
                 }
-                Pheromone actor3 = (Pheromone)isElement(xi, yi + _dy, _type);
+                Pheromone actor3 = (Pheromone)isElement(xi, yi - _dy, _type);
 
                 if (actor3 != null)
                 {
@@ -427,14 +412,28 @@ public class Ecosystem extends Stage
                     }
                 }
 
-                if (isElement(xi + _dx, yi, ElementActorType.OBSTACLE) != null)
+                if (isElement(xi - _dx, yi, ElementActorType.OBSTACLE) != null)
                 {
                     return res;
                 }
-                if (isElement(xi, yi + _dy, ElementActorType.OBSTACLE) != null)
+                if (isElement(xi, yi - _dy, ElementActorType.OBSTACLE) != null)
                 {
                     return res;
                 }
+            }
+            Pheromone actor = (Pheromone)isElement(xi, yi, _type);
+            if (actor != null)
+            {
+                if (actor.getStepFrom() < resStepFrom)
+                {
+                    res = actor;
+                    resStepFrom = actor.getStepFrom();
+                }
+                
+            }
+            else if (isElement(xi, yi, ElementActorType.OBSTACLE) != null)
+            {
+                return res;
             }
 
         }
