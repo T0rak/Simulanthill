@@ -11,8 +11,8 @@ import java.util.Random;
 
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
-import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
+import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.Resource;
 
 /**
@@ -32,12 +32,18 @@ public class WorldMap
 	public String filename;
 	private ArrayList<String> mapStringLines;
 
-	private ElementActor[][][] elementActorGrid;
+	private Pheromone[][][] pheromoneGrid;
+
+	//Contains Anthills, Obstacles and Resources
+	private ElementActor[][] mapTileGrid;
+
+	//Contains pheromones of every ant colony (anthill)
+	//private List<Pheromone[][][]> pheromoneGridList;
 
 	private static final int errorMapWidth = 125 ;
 	private static final int errorMapHeight = 58 ;
 
-	private static final int nbLayers = 5;
+	private static final int nbPhero = 3;
 	
 	private static final Character[] ACCEPTED_CHAR_LIST = 
 	{
@@ -130,7 +136,8 @@ public class WorldMap
 	 */
 	private void convertMap() 
 	{
-		elementActorGrid = new ElementActor[width][height][nbLayers];
+		pheromoneGrid = new Pheromone[width][height][nbPhero];
+		mapTileGrid = new ElementActor[width][height];
 		int iLine = height;
 		for (String line : mapStringLines) 
 		{
@@ -154,16 +161,16 @@ public class WorldMap
 				break;
 			case '#':
 				actor = new Obstacle(col * caseSize, line * caseSize, caseSize, caseSize);
-				elementActorGrid[col][line][ElementActorType.OBSTACLE.getValue()] = actor;
+				mapTileGrid[col][line] = actor;
 				break;
 			case 'O':
 				// TODO: Manage it for multiple Anthills
 				actor = new Anthill(col * caseSize, line * caseSize, caseSize, caseSize);
-				elementActorGrid[col][line][ElementActorType.ANTHILL.getValue()] = actor;
+				mapTileGrid[col][line] = actor;
 				break;
 			case 'R':
 				actor = new Resource(col * caseSize, line * caseSize, caseSize, caseSize);
-				elementActorGrid[col][line][ElementActorType.RESSOURCE.getValue()] = actor;
+				mapTileGrid[col][line] = actor;
 				break;
 		
 			default:
@@ -379,7 +386,8 @@ public class WorldMap
 	 */
 	public boolean reset() 
 	{
-		elementActorGrid = null;
+		pheromoneGrid = null;
+		mapTileGrid = null;
 		convertMap();
 		return true;
 	}
@@ -388,9 +396,14 @@ public class WorldMap
 	 * Returns the Actor grid (getter) 
 	 * @return the grid containing the actors
 	 */
-	public ElementActor[][][] getElementActorGrid() 
+	public Pheromone[][][] getpheromoneGrid() 
 	{
-		return elementActorGrid;
+		return pheromoneGrid;
+	}
+
+	public ElementActor[][] getmapTileGrid() 
+	{
+		return mapTileGrid;
 	}
 
 	/**

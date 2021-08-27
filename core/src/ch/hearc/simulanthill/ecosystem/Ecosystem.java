@@ -5,14 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.math.MathUtils;
-
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
-import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
+import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
 import ch.hearc.simulanthill.ecosystem.actors.Resource;
@@ -110,7 +109,7 @@ public class Ecosystem extends Stage
     { 
         removeAllActor();
 
-        if(worldMap.reset())
+        if (worldMap.reset())
         {
             addElementActorGridToStage();
         }
@@ -162,16 +161,14 @@ public class Ecosystem extends Stage
      */
     private void addElementActorGridToStage()
     {
-        for (ElementActor[][] elementA: worldMap.getElementActorGrid()) 
+        for (ElementActor[] elementA: worldMap.getmapTileGrid()) 
         {
-            for (ElementActor[] elementB: elementA) 
+    
+            for (ElementActor elementB: elementA)
             {
-                for (ElementActor elementC: elementB)
+                if (elementB != null)
                 {
-                    if (elementC != null)
-                    {
-                        addActor(elementC);
-                    }
+                    addActor(elementB);
                 }
             }
 		}
@@ -183,14 +180,14 @@ public class Ecosystem extends Stage
     private void refreshAnthills()
     {
         anthills.clear();
-        for (ElementActor[][] elementA: worldMap.getElementActorGrid()) 
+        for (ElementActor[] elementA: worldMap.getmapTileGrid()) 
         {
-            for (ElementActor[] elementB: elementA) 
+            for (ElementActor elementB: elementA) 
             {
-                    if (elementB[ElementActorType.ANTHILL.getValue()] != null)
-                    {
-                        anthills.add((Anthill)elementB[ElementActorType.ANTHILL.getValue()]);
-                    }
+                if (elementB != null && elementB.getClass() == Anthill.class)
+                {
+                    anthills.add((Anthill)elementB);
+                }
             }
 		}
     }
@@ -210,6 +207,7 @@ public class Ecosystem extends Stage
         this.clear();
     }
 
+
     /**
      * Checks the presence of an element at a given position
      * @param _x position x of point (scene coordinates)
@@ -217,11 +215,11 @@ public class Ecosystem extends Stage
      * @param _type type of element to check
      * @return actor in the case, null if has not an element of this type
      */
-    public ElementActor isElement(float _x, float _y, ElementActorType _type)
+    public ElementActor getElement(float _x, float _y)
     {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
-        return isElement(xCase, yCase, _type);
+        return getElement(xCase, yCase);
     }
 
     /**
@@ -231,9 +229,57 @@ public class Ecosystem extends Stage
      * @param _type type of element to check
      * @return actor in the case, null if has not an element of this type
      */
-    private ElementActor isElement(int _x, int _y, ElementActorType _type)
+    private ElementActor getElement(int _x, int _y)
     {
-        return worldMap.getElementActorGrid()[_x][_y][_type.getValue()];
+        return worldMap.getmapTileGrid()[_x][_y];
+    }
+
+    public boolean isObstacle(ElementActor actor)
+    {
+        return actor != null && actor.getClass() == Obstacle.class;
+    }
+
+    public boolean isResource(ElementActor actor) 
+    {
+        return actor != null && actor.getClass() == Resource.class;
+    }
+
+    public boolean isAnthill(ElementActor actor) 
+    {
+        return actor != null && actor.getClass() == Anthill.class;
+    }
+
+    
+    public boolean isInstanceOf(ElementActor actor, Class<?> _class) 
+    {
+        return actor != null && actor.getClass() == _class;
+    }
+
+    /**
+     * Checks the presence of an element at a given position
+     * @param _x position x of point (scene coordinates)
+     * @param _y position y of point (scene coordinates)
+     * @param _type type of element to check
+     * @return actor in the case, null if has not an element of this type
+     */
+    public Pheromone isPheromone(float _x, float _y, PheromoneType _type)
+    {
+        int xCase = castInCase(_x);
+        int yCase = castInCase(_y);
+        return isPheromone(xCase, yCase, _type);
+    }
+
+    /**
+     * Checks the presence of an element at a given position
+     * @param _x position x of point (case coordinate)
+     * @param _y position y of point (case coordinate)
+     * @param _type type of element to check
+     * @return actor in the case, null if has not an element of this type
+     */
+    private Pheromone isPheromone(int _x, int _y, PheromoneType _type)
+    {
+
+        return worldMap.getpheromoneGrid()[_x][_y][_type.getValue()];
     }
 
      /**
@@ -244,7 +290,7 @@ public class Ecosystem extends Stage
      * @param _type type of actor to find
      * @return the ElementActor if there is one else null
      */
-    public ElementActor checkRadial(float _x, float _y, int _radius, ElementActorType _type)
+    public ElementActor checkRadial(float _x, float _y, int _radius, Class<?> _class)
     {
         ElementActor res = null;
         float distance = 0;
@@ -258,7 +304,7 @@ public class Ecosystem extends Stage
             {
                 if (!(i==0 && j==0))
                 {
-                    ElementActor v = checkRadialLine(xCase, yCase, _radius, i, j, _type);
+                    ElementActor v = checkRadialLine(xCase, yCase, _radius, i, j, _class);
                     if (v != null) 
                     {
                         float d = (float)(Math.pow(_x - v.getX(), 2) + Math.pow(_y - v.getY(), 2));
@@ -283,45 +329,48 @@ public class Ecosystem extends Stage
      * @param _type type of actor to find
      * @return the ElementActor if there is one else null
      */
-    private ElementActor checkRadialLine(int _x, int _y, int _radius, int _dx, int _dy, ElementActorType _type)
+    private ElementActor checkRadialLine(int _x, int _y, int _radius, int _dx, int _dy, Class<?> _class)
     {
         for (int i = 1; i <= _radius; i++)
         {
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
-            //addActor(new Pheromone(xi * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
             
             if (Math.abs(_dx) == Math.abs(_dy))
             {
-                ElementActor actor2 = isElement(xi - _dx, yi, _type);
-                //addActor(new Pheromone((xi +dx) * caseSize, yi * caseSize, PheromoneType.HOME, null, 0));
-                if (actor2 != null)
+                ElementActor actor2 = getElement(xi - _dx, yi);
+                ElementActor actor3 = getElement(xi, yi - _dy);
+
+                if (isInstanceOf(actor2, _class))
                 {
-                    return actor2;   
+                    return actor2;
                 }
-                ElementActor actor3 = isElement(xi, yi - _dy, _type);
-                //addActor(new Pheromone(xi * caseSize, (yi+dy) * caseSize, PheromoneType.HOME, null, 0));
-                if (actor3 != null)
+
+                
+                if (isInstanceOf(actor3, _class))
                 {
                     return actor3;
-                } 
+                }
+
                 
-                if (isElement(xi - _dx, yi, ElementActorType.OBSTACLE) != null)
+                if (isObstacle(actor2))
                 {
                     return null;
                 }
-                if (isElement(xi, yi - _dy, ElementActorType.OBSTACLE) != null)
+
+                if (isObstacle(actor3))
                 {
                     return null;
                 }
             }
-            ElementActor actor = isElement(xi, yi, _type);
 
-            if (actor != null)
+            ElementActor actor = getElement(xi, yi);
+
+            if (isInstanceOf(actor, _class))
             {
                 return actor;
             }
-            else if (isElement(xi, yi, ElementActorType.OBSTACLE) != null)
+            else if (isObstacle(actor))
             {
                 return null;
             }
@@ -340,20 +389,17 @@ public class Ecosystem extends Stage
     {
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
-        /*if (pheromone != null)
-        {
-            resStepFrom = pheromone.getStepFrom();
-        }*/
+
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
+
         for (int i = -1; i <= 1; i++)
         {
             for (int j = -1; j <= 1; j++)
             {
                 if (!(j == 0 && i == 0))
                 {
-                    Pheromone actor = checkRadialLinePheromone(xCase, yCase, _radius, i, j, toActorType(_type));
-                    //Pheromone actor = (Pheromone)isElement(xi, yi, type);
+                    Pheromone actor = checkRadialLinePheromone(xCase, yCase, _radius, i, j, _type);
                     if (actor != null)
                     {
                         if(actor.getStepFrom() < resStepFrom)
@@ -380,7 +426,7 @@ public class Ecosystem extends Stage
      * @param _pheromone type of pheromone to find
      * @return the Pheromone if there is one else null
      */
-    private Pheromone checkRadialLinePheromone(int _x, int _y, int _radius, int _dx, int _dy, ElementActorType _type)
+    private Pheromone checkRadialLinePheromone(int _x, int _y, int _radius, int _dx, int _dy, PheromoneType _type)
     {
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
@@ -392,7 +438,7 @@ public class Ecosystem extends Stage
 
             if (Math.abs(_dx) == Math.abs(_dy))
             {
-                Pheromone actor2 = (Pheromone)isElement(xi - _dx, yi, _type);
+                Pheromone actor2 = (Pheromone)isPheromone(xi - _dx, yi, _type);
                 
                 if (actor2 != null)
                 {
@@ -403,7 +449,7 @@ public class Ecosystem extends Stage
                     }
                     
                 }
-                Pheromone actor3 = (Pheromone)isElement(xi, yi - _dy, _type);
+                Pheromone actor3 = (Pheromone)isPheromone(xi, yi - _dy, _type);
 
                 if (actor3 != null)
                 {
@@ -414,16 +460,16 @@ public class Ecosystem extends Stage
                     }
                 }
 
-                if (isElement(xi - _dx, yi, ElementActorType.OBSTACLE) != null)
+                if (isObstacle(getElement(xi - _dx, yi)))
                 {
                     return res;
                 }
-                if (isElement(xi, yi - _dy, ElementActorType.OBSTACLE) != null)
+                if (isObstacle(getElement(xi, yi - _dy)))
                 {
                     return res;
                 }
             }
-            Pheromone actor = (Pheromone)isElement(xi, yi, _type);
+            Pheromone actor = isPheromone(xi, yi, _type);
             if (actor != null)
             {
                 if (actor.getStepFrom() < resStepFrom)
@@ -433,7 +479,7 @@ public class Ecosystem extends Stage
                 }
                 
             }
-            else if (isElement(xi, yi, ElementActorType.OBSTACLE) != null)
+            else if (isObstacle(getElement(xi, yi)))
             {
                 return res;
             }
@@ -461,15 +507,14 @@ public class Ecosystem extends Stage
         int dy = destinationYCase - initYCase;
         
 
-        if (isElement(destinationXCase, destinationYCase, ElementActorType.OBSTACLE) != null) 
+        if (isObstacle(getElement(destinationXCase, destinationYCase))) 
         {
             return false;
         }
         
         if (dx != 0 && dy != 0) 
         {
-            if (isElement(initXCase, initYCase + dy, ElementActorType.OBSTACLE) != null &&
-             isElement(initXCase + dx, initYCase, ElementActorType.OBSTACLE) != null)
+            if (isObstacle(getElement(initXCase, initYCase + dy)) && isObstacle(getElement(initXCase + dx, initYCase)))
             {
                 return false;
             }
@@ -490,7 +535,15 @@ public class Ecosystem extends Stage
     {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
-        return ((Resource)worldMap.getElementActorGrid()[xCase][yCase][1]).decrease(_quantity);
+        ElementActor actor = getElement(xCase, yCase);
+        
+        if (actor != null && actor.getClass() == Resource.class)
+        {
+            return ((Resource)actor).decrease(_quantity);
+
+        }
+        return 0;
+        
     }
 
     /**
@@ -500,7 +553,12 @@ public class Ecosystem extends Stage
      */
     public void removeResource(float _x, float _y) 
     {
-        worldMap.getElementActorGrid()[castInCase(_x)][castInCase(_y)][1] = null;
+        int xCase = castInCase(_x);
+        int yCase = castInCase(_y);
+        if (worldMap.getmapTileGrid()[xCase][yCase].getClass() == Resource.class)
+        {
+            worldMap.getmapTileGrid()[xCase][yCase] = null;
+        }
 
     }
 
@@ -515,17 +573,17 @@ public class Ecosystem extends Stage
     public void addPheromone(float _x, float _y, PheromoneType _type, Ant _ant, int _stepFrom) 
     {
       
-        int i = toActorType(_type).getValue();
+        int i = _type.getValue();
         int caseX = castInCase(_x);
         int caseY = castInCase(_y);
-        Pheromone currentPheromoneCase = (Pheromone)worldMap.getElementActorGrid()[caseX][caseY][i];
+        Pheromone currentPheromoneCase = worldMap.getpheromoneGrid()[caseX][caseY][i];
         if (currentPheromoneCase != null) 
         {
             if (currentPheromoneCase.getStepFrom() > _stepFrom)
             {
                 currentPheromoneCase.remove();
                 Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-                worldMap.getElementActorGrid()[caseX][caseY][i] = p;
+                worldMap.getpheromoneGrid()[caseX][caseY][i] = p;
                 addActor(p);
             }
             else
@@ -537,7 +595,7 @@ public class Ecosystem extends Stage
         else
         {
             Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-            worldMap.getElementActorGrid()[caseX][caseY][i] = p;
+            worldMap.getpheromoneGrid()[caseX][caseY][i] = p;
             addActor(p);
         }
     }
@@ -549,7 +607,7 @@ public class Ecosystem extends Stage
      */
     public void removePheromone(float _x, float _y, PheromoneType _type) 
     {
-        worldMap.getElementActorGrid()[castInCase(_x)][castInCase(_y)][toActorType(_type).getValue()] = null;
+        worldMap.getpheromoneGrid()[castInCase(_x)][castInCase(_y)][_type.getValue()] = null;
 
     }
 
@@ -568,7 +626,7 @@ public class Ecosystem extends Stage
      * @param _type PheromoneType to convert
      * @return ElementActorType
      */
-    private ElementActorType toActorType(PheromoneType _type)
+    /*private ElementActorType toActorType(PheromoneType _type)
     {
         if (_type == PheromoneType.HOME) 
         {
@@ -581,7 +639,7 @@ public class Ecosystem extends Stage
         }
 
         return null;
-    }
+    }*/
 
     public void setNbAntMax(int _nbAntMax)
     {

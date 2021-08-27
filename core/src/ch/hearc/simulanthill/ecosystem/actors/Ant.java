@@ -143,7 +143,7 @@ public class Ant extends ElementActor
     public void tryCollectFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isElement(getX(), getY(), ElementActorType.RESSOURCE) != null) 
+        if (ecosystem.isResource(ecosystem.getElement(getX(), getY()))) 
         {
             capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
             if (capacity >= MAX_CAPACITY)
@@ -161,7 +161,7 @@ public class Ant extends ElementActor
     public void tryDepositFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) 
+        if (ecosystem.isAnthill(ecosystem.getElement(getX(), getY()))) 
         {
             anthill.addRessource(capacity);
             capacity = 0;
@@ -182,7 +182,7 @@ public class Ant extends ElementActor
     public ElementActor searchAnthill()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.ANTHILL);
+        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, Anthill.class);
     }
 
     /**
@@ -192,7 +192,7 @@ public class Ant extends ElementActor
     public ElementActor searchFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, ElementActorType.RESSOURCE);
+        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, Resource.class);
     }
 
     /**
@@ -291,7 +291,7 @@ public class Ant extends ElementActor
     public void releasePheromone(PheromoneType _type) 
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isElement(getX(), getY(), ElementActorType.OBSTACLE) == null)
+        if (ecosystem.getElement(getX(), getY()) == null)
         {
             if (pheromoneCountdown < 0)
             {
