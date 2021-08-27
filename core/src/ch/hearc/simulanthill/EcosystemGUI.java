@@ -2,11 +2,7 @@ package ch.hearc.simulanthill;
 
 import java.util.List;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.kotcrab.vis.ui.widget.VisImageButton;
 
 import ch.hearc.simulanthill.actors.Anthill;
 

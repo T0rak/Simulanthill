@@ -1,10 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.Batch;
 
 /**
  * Holds the element informations. It's a superclasse of all elements used in simulantHill (ants, obstacle, resources, ...)

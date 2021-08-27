@@ -2,8 +2,6 @@ package ch.hearc.simulanthill.actors;
 
 import com.badlogic.gdx.graphics.Color;
 
-import ch.hearc.simulanthill.Asset;
-
 /**
  * The class representing the obstacles
  */

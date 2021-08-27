@@ -2,7 +2,6 @@ package ch.hearc.simulanthill;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,7 +16,6 @@ import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
 
 import ch.hearc.simulanthill.actors.Ant;
-import ch.hearc.simulanthill.actors.Anthill;
 import ch.hearc.simulanthill.actors.Pheromone;
 
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -25,11 +23,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.math.BigDecimal;
-
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The stage that contains input
