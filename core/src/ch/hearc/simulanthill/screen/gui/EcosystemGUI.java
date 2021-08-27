@@ -1,10 +1,11 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen.gui;
 
 import java.util.List;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import ch.hearc.simulanthill.actors.Anthill;
+import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 
 public class EcosystemGUI extends Stage
 {

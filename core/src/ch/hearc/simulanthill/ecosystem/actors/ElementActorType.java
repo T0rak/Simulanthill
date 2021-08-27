@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill.actors;
+package ch.hearc.simulanthill.ecosystem.actors;
 
 /**
  * Enum that gives the type of ElementActor

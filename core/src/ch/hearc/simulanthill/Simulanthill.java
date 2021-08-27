@@ -7,6 +7,7 @@ import com.kotcrab.vis.ui.VisUI;
 import ch.hearc.simulanthill.screen.AboutScreen;
 import ch.hearc.simulanthill.screen.MapDimensionsScreen;
 import ch.hearc.simulanthill.screen.MapSelectionScreen;
+import ch.hearc.simulanthill.tools.Asset;
 import ch.hearc.simulanthill.screen.MainScreen;
 
 /**

@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill.actors;
+package ch.hearc.simulanthill.tools;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
