@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kotcrab.vis.ui.widget.VisImage;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
+
+import ch.hearc.simulanthill.Asset;
+import ch.hearc.simulanthill.Simulanthill;
 
 /**
  * Gives information about the institution and students that worked on the simulator
@@ -83,7 +86,7 @@ public class AboutScreen implements Screen
         if(time > 3)
         {
             time = 0;
-            ((Simulanthill)game).displaySimulanthillScreen();
+            ((Simulanthill)game).displayMainScreen();
         }
     }
 

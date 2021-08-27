@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -17,6 +17,8 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 
+import ch.hearc.simulanthill.Ecosystem;
+import ch.hearc.simulanthill.Simulanthill;
 import ch.hearc.simulanthill.actors.Ant;
 
 import java.io.File;
@@ -83,7 +85,7 @@ public class MapSelectionScreen implements Screen
                 @Override
                 public void clicked(InputEvent event, float x, float y) 
                 {           
-                    ((Simulanthill)MapSelectionScreen.this.game).displaySimulanthillScreen();
+                    ((Simulanthill)MapSelectionScreen.this.game).displayMainScreen();
                 }
             }
         );
@@ -102,7 +104,7 @@ public class MapSelectionScreen implements Screen
                         ecosystem.loadMap(mapFolderPath + "/" + selectedFileName);
                         Ant.updateSpeed();
                     }
-                    ((Simulanthill)MapSelectionScreen.this.game).displaySimulanthillScreen();
+                    ((Simulanthill)MapSelectionScreen.this.game).displayMainScreen();
                             
                 }
             }

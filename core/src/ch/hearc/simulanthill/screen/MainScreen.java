@@ -1,8 +1,11 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import ch.hearc.simulanthill.Ecosystem;
+import ch.hearc.simulanthill.EcosystemGUI;
+import ch.hearc.simulanthill.GUI;
 import ch.hearc.simulanthill.actors.Ant;
 
 import com.badlogic.gdx.Screen;
@@ -15,7 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * Class of the screen that handles the simulator. 
  */
-public class SimulathillScreen implements Screen 
+public class MainScreen implements Screen 
 {
 	private final Game game;
 	private Ecosystem ecosystem;
@@ -29,7 +32,7 @@ public class SimulathillScreen implements Screen
      * Constructor
      * @param _game handler of the content of AboutScreen
      */
-	public SimulathillScreen(Game _game) 
+	public MainScreen(Game _game) 
 	{
 		this.game = _game;
 		//manager = new AssetManager();

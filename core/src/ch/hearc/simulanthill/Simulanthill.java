@@ -4,13 +4,18 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
 
+import ch.hearc.simulanthill.screen.AboutScreen;
+import ch.hearc.simulanthill.screen.MapDimensionsScreen;
+import ch.hearc.simulanthill.screen.MapSelectionScreen;
+import ch.hearc.simulanthill.screen.MainScreen;
+
 /**
  * Is the class that handle the whole simulation.
  */
 public class Simulanthill extends Game
 {
     private Screen aboutScreen;
-    private Screen simulanthillScreen;
+    private Screen mainScreen;
     private Screen mapDimensionsScreen;
     private Screen mapSelectionScreen;
     /**
@@ -23,7 +28,7 @@ public class Simulanthill extends Game
         VisUI.load();
 
         aboutScreen = new AboutScreen(this);
-        simulanthillScreen = new SimulathillScreen(this);
+        mainScreen = new MainScreen(this);
         mapDimensionsScreen = new MapDimensionsScreen(this);
         mapSelectionScreen = new MapSelectionScreen(this);
 
@@ -34,8 +39,8 @@ public class Simulanthill extends Game
         setScreen(aboutScreen);
     }
 
-    public void displaySimulanthillScreen() {
-        setScreen(simulanthillScreen);
+    public void displayMainScreen() {
+        setScreen(mainScreen);
     }
 
     public void displayMapDimensionsScreen() {

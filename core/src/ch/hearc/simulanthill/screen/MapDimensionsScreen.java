@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -13,6 +13,8 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.spinner.Spinner;
 
+import ch.hearc.simulanthill.Ecosystem;
+import ch.hearc.simulanthill.Simulanthill;
 import ch.hearc.simulanthill.actors.Ant;
 
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
@@ -75,7 +77,7 @@ public class MapDimensionsScreen implements Screen
                 @Override
                 public void clicked(InputEvent event, float x, float y) 
                 {           
-                    ((Simulanthill)MapDimensionsScreen.this.game).displaySimulanthillScreen();
+                    ((Simulanthill)MapDimensionsScreen.this.game).displayMainScreen();
                 }
             }
         );
@@ -96,7 +98,7 @@ public class MapDimensionsScreen implements Screen
                         //Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
                         Ant.updateSpeed();
                     }
-                    ((Simulanthill)MapDimensionsScreen.this.game).displaySimulanthillScreen();
+                    ((Simulanthill)MapDimensionsScreen.this.game).displayMainScreen();
                             
                 }
             }
