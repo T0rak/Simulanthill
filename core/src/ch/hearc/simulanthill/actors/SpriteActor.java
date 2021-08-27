@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -15,6 +17,19 @@ public class SpriteActor extends Actor
         sprite = new Sprite(_texture);
         setPosition(_x, _y);
     }
+
+    public SpriteActor(float _x, float _y, float _width, float _height, Color _color) {
+      this(_x, _y, _width, _height, createColorImage(_color));
+      
+  }
+
+  public static Texture createColorImage(Color _color)
+  {
+      Pixmap bgPixmap = new Pixmap(1,1, Pixmap.Format.RGB565);
+      bgPixmap.setColor(_color);
+      bgPixmap.fill();
+      return new Texture(bgPixmap);
+  }
 
     public SpriteActor(float _x, float _y, float _width, float _height, Texture _texture) 
     {

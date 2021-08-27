@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
+import com.badlogic.gdx.graphics.Color;
+
 import ch.hearc.simulanthill.Asset;
 
 /**
@@ -7,6 +9,7 @@ import ch.hearc.simulanthill.Asset;
  */
 public class Obstacle extends ElementActor
 {
+    private static final Color color = new Color(40/255f, 40/255f, 40/255f, 1);
     /**
     * Main constructor
     * @param _posX the initial x position
@@ -17,6 +20,6 @@ public class Obstacle extends ElementActor
 	public Obstacle(float _posX, float _posY, float _width, float _height)
 	{
 		//TODO : change values fron pannel input ? 
-        super(_posX, _posY, _width, _height, Asset.obstacle());
+        super(_posX, _posY, _width, _height, color);
     }
 }

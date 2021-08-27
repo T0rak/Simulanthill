@@ -1,5 +1,7 @@
 package ch.hearc.simulanthill.actors;
 
+import com.badlogic.gdx.graphics.Color;
+
 import ch.hearc.simulanthill.Asset;
 import ch.hearc.simulanthill.Ecosystem;
 
@@ -9,6 +11,7 @@ import ch.hearc.simulanthill.Ecosystem;
 public class Resource extends ElementActor 
 {
     private static final int INIT_CAPACITY = 10;
+    private static final Color color = new Color(131/255f, 2/255f, 2/255f, 1);
     int capacity;
     /**
     * Main constructor
@@ -19,7 +22,7 @@ public class Resource extends ElementActor
     */
     public Resource(float _x, float _y, float _width, float _height) 
     {
-        super(_x, _y, _width, _height, Asset.resource());
+        super(_x, _y, _width, _height, color);
         this.capacity = INIT_CAPACITY;
     }
 

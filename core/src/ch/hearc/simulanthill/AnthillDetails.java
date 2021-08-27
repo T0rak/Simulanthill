@@ -10,9 +10,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 
 import ch.hearc.simulanthill.actors.Anthill;
-import ch.hearc.simulanthill.actors.ElementActor;
 import ch.hearc.simulanthill.actors.SpriteActor;
-import ch.hearc.simulanthill.actors.ColorActor;
 
 public class AnthillDetails extends Group {
 
@@ -24,7 +22,7 @@ public class AnthillDetails extends Group {
 
     private Anthill anthill;
     private SpriteActor hoverAnthill;
-    private ColorActor background;
+    private SpriteActor background;
 
     public AnthillDetails(Anthill _anthill)
     {
@@ -58,7 +56,7 @@ public class AnthillDetails extends Group {
         }
 
         hoverAnthill = new SpriteActor(0,0,anthill.getWidth(), anthill.getHeight(), Asset.anthill());
-        background = new ColorActor(anthill.getWidth()+10, 0, info.getMinWidth(), info.getMinHeight(), Color.BLACK);
+        background = new SpriteActor(anthill.getWidth()+10, 0, info.getMinWidth(), info.getMinHeight(), Color.BLACK);
         
         setVisible(false);
 
