@@ -14,7 +14,8 @@ public class Ant extends ElementActor
     private static final int MAX_CAPACITY = 1;
     private static int FIELD_OF_VIEW = 3;
 
-	private static double speed = 1;
+	private static double speed = 0;
+    private static float speedFactor = 1f;
     
     private float direction;
     private int viewSpanAngle;
@@ -40,20 +41,21 @@ public class Ant extends ElementActor
 	 */
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
-        super(_x, _y, Asset.ant(), "ant");
+        super(_x, _y, _width, _height, Asset.ant());
 
-        sprite.setOrigin(_width / 2, _height / 2);
-        setSize(_width, _height);
         this.capacity = 0;
         this.viewSpanAngle = 15;
-        //this.direction = 90;
+
         this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
+
         this.anthill = _anthill;
+
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         this.stepFrom = 0;
         this.lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
+        
         blocked = false;
         checkCountdown = NEXT_CHECK_COUNTDOWN;
     }
@@ -66,7 +68,6 @@ public class Ant extends ElementActor
     public void act(float _delta)
     {
         super.act(_delta);
-
         if (capacity < MAX_CAPACITY)
         {
             tryCollectFood();
@@ -103,7 +104,6 @@ public class Ant extends ElementActor
                 newGoal = searchAnthill();
                 if (newGoal == null) 
                 {
-                    //newGoal = this.anthill;
                     newGoal = searchPheromone(PheromoneType.HOME);
                 }
             }
@@ -163,6 +163,7 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isElement(getX(), getY(), ElementActorType.ANTHILL) != null) 
         {
+            anthill.addRessource(capacity);
             capacity = 0;
             stepFrom = 0;
             goal = null;
@@ -235,8 +236,7 @@ public class Ant extends ElementActor
     {
         if (goal != null && blocked == false)
         {
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() - getY(), goal.getX() - getX());
-            //System.out.println(newDirection);
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getY(), goal.getX() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getX());
             float deltaDirection = (float)(newDirection - this.direction) % 360f;
 
             direction = newDirection;
@@ -271,11 +271,10 @@ public class Ant extends ElementActor
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        
-        if (ecosystem.isElement(nextPosX, nextPosY, ElementActorType.OBSTACLE) != null)
+
+        if (!ecosystem.canMove(getX(), getY(), nextPosX, nextPosY))
         {
             blocked = true;
-
         }
         else
         {
@@ -325,9 +324,18 @@ public class Ant extends ElementActor
 	 * Changes the movement speed of the ant
      * @param _speed new speed
 	 */
-    public static  void setSpeed(float _speed)
+    public static  void setSpeedFactor(float _speedFactor)
     {
-        speed = _speed;
+        speedFactor = _speedFactor;
+        Ant.updateSpeed();
+    }
+    /**
+    * Changes the movement speed of the ant
+    * @param _speed new speed
+    */
+    public static  void updateSpeed()
+    {
+        speed = speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize() / 10;
     }
 
     /**
@@ -337,5 +345,14 @@ public class Ant extends ElementActor
     public static void setAutonomy(int _autonomy)
     {
         NEXT_CHECK_COUNTDOWN = _autonomy;
+    }
+
+
+    @Override
+    public void setPosition(float _x, float _y) 
+    {
+        super.setPosition(_x, _y);
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        sprite.setPosition(_x - getWidth()/2 + ecosystem.getMapCaseSize()/2, _y - getHeight()/2 + ecosystem.getMapCaseSize()/2);
     }
 }

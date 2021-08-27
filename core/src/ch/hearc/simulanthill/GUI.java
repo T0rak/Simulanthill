@@ -1,10 +1,11 @@
 package ch.hearc.simulanthill;
 
+
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSlider;
@@ -21,18 +22,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.io.File;
 import java.math.BigDecimal;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The stage that contains input
  */
 public class GUI extends Stage
 {
+	private final Game game;
 
 	private VisTable lytMain;
 	private VisTable lytSimulation;
@@ -82,10 +79,10 @@ public class GUI extends Stage
 	 * Constructor
 	 * @param _vp location where the stage can be drawed
 	 */
-	public GUI (Viewport _vp) 
+	public GUI (Viewport _vp, Game _game) 
 	{
 		super(_vp);
-		
+		game = _game;
 		
 		simulation = new Actor();
 		
@@ -129,7 +126,7 @@ public class GUI extends Stage
 		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(DEFAULT_ANT_NUMBER, 1, 10000));
 		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(DEFAULT_INDEPENDENCE,0, 100));
 		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(DEFAULT_LIFETIME, 0, 3000));
-		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "2", "0.1", 1));
+		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "9", "0.5", 1));
 	
 		//Fill main layout
 		lytMain.add(lytSimulation);
@@ -202,29 +199,7 @@ public class GUI extends Stage
 				@Override
 				public void clicked(InputEvent event, float x, float y) 
 				{
-					new Thread(new Runnable() {             
-						@Override
-						public void run() {
-							JFileChooser chooser = new JFileChooser();
-							chooser.setCurrentDirectory(new File("..\\..\\maps\\testmap1.txt"));
-        					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-							chooser.addChoosableFileFilter(new FileNameExtensionFilter("TXT file", "txt"));
-							chooser.setAcceptAllFileFilterUsed(true);
-							JFrame f = new JFrame();
-							f.setVisible(true);
-							f.toFront();
-							f.setVisible(false);
-							chooser.showOpenDialog(f);
-							f.dispose();
-
-							Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-							if (ecosystem != null)
-							{
-								ecosystem.loadMap(chooser.getSelectedFile().getAbsolutePath());
-							}
-							
-						}
-					}).start();
+					((Simulanthill)game).displayMapSelectionScreen();
 				}
 			}
 		);
@@ -238,7 +213,9 @@ public class GUI extends Stage
 					Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 					if (ecosystem != null)
 					{
-						ecosystem.loadMap();
+						((Simulanthill) game).displayMapDimensionsScreen();
+						//ecosystem.loadMap();
+						//Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
 					}
 
 				}
@@ -339,8 +316,7 @@ public class GUI extends Stage
 			@Override
 			public void changed(ChangeEvent event, Actor actor) 
 			{
-				Ant.setSpeed(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
-				
+				Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
 			}
 			
 		});
@@ -382,7 +358,7 @@ public class GUI extends Stage
 					((IntSpinnerModel)(spinAntNumber.getModel())).setValue(DEFAULT_ANT_NUMBER);
 					((IntSpinnerModel)(spinFrequence.getModel())).setValue(DEFAULT_FREQUENCE); 	
 					((IntSpinnerModel)(spinAntIndependence.getModel())).setValue(DEFAULT_INDEPENDENCE);
-					((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(DEFAULT_SPEED));; 	
+					((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(DEFAULT_SPEED));
 					
 				}
 			

@@ -21,15 +21,15 @@
 #                                                                                                                   #
 #                                                                                                                   #
 #                    R R                                                                          ###               #
-#                  RRRRRRR                                                                      ###                 #
-#                   RRRR                                                                        ##                  #
-#                   R                                                                          ###                  #
-#                                                                                          ###R RRR                 #
-#                                                                                            ###R R                 #
-#                                                        O                                 # ####RR                 #
-#                                            ####                                                                   #
-#                                               ##                                                                  #
-#                                    #######    #######################                                             #
+#                  RRRRRRR                    ###################################               ###                 #
+#                   RRRR                       ####                           #                 ##                  #
+#                   R                          #          RRRRRRRRRRRRRRRRRRR #                ###                  #
+#                                              #           RRRRRRRRRRRRRRRRRR #            ###R RRR                 #
+#                                              #            RRRRRRRRRRRRRRRRR #              ###R R                 #
+#                                              #         O  RRRRRRRRRRRRRRR   #            # ####RR                 #
+#                                            ####           RRRRRRRRRRRRR     #                                     #
+#                                               ##                            #                                     #
+#                                    #######    ###############################                                     #
 #                                                                                                                   #
 #                                            RRRRRRR   RRRR                                                         #
 #                                                RRRR                                                               #

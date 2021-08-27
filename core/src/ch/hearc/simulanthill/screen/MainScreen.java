@@ -1,7 +1,13 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import ch.hearc.simulanthill.Ecosystem;
+import ch.hearc.simulanthill.EcosystemGUI;
+import ch.hearc.simulanthill.GUI;
+import ch.hearc.simulanthill.actors.Ant;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -12,22 +18,40 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * Class of the screen that handles the simulator. 
  */
-public class SimulathillScreen implements Screen 
+public class MainScreen implements Screen 
 {
 	private final Game game;
 	private Ecosystem ecosystem;
+	private EcosystemGUI guiEco;
 	private Viewport ecosystemViewport;
 	private Viewport GUIViewport;
-	GUI gui;
+	private InputMultiplexer multiPlexer;
+	private GUI gui;
    
     /**
      * Constructor
      * @param _game handler of the content of AboutScreen
      */
-	public SimulathillScreen(Game _game) 
+	public MainScreen(Game _game) 
 	{
 		this.game = _game;
 		//manager = new AssetManager();
+		// multiple stage
+		multiPlexer = new InputMultiplexer();
+
+		GUIViewport = new FitViewport(1600,900);
+		ecosystemViewport = new FitViewport(1600,900);
+
+		ecosystem = Ecosystem.getInstance(ecosystemViewport);
+		ecosystem.loadMap(124, 70);
+
+
+		Ant.setSpeedFactor(1);
+		gui = new GUI(GUIViewport, game); 
+
+		guiEco = new EcosystemGUI(ecosystem);
+
+			
 	}
   
     /**
@@ -36,21 +60,10 @@ public class SimulathillScreen implements Screen
 	@Override
 	public void show()
 	{
-		// multiple stage
-		InputMultiplexer multiPlexer = new InputMultiplexer();
-
-		GUIViewport = new FitViewport(1600,900);
-		ecosystemViewport = new FitViewport(1600,900);
-
-		ecosystem = Ecosystem.getInstance(ecosystemViewport);
-
-		ecosystem.loadMap();
-
-		gui = new GUI(GUIViewport); 
-
 		multiPlexer.addProcessor(gui);
 		multiPlexer.addProcessor(ecosystem);
-   
+		multiPlexer.addProcessor(guiEco);
+	
 		Gdx.input.setInputProcessor(multiPlexer);
 	}
    
@@ -65,9 +78,6 @@ public class SimulathillScreen implements Screen
 		Gdx.gl.glClearColor(0.12f, 0.12f, 0.12f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		gui.getViewport().apply();
-		gui.act(Gdx.graphics.getDeltaTime());
-		gui.draw();
 
 		// for the first render
 		if(ecosystemViewport.getScreenX() == 0)
@@ -85,7 +95,13 @@ public class SimulathillScreen implements Screen
 		{
 			ecosystem.act(/*Gdx.graphics.getDeltaTime()*/);
 		}
-		ecosystem.draw();	
+		ecosystem.draw();
+		guiEco.act();
+		guiEco.draw();	
+
+		gui.getViewport().apply();
+		gui.act(Gdx.graphics.getDeltaTime());
+		gui.draw();
 	}
    
     /**
@@ -120,7 +136,7 @@ public class SimulathillScreen implements Screen
 	@Override
 	public void hide()
 	{
-		dispose();
+		//dispose();
 	}
    
     /**

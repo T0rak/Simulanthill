@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kotcrab.vis.ui.widget.VisImage;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
+
+import ch.hearc.simulanthill.Asset;
+import ch.hearc.simulanthill.Simulanthill;
 
 /**
  * Gives information about the institution and students that worked on the simulator
@@ -39,9 +42,7 @@ public class AboutScreen implements Screen
      */
     @Override
     public void show() 
-    {
-        
-		
+    {		
         stage = new Stage(new FitViewport(1600, 900));
 		Gdx.input.setInputProcessor(stage);
 
@@ -60,9 +61,7 @@ public class AboutScreen implements Screen
         lytMain.row();
         lytMain.add(allRightsReserved).pad(10f);
 
-        
         //lytMain.setDebug(true);
-
 
         lytMain.setFillParent(true);
 
@@ -86,7 +85,8 @@ public class AboutScreen implements Screen
         time += _delta;
         if(time > 3)
         {
-            game.setScreen(new SimulathillScreen(game));
+            time = 0;
+            ((Simulanthill)game).displayMainScreen();
         }
     }
 

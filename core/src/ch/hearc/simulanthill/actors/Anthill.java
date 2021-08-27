@@ -6,6 +6,10 @@ import ch.hearc.simulanthill.Ecosystem;
  */
 public class Anthill extends ElementActor
 {
+
+    private int nbAnts;
+    private int nbResources;
+
     /**
 	 * Main constructor
 	 * @param  _x the initial x position of the ant 
@@ -15,10 +19,7 @@ public class Anthill extends ElementActor
 	 */
     public Anthill(float _x, float _y, float _width, float _height) 
     {
-        super(_x, _y, Asset.anthill(), "anthill");
-
-        setSize(_width, _height);
-        this.sprite.setOrigin(_width/2, _height/2);
+        super(_x, _y, _width, _height, Asset.anthill());
     }
     
     /**
@@ -56,15 +57,32 @@ public class Anthill extends ElementActor
      */
     public void createAnt()
     {
-        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX(), this.getY(), 12, 12, this));
+        nbAnts++;
+        int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
+        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX(), this.getY(),  antSize, antSize, this));
     }
     
     /**
      * Removes an ant
      * @param ant  the ant that will removed
      */
-    public void removeAnt(Ant ant)
+    public void removeAnt(Ant _ant)
     {
-        Ecosystem.getCurrentEcosystem().removeAnt(ant);
+        Ecosystem.getCurrentEcosystem().removeAnt(_ant);
+    }
+
+
+    public void addRessource(int _nbResources)
+    {
+        nbResources += _nbResources;
+    }
+
+    public int getNbAnts()
+    {
+        return nbAnts;
+    }
+    public int getNbResource()
+    {
+        return nbResources;
     }
 }
