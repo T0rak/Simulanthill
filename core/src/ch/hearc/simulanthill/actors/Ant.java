@@ -41,19 +41,21 @@ public class Ant extends ElementActor
 	 */
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
-        super(_x, _y, Asset.ant(), "ant");
-        sprite.setOrigin(_width / 2, _height / 2);
-        setSize(_width, _height);
+        super(_x, _y, _width, _height, Asset.ant());
+
         this.capacity = 0;
         this.viewSpanAngle = 15;
-        //this.direction = 90;
+
         this.direction = MathUtils.random(360f);
         this.sprite.rotate(this.direction);
+
         this.anthill = _anthill;
+
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
         this.stepFrom = 0;
         this.lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
+        
         blocked = false;
         checkCountdown = NEXT_CHECK_COUNTDOWN;
     }
