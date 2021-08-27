@@ -219,7 +219,7 @@ public class Ecosystem extends Stage
     {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
-        return worldMap.getElementActorGrid()[yCase][xCase][_type.getValue()];
+        return isElement(xCase, yCase, _type);
     }
 
     /**
@@ -231,7 +231,7 @@ public class Ecosystem extends Stage
      */
     private ElementActor isElement(int _x, int _y, ElementActorType _type)
     {
-        return worldMap.getElementActorGrid()[_y][_x][_type.getValue()];
+        return worldMap.getElementActorGrid()[_x][_y][_type.getValue()];
     }
 
      /**
@@ -488,7 +488,7 @@ public class Ecosystem extends Stage
     {
         int xCase = castInCase(_x);
         int yCase = castInCase(_y);
-        return ((Resource)worldMap.getElementActorGrid()[yCase][xCase][1]).decrease(_quantity);
+        return ((Resource)worldMap.getElementActorGrid()[xCase][yCase][1]).decrease(_quantity);
     }
 
     /**
@@ -498,7 +498,7 @@ public class Ecosystem extends Stage
      */
     public void removeResource(float _x, float _y) 
     {
-        worldMap.getElementActorGrid()[castInCase(_y)][castInCase(_x)][1] = null;
+        worldMap.getElementActorGrid()[castInCase(_x)][castInCase(_y)][1] = null;
 
     }
 
@@ -516,14 +516,14 @@ public class Ecosystem extends Stage
         int i = toActorType(_type).getValue();
         int caseX = castInCase(_x);
         int caseY = castInCase(_y);
-        Pheromone currentPheromoneCase = (Pheromone)worldMap.getElementActorGrid()[caseY][caseX][i];
+        Pheromone currentPheromoneCase = (Pheromone)worldMap.getElementActorGrid()[caseX][caseY][i];
         if (currentPheromoneCase != null) 
         {
             if (currentPheromoneCase.getStepFrom() > _stepFrom)
             {
                 currentPheromoneCase.remove();
                 Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-                worldMap.getElementActorGrid()[caseY][caseX][i] = p;
+                worldMap.getElementActorGrid()[caseX][caseY][i] = p;
                 addActor(p);
             }
             else
@@ -535,7 +535,7 @@ public class Ecosystem extends Stage
         else
         {
             Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-            worldMap.getElementActorGrid()[caseY][caseX][i] = p;
+            worldMap.getElementActorGrid()[caseX][caseY][i] = p;
             addActor(p);
         }
     }
@@ -547,7 +547,7 @@ public class Ecosystem extends Stage
      */
     public void removePheromone(float _x, float _y, PheromoneType _type) 
     {
-        worldMap.getElementActorGrid()[castInCase(_y)][castInCase(_x)][toActorType(_type).getValue()] = null;
+        worldMap.getElementActorGrid()[castInCase(_x)][castInCase(_y)][toActorType(_type).getValue()] = null;
 
     }
 
