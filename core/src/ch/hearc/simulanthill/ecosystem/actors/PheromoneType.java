@@ -1,19 +1,20 @@
-package ch.hearc.simulanthill.actors;
+package ch.hearc.simulanthill.ecosystem.actors;
 
 /**
- * Enum that gives the type of ElementActor
+ * Enum that helps determinating the pheromone type
  */
-public enum ElementActorType 
+public enum PheromoneType 
 {
-    OBSTACLE(0), RESSOURCE(1), ANTHILL(2), HOME_PHEROMONE(3), FOOD_PHEROMONE(4);
-    
-    private final int value;
+	RESSOURCE(0),
+	HOME(1);
+
+	private final int value;
 
     /**
      * Defines the elementActor type
      * @param _value the value wanted to assign the type
      */
-    private ElementActorType(int _value) 
+    private PheromoneType(int _value) 
     {
         this.value = _value;
     }

@@ -1,4 +1,4 @@
-package ch.hearc.simulanthill;
+package ch.hearc.simulanthill.screen.gui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -9,8 +9,9 @@ import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 
-import ch.hearc.simulanthill.actors.Anthill;
-import ch.hearc.simulanthill.actors.SpriteActor;
+import ch.hearc.simulanthill.ecosystem.actors.Anthill;
+import ch.hearc.simulanthill.tools.Asset;
+import ch.hearc.simulanthill.tools.SpriteActor;
 
 public class AnthillDetails extends Group {
 

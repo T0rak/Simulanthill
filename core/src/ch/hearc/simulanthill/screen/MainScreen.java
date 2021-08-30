@@ -3,10 +3,10 @@ package ch.hearc.simulanthill.screen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import ch.hearc.simulanthill.Ecosystem;
-import ch.hearc.simulanthill.EcosystemGUI;
-import ch.hearc.simulanthill.GUI;
-import ch.hearc.simulanthill.actors.Ant;
+import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.actors.Ant;
+import ch.hearc.simulanthill.screen.gui.EcosystemGUI;
+import ch.hearc.simulanthill.screen.gui.GUI;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -43,6 +43,7 @@ public class MainScreen implements Screen
 		ecosystemViewport = new FitViewport(1600,900);
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
+		System.out.println(Ecosystem.getCurrentEcosystem());
 		ecosystem.loadMap(124, 70);
 
 
