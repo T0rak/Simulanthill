@@ -1,6 +1,7 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
@@ -9,17 +10,13 @@ import ch.hearc.simulanthill.tools.Asset;
  * The anthill actor that makes ants spawning
  */
 public class Anthill extends ElementActor
-{
-    
-    protected final Color color = new Color(MathUtils.random(0.2f, 0.8f) , MathUtils.random(0.2f, 0.8f), MathUtils.random(0.2f, 0.8f), 1);
+{ 
+    private final Texture texture = createColorImage(new Color(MathUtils.random(0.2f, 0.8f) , MathUtils.random(0.2f, 0.8f), MathUtils.random(0.2f, 0.8f), 1));
 
     private static int idGenerator = 0;
 
     private int nbAnts;
     private int nbResources;
-
-
-    
     private int id;
 
     /**
@@ -104,7 +101,7 @@ public class Anthill extends ElementActor
         return id;
     }
 
-    public Color getColor() {
-        return color;
+    public Texture getTexture() {
+        return texture;
     }
 }

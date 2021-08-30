@@ -12,7 +12,6 @@ import java.util.Random;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
-import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.Resource;
 
 /**
@@ -32,18 +31,11 @@ public class WorldMap
 	public String filename;
 	private ArrayList<String> mapStringLines;
 
-	//private Pheromone[][][] pheromoneGrid;
-
 	//Contains Anthills, Obstacles and Resources
 	private ElementActor[][] mapTileGrid;
 
-	//Contains pheromones of every ant colony (anthill)
-	//private List<Pheromone[][][]> pheromoneGridList;
-
 	private static final int errorMapWidth = 125 ;
 	private static final int errorMapHeight = 58 ;
-
-	private static final int nbPhero = 3;
 	
 	private static final Character[] ACCEPTED_CHAR_LIST = 
 	{
@@ -164,7 +156,6 @@ public class WorldMap
 				mapTileGrid[col][line] = actor;
 				break;
 			case 'O':
-				// TODO: Manage it for multiple Anthills
 				actor = new Anthill(col * caseSize, line * caseSize, caseSize, caseSize);
 				mapTileGrid[col][line] = actor;
 				break;

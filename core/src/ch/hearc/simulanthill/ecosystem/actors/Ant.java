@@ -1,9 +1,7 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.tools.Asset;
 
 /**
  * The ant actor that contains it's behaviour
@@ -28,9 +26,7 @@ public class Ant extends ElementActor
     private ElementActor goal;
     private int lastStepFrom;
     private int countLastPhero;
-    private boolean blocked;
-
-    
+    private boolean blocked;    
     
 	/**
 	 * Constructor
@@ -42,7 +38,7 @@ public class Ant extends ElementActor
 	 */
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
-        super(_x, _y, _width, _height, _anthill.getColor());
+        super(_x, _y, _width, _height, _anthill.getTexture());
 
         this.capacity = 0;
         this.viewSpanAngle = 15;
@@ -275,8 +271,6 @@ public class Ant extends ElementActor
         float directionRad = (float) Math.toRadians(this.direction);
         float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
-
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
         if (!canMove(nextPosX, nextPosY))
         {

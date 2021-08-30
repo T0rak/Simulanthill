@@ -39,7 +39,7 @@ public class Ecosystem extends Stage
 
     private List<MapListener> MapListeners;
 
-    private Map<Integer, Pheromone[][][]> pheremoneGridMap;
+    private Map<Integer, Pheromone[][][]> pheromoneGridMap;
 
     
     //reset
@@ -57,7 +57,7 @@ public class Ecosystem extends Stage
         isPlaying = false;
         nbAntMax = 500;
         MapListeners = new LinkedList<MapListener>();
-        pheremoneGridMap =  new TreeMap<Integer, Pheromone[][][]>();
+        pheromoneGridMap =  new TreeMap<Integer, Pheromone[][][]>();
     }
 
     /**
@@ -117,8 +117,6 @@ public class Ecosystem extends Stage
     public void reset()
     { 
         removeAllActor();
-
-
 
         if (worldMap.reset())
         {
@@ -191,7 +189,7 @@ public class Ecosystem extends Stage
 
     private void refreshAnthills()
     {
-        pheremoneGridMap.clear();
+        pheromoneGridMap.clear();
         anthills.clear();
         for (ElementActor[] elementA: worldMap.getmapTileGrid()) 
         {
@@ -200,7 +198,7 @@ public class Ecosystem extends Stage
                 if (elementB != null && elementB.getClass() == Anthill.class)
                 {
                     anthills.add((Anthill)elementB);
-                    pheremoneGridMap.put(((Anthill)elementB).getId(), new Pheromone[worldMap.getWidth()][worldMap.getHeight()][2]);
+                    pheromoneGridMap.put(((Anthill)elementB).getId(), new Pheromone[worldMap.getWidth()][worldMap.getHeight()][2]);
                 }
             }
 		}
@@ -217,6 +215,7 @@ public class Ecosystem extends Stage
     private void removeAllActor()
     {
         anthills.clear();
+        pheromoneGridMap.clear();
         ants.clear();
         this.clear();
     }
@@ -292,7 +291,7 @@ public class Ecosystem extends Stage
      */
     public Pheromone isPheromone(int _x, int _y, Anthill anthill, PheromoneType _type)
     {
-        return pheremoneGridMap.get(anthill.getId())[_x][_y][_type.getValue()];
+        return pheromoneGridMap.get(anthill.getId())[_x][_y][_type.getValue()];
     }
 
     
@@ -351,14 +350,14 @@ public class Ecosystem extends Stage
         int i = _type.getValue();
         int caseX = castInCase(_x);
         int caseY = castInCase(_y);
-        Pheromone currentPheromoneCase = pheremoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i];
+        Pheromone currentPheromoneCase = pheromoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i];
         if (currentPheromoneCase != null) 
         {
             if (currentPheromoneCase.getStepFrom() > _stepFrom)
             {
                 currentPheromoneCase.remove();
                 Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-                pheremoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i] = p;
+                pheromoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i] = p;
                 addActor(p);
             }
             else
@@ -370,7 +369,7 @@ public class Ecosystem extends Stage
         else
         {
             Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-            pheremoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i] = p;
+            pheromoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i] = p;
             addActor(p);
         }
     }
@@ -386,7 +385,7 @@ public class Ecosystem extends Stage
         int xCase = castInCase(_pheromone.getX());
         int yCase = castInCase(_pheromone.getY());
         int typeIndex = _pheromone.getType().getValue();
-        pheremoneGridMap.get(anthill.getId())[xCase][yCase][typeIndex] = null;
+        pheromoneGridMap.get(anthill.getId())[xCase][yCase][typeIndex] = null;
     }
 
     /**
@@ -398,26 +397,6 @@ public class Ecosystem extends Stage
     {
         return MathUtils.round(_f / worldMap.getCaseSize());
     }
-
-    /**
-     * Convetr PheromoneType to ElementActorType
-     * @param _type PheromoneType to convert
-     * @return ElementActorType
-     */
-    /*private ElementActorType toActorType(PheromoneType _type)
-    {
-        if (_type == PheromoneType.HOME) 
-        {
-            return ElementActorType.HOME_PHEROMONE;
-        }
-
-        if (_type == PheromoneType.RESSOURCE) 
-        {
-            return ElementActorType.FOOD_PHEROMONE;
-        }
-
-        return null;
-    }*/
 
     public void setNbAntMax(int _nbAntMax)
     {
