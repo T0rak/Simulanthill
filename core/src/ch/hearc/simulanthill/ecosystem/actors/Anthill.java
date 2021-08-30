@@ -1,4 +1,8 @@
 package ch.hearc.simulanthill.ecosystem.actors;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
+
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.tools.Asset;
 /**
@@ -6,9 +10,17 @@ import ch.hearc.simulanthill.tools.Asset;
  */
 public class Anthill extends ElementActor
 {
+    
+    protected final Color color = new Color(MathUtils.random(0.2f, 0.8f) , MathUtils.random(0.2f, 0.8f), MathUtils.random(0.2f, 0.8f), 1);
+
+    private static int idGenerator = 0;
 
     private int nbAnts;
     private int nbResources;
+
+
+    
+    private int id;
 
     /**
 	 * Main constructor
@@ -20,6 +32,7 @@ public class Anthill extends ElementActor
     public Anthill(float _x, float _y, float _width, float _height) 
     {
         super(_x, _y, _width, _height, Asset.anthill());
+        id = idGenerator ++;
     }
     
     /**
@@ -84,5 +97,14 @@ public class Anthill extends ElementActor
     public int getNbResource()
     {
         return nbResources;
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

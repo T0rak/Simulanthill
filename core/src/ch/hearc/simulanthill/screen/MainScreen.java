@@ -43,6 +43,7 @@ public class MainScreen implements Screen
 		ecosystemViewport = new FitViewport(1600,900);
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
+		System.out.println(Ecosystem.getCurrentEcosystem());
 		ecosystem.loadMap(124, 70);
 
 

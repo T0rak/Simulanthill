@@ -1,5 +1,6 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.tools.Asset;
@@ -41,7 +42,7 @@ public class Ant extends ElementActor
 	 */
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
     {
-        super(_x, _y, _width, _height, Asset.ant());
+        super(_x, _y, _width, _height, _anthill.getColor());
 
         this.capacity = 0;
         this.viewSpanAngle = 15;
@@ -143,7 +144,7 @@ public class Ant extends ElementActor
     public void tryCollectFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isResource(ecosystem.getElement(getX(), getY()))) 
+        if (ecosystem.isResource(ecosystem.getElementFrom(getX(), getY()))) 
         {
             capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
             if (capacity >= MAX_CAPACITY)
@@ -161,7 +162,8 @@ public class Ant extends ElementActor
     public void tryDepositFood()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isAnthill(ecosystem.getElement(getX(), getY()))) 
+        ElementActor actorFound = ecosystem.getElementFrom(getX(), getY());
+        if (ecosystem.isAnthill(actorFound) && anthill == (Anthill)actorFound) 
         {
             anthill.addRessource(capacity);
             capacity = 0;
@@ -181,8 +183,14 @@ public class Ant extends ElementActor
 	 */
     public ElementActor searchAnthill()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, Anthill.class);
+        Anthill actor = (Anthill)checkRadial(Anthill.class);
+
+        if(actor != null && actor != anthill)
+        {
+            return null;
+        }
+    
+        return actor;
     }
 
     /**
@@ -191,8 +199,7 @@ public class Ant extends ElementActor
 	 */
     public ElementActor searchFood()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        return ecosystem.checkRadial(getX(), getY(), FIELD_OF_VIEW, Resource.class);
+        return checkRadial(Resource.class);
     }
 
     /**
@@ -202,9 +209,8 @@ public class Ant extends ElementActor
 	 */
     public ElementActor searchPheromone(PheromoneType _type)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
-        Pheromone res = ecosystem.checkRadialPheromone(getX(), getY(), FIELD_OF_VIEW, _type);
+        Pheromone res = checkRadialPheromone(_type);
 
         if (res != null && (res.getStepFrom() < lastStepFrom || countLastPhero == 200))
         {
@@ -272,7 +278,7 @@ public class Ant extends ElementActor
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
 
-        if (!ecosystem.canMove(getX(), getY(), nextPosX, nextPosY))
+        if (!canMove(nextPosX, nextPosY))
         {
             blocked = true;
         }
@@ -291,7 +297,7 @@ public class Ant extends ElementActor
     public void releasePheromone(PheromoneType _type) 
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.getElement(getX(), getY()) == null)
+        if (ecosystem.getElementFrom(getX(), getY()) == null)
         {
             if (pheromoneCountdown < 0)
             {
@@ -355,4 +361,255 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         sprite.setPosition(_x - getWidth()/2 + ecosystem.getMapCaseSize()/2, _y - getHeight()/2 + ecosystem.getMapCaseSize()/2);
     }
+
+    public Anthill getAnthill()
+    {
+        return anthill;
+    }
+
+    private boolean canMove(float _destinationX, float _destinationY) {
+
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        int destinationXCase = ecosystem.castInCase(_destinationX);
+        int destinationYCase = ecosystem.castInCase(_destinationY);
+
+        int initXCase = ecosystem.castInCase(getX());
+        int initYCase = ecosystem.castInCase(getY());
+
+        int dx = destinationXCase - initXCase;
+        int dy = destinationYCase - initYCase;
+        
+
+        if (ecosystem.isObstacle(ecosystem.getElement(destinationXCase, destinationYCase))) 
+        {
+            return false;
+        }
+        
+        if (dx != 0 && dy != 0) 
+        {
+            if (ecosystem.isObstacle(ecosystem.getElement(initXCase, initYCase + dy)) && ecosystem.isObstacle(ecosystem.getElement(initXCase + dx, initYCase)))
+            {
+                return false;
+            }
+            
+        }
+        
+        return true;
+    }
+
+     /**
+     * Checks around a position if there is an actor of a given type and returns it 
+     * @param _x position x of point (scene coordinates)
+     * @param _y position y of point (scene coordinates)
+     * @param _radius the number of cases around the position
+     * @param _type type of actor to find
+     * @return the ElementActor if there is one else null
+     */
+    public ElementActor checkRadial(Class<?> _class)
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        ElementActor res = null;
+        float distance = 0;
+        
+        int xCase = ecosystem.castInCase(getX());
+        int yCase = ecosystem.castInCase(getY());
+
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (!(i==0 && j==0))
+                {
+                    ElementActor v = checkRadialLine(xCase, yCase, i, j, _class);
+                    if (v != null) 
+                    {
+                        float d = (float)(Math.pow(getX() - v.getX(), 2) + Math.pow(getY() - v.getY(), 2));
+                        if (res == null || (res != null && d < distance))
+                        {
+                            distance = d;
+                            res = v;   
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+        
+    }
+    /**
+     * Checks on a line if ElementActor of a given type is present
+     * @param _x start y position of point (case coordinates)
+     * @param _y start x position of point (case coordinates)
+     * @param _dx end y position of point (case coordinates)
+     * @param _dy end x position of point (case coordinates)
+     * @param _type type of actor to find
+     * @return the ElementActor if there is one else null
+     */
+    private ElementActor checkRadialLine(int _x, int _y, int _dx, int _dy, Class<?> _class)
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        for (int i = 1; i <= FIELD_OF_VIEW; i++)
+        {
+            int xi = _x + i * _dx;
+            int yi = _y + i * _dy;
+            
+            if (Math.abs(_dx) == Math.abs(_dy))
+            {
+                ElementActor actor2 = ecosystem.getElement(xi - _dx, yi);
+                ElementActor actor3 = ecosystem.getElement(xi, yi - _dy);
+
+                if (ecosystem.isInstanceOf(actor2, _class))
+                {
+                    return actor2;
+                }
+
+                
+                if (ecosystem.isInstanceOf(actor3, _class))
+                {
+                    return actor3;
+                }
+
+                
+                if (ecosystem.isObstacle(actor2))
+                {
+                    return null;
+                }
+
+                if (ecosystem.isObstacle(actor3))
+                {
+                    return null;
+                }
+            }
+
+            ElementActor actor = ecosystem.getElement(xi, yi);
+
+            if (ecosystem.isInstanceOf(actor, _class))
+            {
+                return actor;
+            }
+            else if (ecosystem.isObstacle(actor))
+            {
+                return null;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Checks around a position if a phereomone of a given type is present
+     * @param _x start y position of point (scene coordinates)
+     * @param _y start x position of point (scene coordinates)
+     * @param _radius the number of cases around the position
+     * @param _type type of pheromone to find
+     * @return the Pheromone if there is one else null
+     */
+     
+    public Pheromone checkRadialPheromone(PheromoneType _type)
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
+        Pheromone res = null;
+        int resStepFrom = Integer.MAX_VALUE;
+
+        int xCase = ecosystem.castInCase(getX());
+        int yCase = ecosystem.castInCase(getY());
+
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (!(j == 0 && i == 0))
+                {
+                    Pheromone actor = checkRadialLinePheromone(xCase, yCase, i, j, _type);
+                    if (actor != null)
+                    {
+                        if(actor.getStepFrom() < resStepFrom)
+                        {
+                            res = actor;
+                            resStepFrom = actor.getStepFrom();
+                        }
+                        
+                    }
+                }
+            }
+        }
+        return res;
+        
+    }    
+    
+    /**
+     * Checks on a line if a pheromone of a given type is present
+     * @param _x start y position of point (case coordinates)
+     * @param _y start x position of point (case coordinates)
+     * @param _dx end y position of point (case coordinates)
+     * @param _dy end x position of point (case coordinates)
+     * @param _type type of actor to find
+     * @param _pheromone type of pheromone to find
+     * @return the Pheromone if there is one else null
+     */
+    private Pheromone checkRadialLinePheromone(int _x, int _y, int _dx, int _dy, PheromoneType _type)
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        Pheromone res = null;
+        int resStepFrom = Integer.MAX_VALUE;
+
+        for (int i = 1; i <= FIELD_OF_VIEW; i++)
+        {
+            int xi = _x + i * _dx;
+            int yi = _y + i * _dy;
+
+            if (Math.abs(_dx) == Math.abs(_dy))
+            {
+                Pheromone actor2 = (Pheromone)ecosystem.isPheromone(xi - _dx, yi, anthill, _type);
+                
+                if (actor2 != null)
+                {
+                    if (actor2.getStepFrom() < resStepFrom)
+                    {
+                        res = actor2;
+                        resStepFrom = actor2.getStepFrom();
+                    }
+                    
+                }
+                Pheromone actor3 = (Pheromone)ecosystem.isPheromone(xi, yi - _dy, anthill, _type);
+
+                if (actor3 != null)
+                {
+                    if (actor3.getStepFrom() < resStepFrom)
+                    {
+                        res = actor3;
+                        resStepFrom = actor3.getStepFrom();
+                    }
+                }
+
+                if (ecosystem.isObstacle(ecosystem.getElement(xi - _dx, yi)))
+                {
+                    return res;
+                }
+                if (ecosystem.isObstacle(ecosystem.getElement(xi, yi - _dy)))
+                {
+                    return res;
+                }
+            }
+            Pheromone actor = ecosystem.isPheromone(xi, yi, anthill, _type);
+            if (actor != null)
+            {
+                if (actor.getStepFrom() < resStepFrom)
+                {
+                    res = actor;
+                    resStepFrom = actor.getStepFrom();
+                }
+                
+            }
+            else if (ecosystem.isObstacle(ecosystem.getElement(xi, yi)))
+            {
+                return res;
+            }
+
+        }
+        return res;
+    }
+
+    
 }

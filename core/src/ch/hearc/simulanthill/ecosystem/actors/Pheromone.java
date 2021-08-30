@@ -123,7 +123,7 @@ public class Pheromone extends ElementActor
 	@Override
 	public boolean remove() 
 	{
-		Ecosystem.getCurrentEcosystem().removePheromone(getX(), getY(), pheromoneType);
+		Ecosystem.getCurrentEcosystem().removePheromone(this);
 		return super.remove();
 	}
 

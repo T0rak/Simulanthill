@@ -32,7 +32,7 @@ public class WorldMap
 	public String filename;
 	private ArrayList<String> mapStringLines;
 
-	private Pheromone[][][] pheromoneGrid;
+	//private Pheromone[][][] pheromoneGrid;
 
 	//Contains Anthills, Obstacles and Resources
 	private ElementActor[][] mapTileGrid;
@@ -136,7 +136,7 @@ public class WorldMap
 	 */
 	private void convertMap() 
 	{
-		pheromoneGrid = new Pheromone[width][height][nbPhero];
+		//pheromoneGrid = new Pheromone[width][height][nbPhero];
 		mapTileGrid = new ElementActor[width][height];
 		int iLine = height;
 		for (String line : mapStringLines) 
@@ -386,7 +386,7 @@ public class WorldMap
 	 */
 	public boolean reset() 
 	{
-		pheromoneGrid = null;
+		//pheromoneGrid = null;
 		mapTileGrid = null;
 		convertMap();
 		return true;
@@ -396,10 +396,10 @@ public class WorldMap
 	 * Returns the Actor grid (getter) 
 	 * @return the grid containing the actors
 	 */
-	public Pheromone[][][] getpheromoneGrid() 
+	/*public Pheromone[][][] getpheromoneGrid() 
 	{
 		return pheromoneGrid;
-	}
+	}*/
 
 	public ElementActor[][] getmapTileGrid() 
 	{
