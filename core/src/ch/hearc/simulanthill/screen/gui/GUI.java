@@ -1,11 +1,13 @@
 package ch.hearc.simulanthill.screen.gui;
 
-
+import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSlider;
@@ -26,6 +28,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The stage that contains input
@@ -77,6 +81,8 @@ public class GUI extends Stage
 	private static final float DEFAULT_SPEED 		= 1;
 	private static final int DEFAULT_INDEPENDENCE 	= 10;
 	private static final int DEFAULT_ANT_NUMBER 	= 500;
+
+	private List<SelectionListener> selectionListeners;
     
 	/**
 	 * Constructor
@@ -87,6 +93,8 @@ public class GUI extends Stage
 		super(_vp);
 		game = _game;
 		
+		selectionListeners = new LinkedList<SelectionListener>();
+
 		simulation = new Actor();
 		
 		//Create All layout
@@ -190,8 +198,37 @@ public class GUI extends Stage
 		lytInteractibles.add(btnAnthill).size(100,100);
 		lytInteractibles.add(btnFoodPheromone).size(100,100);
 		lytInteractibles.add(btnHomePheromone).size(100,100);
-		
-		
+		btnAnthill.addListener(new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					signalSelectionListener(ElementActorType.ANTHILL);
+					super.clicked(event, x, y);
+					btnAnthill.setColor(Color.BLUE);
+				}
+
+			});
+
+		btnObstacle.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.OBSTACLE);
+				super.clicked(event, x, y);
+			}
+
+		});
+
+		btnFood.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.RESOURCE);
+				super.clicked(event, x, y);
+			}
+
+		});
+
 		lytMain.setFillParent(true);
 		addActor(lytMain);
 
@@ -367,5 +404,18 @@ public class GUI extends Stage
 			
 		});
 
+
+	}
+
+	public void signalSelectionListener(ElementActorType _type)
+	{
+		for (SelectionListener selectionListener : selectionListeners) {
+			selectionListener.changed(_type);
+		}
+	}
+
+	public void addSelectionListener(SelectionListener _selectionListener)
+	{
+		selectionListeners.add(_selectionListener);
 	}
 }
