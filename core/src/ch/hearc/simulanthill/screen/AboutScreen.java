@@ -83,7 +83,7 @@ public class AboutScreen implements Screen
 		stage.draw();
 
         time += _delta;
-        if(time > 3)
+        if(time > 0)
         {
             time = 0;
             ((Simulanthill)game).displayMainScreen();

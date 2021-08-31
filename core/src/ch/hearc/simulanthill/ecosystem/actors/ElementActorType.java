@@ -5,7 +5,7 @@ package ch.hearc.simulanthill.ecosystem.actors;
  */
 public enum ElementActorType 
 {
-    OBSTACLE(0), RESSOURCE(1), ANTHILL(2), HOME_PHEROMONE(3), FOOD_PHEROMONE(4);
+    NONE(0), OBSTACLE(1), RESOURCE(2), ANTHILL(3), HOME_PHEROMONE(4), FOOD_PHEROMONE(5), ANT(6);
     
     private final int value;
 

@@ -5,8 +5,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Ant;
+import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.screen.gui.EcosystemGUI;
 import ch.hearc.simulanthill.screen.gui.GUI;
+import ch.hearc.simulanthill.screen.gui.SelectionListener;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -14,6 +16,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 /**
  * Class of the screen that handles the simulator. 
@@ -51,6 +56,15 @@ public class MainScreen implements Screen
 		gui = new GUI(GUIViewport, game); 
 
 		guiEco = new EcosystemGUI(ecosystem);
+		gui.addSelectionListener(new SelectionListener(){
+
+			@Override
+			public void changed(ElementActorType _type) {
+				guiEco.changeTypeOfAdd(_type);
+				
+			}
+			
+		});
 
 			
 	}

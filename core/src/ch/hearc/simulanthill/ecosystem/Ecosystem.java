@@ -6,13 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
+import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
@@ -20,6 +24,7 @@ import ch.hearc.simulanthill.ecosystem.actors.Resource;
 import ch.hearc.simulanthill.ecosystem.map.WorldMap;
 import ch.hearc.simulanthill.screen.gui.MapListener;
 import ch.hearc.simulanthill.tools.Asset;
+import ch.hearc.simulanthill.tools.SpriteActor;
 
 /**
  * This class contains all element (actor) of simulation (implements Stage from Libgdx)
@@ -32,6 +37,8 @@ public class Ecosystem extends Stage
 
     private List<Ant> ants;
     private List<Anthill> anthills;
+
+    private Group mapTiles;
     
     private int nbAntMax;
 
@@ -52,12 +59,15 @@ public class Ecosystem extends Stage
     private Ecosystem(Viewport _viewport)
     {
         super(_viewport);
+        mapTiles = new Group();
         ants = new ArrayList<Ant>();
         anthills = new ArrayList<Anthill>();
         isPlaying = false;
         nbAntMax = 500;
         MapListeners = new LinkedList<MapListener>();
         pheromoneGridMap =  new TreeMap<Integer, Pheromone[][][]>();
+        
+        
     }
 
     /**
@@ -131,7 +141,6 @@ public class Ecosystem extends Stage
     {
         removeAllActor();
         worldMap = new WorldMap(getViewport().getWorldWidth(), getViewport().getWorldHeight(), _width, _height);
-        
         addElementActorGridToStage();
     }
 
@@ -171,6 +180,9 @@ public class Ecosystem extends Stage
      */
     private void addElementActorGridToStage()
     {
+        
+        addActor(mapTiles);
+
         for (ElementActor[] elementA: worldMap.getmapTileGrid()) 
         {
     
@@ -178,12 +190,12 @@ public class Ecosystem extends Stage
             {
                 if (elementB != null)
                 {
-                    addActor(elementB);
+                    mapTiles.addActor(elementB);
                 }
             }
 		}
         refreshAnthills();
-        informChangeMap();
+       ;
     }
 
 
@@ -202,6 +214,7 @@ public class Ecosystem extends Stage
                 }
             }
 		}
+        informChangeMap();
     }
 
     public List<Anthill> getAnthills()
@@ -214,6 +227,7 @@ public class Ecosystem extends Stage
      */
     private void removeAllActor()
     {
+        mapTiles.clear();
         anthills.clear();
         pheromoneGridMap.clear();
         ants.clear();
@@ -398,6 +412,10 @@ public class Ecosystem extends Stage
         return MathUtils.round(_f / worldMap.getCaseSize());
     }
 
+    public int mouseToGrid(float _f) {
+        return MathUtils.floor(_f / worldMap.getCaseSize());
+    }
+
     public void setNbAntMax(int _nbAntMax)
     {
         nbAntMax = _nbAntMax;
@@ -438,6 +456,59 @@ public class Ecosystem extends Stage
         for (MapListener mapListener : MapListeners) {
             mapListener.change();
         }
+    }
+
+    public void addMapTiles(int _x, int _y, ElementActorType _type)
+    {
+        if (isOnBorder(_x, _y))
+        {
+            return;
+        }
+    
+        ElementActor actor;
+        switch (_type) {
+            case ANTHILL:
+                actor = addAnthill(_x, _y);
+                break;
+            case OBSTACLE:
+                actor = new Obstacle(_x * getMapCaseSize(), _y * getMapCaseSize(), getMapCaseSize(), getMapCaseSize());
+                break;
+            case RESOURCE:
+                actor = new Resource(_x * getMapCaseSize(), _y * getMapCaseSize(), getMapCaseSize(), getMapCaseSize());
+                break;
+        
+            default:
+                return;
+        }
+        
+        if(worldMap.getmapTileGrid()[_x][_y] != null)
+        {
+            if (isAnthill(worldMap.getmapTileGrid()[_x][_y]))
+            {
+                anthills.remove((Anthill)worldMap.getmapTileGrid()[_x][_y]);
+                informChangeMap();
+            }
+            worldMap.getmapTileGrid()[_x][_y].remove();
+        }
+        worldMap.getmapTileGrid()[_x][_y] = actor;
+        mapTiles.addActor(actor);
+        
+        
+    }
+
+    public boolean isOnBorder(int _x, int _y)
+    {
+        return _x == 0 || _x == worldMap.getWidth()-1 || _y == 0 || _y == worldMap.getHeight()-1;
+    }
+
+    public Anthill addAnthill(int _x, int _y)
+    {
+        Anthill anthill = new Anthill(_x * getMapCaseSize(), _y * getMapCaseSize(), getMapCaseSize(), getMapCaseSize());
+        anthills.add(anthill);
+        pheromoneGridMap.put(anthill.getId(), new Pheromone[worldMap.getWidth()][worldMap.getHeight()][2]);
+        informChangeMap();
+        return anthill;
+
     }
 
 }

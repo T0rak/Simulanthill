@@ -35,7 +35,7 @@ public class SpriteActor extends Actor
         {
             return ColorTexture.get(_color);
         }
-        System.out.println(_color.toString());
+        
         Pixmap bgPixmap = new Pixmap(1, 1, Pixmap.Format.RGB565);
         bgPixmap.setColor(_color);
         bgPixmap.fill();
