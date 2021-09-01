@@ -110,8 +110,8 @@ public class ColorManagement
         currentHue = 0f;
         currentSat = 1f;
         currentBright = 1f;
-        colorCacheList.clear();
-        dividerList.clear();
+        colorCacheList = null;
+        dividerList = null;
         currentIndex = 0;
         pastIndex = 0;
         currentPow = 0;

@@ -134,7 +134,7 @@ public class Ecosystem extends Stage
      * reset Ecosystem at the initial state
      */
     public void reset()
-    { 
+    {
         removeAllActor();
 
         if (worldMap.reset())
@@ -188,7 +188,6 @@ public class Ecosystem extends Stage
      */
     private void addElementActorGridToStage()
     {
-        ColorManagement.reset();
         for (ElementActor[] elementA: worldMap.getmapTileGrid()) 
         {
     
@@ -232,6 +231,7 @@ public class Ecosystem extends Stage
      */
     private void removeAllActor()
     {
+        ColorManagement.reset();
         mapTiles.clear();
         anthills.clear();
         pheromones.clear();
@@ -240,7 +240,6 @@ public class Ecosystem extends Stage
         pheromoneGridMap.clear();
         //this.clear();
     }
-
 
     /**
      * Checks the presence of an element at a given position
