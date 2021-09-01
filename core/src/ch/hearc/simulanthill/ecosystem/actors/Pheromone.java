@@ -16,7 +16,7 @@ public class Pheromone extends ElementActor
 	private int lifeTime;
 	private PheromoneType pheromoneType;
 	private int stepFrom;
-	private Ant ant;
+	private Anthill anthill;
 	private static float opacityFactor = 0;
 	private static final Texture foodTexture = createColorImage(new Color(255/255f, 153/255f, 51/255f, 1));
 	private static final Texture homeTexture = createColorImage(new Color(102/255f, 255/255f, 102/255f, 1));
@@ -29,10 +29,10 @@ public class Pheromone extends ElementActor
 	 * @param _ant ant that releases the pheromone
 	 * @param _stepFrom steps from the last goal that the ant releasing the pheromone reached.
 	 */
-	public Pheromone(float _posX, float _posY, PheromoneType _type, Ant _ant, int _stepFrom)
+	public Pheromone(float _posX, float _posY, PheromoneType _type, Anthill _anthill, int _stepFrom)
 	{
 		super(_posX, _posY, 4, 4, (_type == PheromoneType.HOME ? homeTexture : foodTexture));
-		ant = _ant;
+		anthill = _anthill;
 		lifeTime = INIT_LIFE_TIME;
 		pheromoneType = _type;
 		stepFrom = _stepFrom;
@@ -104,9 +104,9 @@ public class Pheromone extends ElementActor
 	 * getter on the ant that released the pheromone.
 	 * @return the ant that released the pheromone.
 	 */
-	public Ant getAnt() 
+	public Anthill getAnthill() 
 	{
-		return ant;
+		return anthill;
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package ch.hearc.simulanthill.screen.gui;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -20,6 +21,7 @@ import com.kotcrab.vis.ui.widget.spinner.Spinner;
 import ch.hearc.simulanthill.Simulanthill;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Ant;
+import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.tools.Asset;
 
@@ -82,7 +84,7 @@ public class GUI extends Stage
 	private static final int DEFAULT_INDEPENDENCE 	= 10;
 	private static final int DEFAULT_ANT_NUMBER 	= 500;
 
-	private List<SelectionListener> selectionListeners;
+	private List<SelectionTypeOfAddListener> selectionListeners;
     
 	/**
 	 * Constructor
@@ -93,7 +95,7 @@ public class GUI extends Stage
 		super(_vp);
 		game = _game;
 		
-		selectionListeners = new LinkedList<SelectionListener>();
+		selectionListeners = new LinkedList<SelectionTypeOfAddListener>();
 
 		simulation = new Actor();
 		
@@ -112,12 +114,14 @@ public class GUI extends Stage
 		btnLoadMap = 		new VisTextButton("Load Map");
 		btnGenerateMap = 	new VisTextButton("Generate Map");
 		
-		btnFood =		new VisImageButton(new Image(Asset.resourceLegend()).getDrawable());
-		btnObstacle =	new VisImageButton(new Image(Asset.obstacleLegend()).getDrawable());
-		btnAnt =		new VisImageButton(new Image(Asset.antLegend()).getDrawable());
-		btnAnthill =	new VisImageButton(new Image(Asset.anthillLegend()).getDrawable());
-		btnHomePheromone =	new VisImageButton(new Image(Asset.homePheromoneLegend()).getDrawable());
-		btnFoodPheromone =	new VisImageButton(new Image(Asset.foodPheromoneLegend()).getDrawable());
+		btnFood 			= creaImageButton(Asset.resource(), "Resource");
+		btnObstacle			= creaImageButton(Asset.obstacle(), "Obstacle");
+		btnAnt				= creaImageButton(Asset.ant(), "Ant");
+		btnAnthill			= creaImageButton(Asset.anthill(), "Anthill");
+		btnHomePheromone 	= creaImageButton(Asset.homePheromone(), "Pheromone Home");
+		btnFoodPheromone 	= creaImageButton(Asset.foodPheromone(), "Pheromone Food");
+		
+		
 
 		btnResetParameters = new VisTextButton("Reset Parameters");
 		
@@ -191,13 +195,14 @@ public class GUI extends Stage
 		lytAntParameters.add(spinAntSpeed);
 		
 		// Fill interactible layout
-		lytInteractibles.add(btnFood).size(100,100);
-		lytInteractibles.add(btnObstacle).size(100,100);
-		lytInteractibles.add(btnAnt).size(100,100);
+		int sizeBtnLegend = 100;
+		lytInteractibles.add(btnFood).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnObstacle).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnAnt).size(sizeBtnLegend,sizeBtnLegend);
 		lytInteractibles.row();
-		lytInteractibles.add(btnAnthill).size(100,100);
-		lytInteractibles.add(btnFoodPheromone).size(100,100);
-		lytInteractibles.add(btnHomePheromone).size(100,100);
+		lytInteractibles.add(btnAnthill).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnFoodPheromone).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnHomePheromone).size(sizeBtnLegend,sizeBtnLegend);
 		btnAnthill.addListener(new ClickListener()
 			{
 				@Override
@@ -224,6 +229,26 @@ public class GUI extends Stage
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				signalSelectionListener(ElementActorType.RESOURCE);
+				super.clicked(event, x, y);
+			}
+
+		});
+
+		btnFoodPheromone.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.FOOD_PHEROMONE);
+				super.clicked(event, x, y);
+			}
+
+		});
+
+		btnHomePheromone.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.HOME_PHEROMONE);
 				super.clicked(event, x, y);
 			}
 
@@ -404,18 +429,35 @@ public class GUI extends Stage
 			
 		});
 
+	}
 
+	public void selectAnthill(Anthill _anthill) {
+		System.out.println("Select " + _anthill);
+		//TODO: Implement
+	}
+
+	public void unselectAnthill() {
+		System.out.println("Unselect");
+		//TODO: Implement
 	}
 
 	public void signalSelectionListener(ElementActorType _type)
 	{
-		for (SelectionListener selectionListener : selectionListeners) {
+		for (SelectionTypeOfAddListener selectionListener : selectionListeners) {
 			selectionListener.changed(_type);
 		}
 	}
 
-	public void addSelectionListener(SelectionListener _selectionListener)
+	public boolean addListener(SelectionTypeOfAddListener _listener) {
+		selectionListeners.add(_listener);
+		return true;
+	}
+
+	public VisImageButton creaImageButton(Texture _texture, String text)
 	{
-		selectionListeners.add(_selectionListener);
+		VisImageButton btn = new VisImageButton(new Image(_texture).getDrawable());
+		btn.row();
+		btn.add(new VisLabel(text));
+		return btn;
 	}
 }

@@ -3,7 +3,6 @@ package ch.hearc.simulanthill.screen.gui;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -24,12 +23,14 @@ public class AnthillDetails extends Group {
     private Anthill anthill;
     private SpriteActor hoverAnthill;
     private SpriteActor background;
+    private boolean selected;
 
     public AnthillDetails(Anthill _anthill)
     {
         super();
+        selected = false;
         anthill = _anthill;
-        
+
         setPosition(anthill.getX(), anthill.getY());
 
         info = new VisTable();
@@ -61,21 +62,6 @@ public class AnthillDetails extends Group {
         
         setVisible(false);
 
-        hoverAnthill.addListener(new ClickListener()
-        {
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                
-                setVisible(true);
-                super.enter(event, x, y, pointer, fromActor);
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                setVisible(false);
-                super.enter(event, x, y, pointer, fromActor);
-            }
-        });
         addActor(hoverAnthill);
         addActor(background);
         addActor(info);
@@ -103,6 +89,28 @@ public class AnthillDetails extends Group {
         lblRessourceNumber.setText(anthill.getNbResource());
         background.setSize(info.getMinWidth(), info.getMinHeight());
         super.act(delta);
+    }
+
+
+    public void addCListener(ClickListener _listener)
+    {
+        hoverAnthill.addListener(_listener);
+    }
+
+    public void setSelected(boolean newSelected)
+    {
+        setVisible(newSelected);
+        selected = newSelected;
+    }
+
+    public boolean getSelected()
+    {
+        return selected;
+    }
+
+    public Anthill getAnthill()
+    {
+        return anthill;
     }
 
 }

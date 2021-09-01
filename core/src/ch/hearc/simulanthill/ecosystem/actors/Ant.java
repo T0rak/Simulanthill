@@ -205,7 +205,7 @@ public class Ant extends ElementActor
 	 */
     public ElementActor searchPheromone(PheromoneType _type)
     {
-
+        
         Pheromone res = checkRadialPheromone(_type);
 
         if (res != null && (res.getStepFrom() < lastStepFrom || countLastPhero == 200))
@@ -295,7 +295,7 @@ public class Ant extends ElementActor
         {
             if (pheromoneCountdown < 0)
             {
-                ecosystem.addPheromone(getX(), getY(), _type, this, stepFrom);
+                ecosystem.addPheromone(new Pheromone(getX(), getY(), _type, anthill, stepFrom));
                 pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
             }
         }
@@ -352,8 +352,8 @@ public class Ant extends ElementActor
     public void setPosition(float _x, float _y) 
     {
         super.setPosition(_x, _y);
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        sprite.setPosition(_x - getWidth()/2 + ecosystem.getMapCaseSize()/2, _y - getHeight()/2 + ecosystem.getMapCaseSize()/2);
+        //Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        sprite.setPosition(_x - getWidth()/2, _y - getHeight()/2);
     }
 
     public Anthill getAnthill()
@@ -364,11 +364,11 @@ public class Ant extends ElementActor
     private boolean canMove(float _destinationX, float _destinationY) {
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        int destinationXCase = ecosystem.castInCase(_destinationX);
-        int destinationYCase = ecosystem.castInCase(_destinationY);
+        int destinationXCase = ecosystem.mouseToGrid(_destinationX);
+        int destinationYCase = ecosystem.mouseToGrid(_destinationY);
 
-        int initXCase = ecosystem.castInCase(getX());
-        int initYCase = ecosystem.castInCase(getY());
+        int initXCase = ecosystem.mouseToGrid(getX());
+        int initYCase = ecosystem.mouseToGrid(getY());
 
         int dx = destinationXCase - initXCase;
         int dy = destinationYCase - initYCase;
@@ -405,8 +405,8 @@ public class Ant extends ElementActor
         ElementActor res = null;
         float distance = 0;
         
-        int xCase = ecosystem.castInCase(getX());
-        int yCase = ecosystem.castInCase(getY());
+        int xCase = ecosystem.mouseToGrid(getX());
+        int yCase = ecosystem.mouseToGrid(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -506,8 +506,8 @@ public class Ant extends ElementActor
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
 
-        int xCase = ecosystem.castInCase(getX());
-        int yCase = ecosystem.castInCase(getY());
+        int xCase = ecosystem.mouseToGrid(getX());
+        int yCase = ecosystem.mouseToGrid(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -555,6 +555,15 @@ public class Ant extends ElementActor
 
             if (Math.abs(_dx) == Math.abs(_dy))
             {
+                if (ecosystem.isObstacle(ecosystem.getElement(xi - _dx, yi)))
+                {
+                    return res;
+                }
+                if (ecosystem.isObstacle(ecosystem.getElement(xi, yi - _dy)))
+                {
+                    return res;
+                }
+
                 Pheromone actor2 = (Pheromone)ecosystem.isPheromone(xi - _dx, yi, anthill, _type);
                 
                 if (actor2 != null)
@@ -576,16 +585,13 @@ public class Ant extends ElementActor
                         resStepFrom = actor3.getStepFrom();
                     }
                 }
-
-                if (ecosystem.isObstacle(ecosystem.getElement(xi - _dx, yi)))
-                {
-                    return res;
-                }
-                if (ecosystem.isObstacle(ecosystem.getElement(xi, yi - _dy)))
-                {
-                    return res;
-                }
             }
+
+            if (ecosystem.isObstacle(ecosystem.getElement(xi, yi)))
+            {
+                return res;
+            }
+
             Pheromone actor = ecosystem.isPheromone(xi, yi, anthill, _type);
             if (actor != null)
             {
@@ -596,10 +602,7 @@ public class Ant extends ElementActor
                 }
                 
             }
-            else if (ecosystem.isObstacle(ecosystem.getElement(xi, yi)))
-            {
-                return res;
-            }
+            
 
         }
         return res;
