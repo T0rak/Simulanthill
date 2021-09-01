@@ -50,6 +50,8 @@ public class Ecosystem extends Stage
     private Map<Integer, Pheromone[][][]> pheromoneGridMap;
 
     
+
+    
     //reset
     //pheromoneGrid = null;
 
@@ -249,8 +251,8 @@ public class Ecosystem extends Stage
      */
     public ElementActor getElementFrom(float _x, float _y)
     {
-        int xCase = castInCase(_x);
-        int yCase = castInCase(_y);
+        int xCase = mouseToGrid(_x);
+        int yCase = mouseToGrid(_y);
         return getElement(xCase, yCase);
     }
 
@@ -294,10 +296,10 @@ public class Ecosystem extends Stage
      * @param _type type of element to check
      * @return actor in the case, null if has not an element of this type
      */
-    public Pheromone isPheromone(float _x, float _y, Anthill _anthill, PheromoneType _type)
+    public Pheromone isPheromoneFrom(float _x, float _y, Anthill _anthill, PheromoneType _type)
     {
-        int xCase = castInCase(_x);
-        int yCase = castInCase(_y);
+        int xCase = mouseToGrid(_x);
+        int yCase = mouseToGrid(_y);
         return isPheromone(xCase, yCase, _anthill, _type);
     }
 
@@ -326,8 +328,8 @@ public class Ecosystem extends Stage
      */
     public int takeResource(float _x, float _y, int _quantity) 
     {
-        int xCase = castInCase(_x);
-        int yCase = castInCase(_y);
+        int xCase = mouseToGrid(_x);
+        int yCase = mouseToGrid(_y);
         ElementActor actor = getElement(xCase, yCase);
         
         if (actor != null && actor.getClass() == Resource.class)
@@ -346,8 +348,8 @@ public class Ecosystem extends Stage
      */
     public void removeResource(float _x, float _y) 
     {
-        int xCase = castInCase(_x);
-        int yCase = castInCase(_y);
+        int xCase = mouseToGrid(_x);
+        int yCase = mouseToGrid(_y);
         if (worldMap.getmapTileGrid()[xCase][yCase].getClass() == Resource.class)
         {
             worldMap.getmapTileGrid()[xCase][yCase] = null;
@@ -363,21 +365,20 @@ public class Ecosystem extends Stage
      * @param _ant that added the pheromone
      * @param _stepFrom distance from the last goal of the ant
      */
-    public void addPheromone(float _x, float _y, PheromoneType _type, Ant _ant, int _stepFrom) 
+    public void addPheromone(Pheromone _pheromone) 
     {
         
-        int i = _type.getValue();
-        int caseX = castInCase(_x);
-        int caseY = castInCase(_y);
-        Pheromone currentPheromoneCase = pheromoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i];
+        int i = _pheromone.getType().getValue();
+        int caseX = mouseToGrid(_pheromone.getX());
+        int caseY = mouseToGrid(_pheromone.getY());
+        Pheromone currentPheromoneCase = pheromoneGridMap.get(_pheromone.getAnthill().getId())[caseX][caseY][i];
         if (currentPheromoneCase != null) 
         {
-            if (currentPheromoneCase.getStepFrom() > _stepFrom)
+            if (currentPheromoneCase.getStepFrom() > _pheromone.getStepFrom())
             {
                 currentPheromoneCase.remove();
-                Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-                pheromoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i] = p;
-                pheromones.addActor(p);
+                pheromoneGridMap.get(_pheromone.getAnthill().getId())[caseX][caseY][i] = _pheromone;
+                pheromones.addActor(_pheromone);
             }
             else
             {
@@ -387,9 +388,36 @@ public class Ecosystem extends Stage
         }
         else
         {
-            Pheromone p = new Pheromone(_x, _y, _type, _ant, _stepFrom);
-            pheromoneGridMap.get(_ant.getAnthill().getId())[caseX][caseY][i] = p;
-            pheromones.addActor(p);
+            pheromoneGridMap.get(_pheromone.getAnthill().getId())[caseX][caseY][i] = _pheromone;
+            pheromones.addActor(_pheromone);
+        }
+    }
+
+    public void addPheromone(float _x, float _y, PheromoneType _type , Anthill _anthill, int _stepFrom) 
+    {
+        Pheromone pheromone = new Pheromone(_x, _y, _type, _anthill, _stepFrom);
+        int i = _type.getValue();
+        int caseX = mouseToGrid(_x);
+        int caseY = mouseToGrid(_y);
+        Pheromone currentPheromoneCase = pheromoneGridMap.get(pheromone.getAnthill().getId())[caseX][caseY][i];
+        if (currentPheromoneCase != null) 
+        {
+            if (currentPheromoneCase.getStepFrom() > pheromone.getStepFrom())
+            {
+                currentPheromoneCase.remove();
+                pheromoneGridMap.get(pheromone.getAnthill().getId())[caseX][caseY][i] = pheromone;
+                pheromones.addActor(pheromone);
+            }
+            else
+            {
+                currentPheromoneCase.reinforce();
+            }
+            
+        }
+        else
+        {
+            pheromoneGridMap.get(pheromone.getAnthill().getId())[caseX][caseY][i] = pheromone;
+            pheromones.addActor(pheromone);
         }
     }
     /**
@@ -400,9 +428,9 @@ public class Ecosystem extends Stage
      */
     public void removePheromone(Pheromone _pheromone) 
     {   
-        Anthill anthill = _pheromone.getAnt().getAnthill();
-        int xCase = castInCase(_pheromone.getX());
-        int yCase = castInCase(_pheromone.getY());
+        Anthill anthill = _pheromone.getAnthill();
+        int xCase = mouseToGrid(_pheromone.getX());
+        int yCase = mouseToGrid(_pheromone.getY());
         int typeIndex = _pheromone.getType().getValue();
         //if(pheromoneGridMap.containsKey(anthill.getId()))
         {
@@ -517,6 +545,14 @@ public class Ecosystem extends Stage
         informChangeMap();
         return anthill;
 
+    }
+
+    public float getWorldMapWidth() {
+        return worldMap.getWorldWidth();
+    }
+
+    public float getWorldMapHeight() {
+        return worldMap.getWorldHeight();
     }
 
 }

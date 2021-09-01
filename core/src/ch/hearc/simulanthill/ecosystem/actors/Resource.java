@@ -63,7 +63,7 @@ public class Resource extends ElementActor
     @Override
 	public boolean remove() 
     {
-		Ecosystem.getCurrentEcosystem().removeResource(getX(), getY());
+		Ecosystem.getCurrentEcosystem().removeResource(getX()+ this.getWidth()/2, getY()+ this.getHeight()/2);
 		return super.remove();
 	}
 }

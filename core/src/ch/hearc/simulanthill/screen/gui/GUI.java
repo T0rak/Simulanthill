@@ -234,6 +234,26 @@ public class GUI extends Stage
 
 		});
 
+		btnFoodPheromone.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.FOOD_PHEROMONE);
+				super.clicked(event, x, y);
+			}
+
+		});
+
+		btnHomePheromone.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.HOME_PHEROMONE);
+				super.clicked(event, x, y);
+			}
+
+		});
+
 		lytMain.setFillParent(true);
 		addActor(lytMain);
 
@@ -409,15 +429,16 @@ public class GUI extends Stage
 			
 		});
 
-
 	}
 
-	public void selectAnthill(Anthill _anthill){
-		System.out.println("Select "+_anthill);
+	public void selectAnthill(Anthill _anthill) {
+		System.out.println("Select " + _anthill);
+		//TODO: Implement
 	}
 
-	public void unselectAnthill(){
+	public void unselectAnthill() {
 		System.out.println("Unselect");
+		//TODO: Implement
 	}
 
 	public void signalSelectionListener(ElementActorType _type)

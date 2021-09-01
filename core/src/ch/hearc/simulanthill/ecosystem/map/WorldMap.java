@@ -87,8 +87,7 @@ public class WorldMap
 	 */
 	public WorldMap(String _filename, float _worldWidth, float _worldHeight) 
 	{
-		worldHeight = _worldHeight;
-		worldWidth = _worldWidth;
+		
 
 		if(!loadFile(_filename) || !validateDimensions() || !validateCharacters() || !validateStructure())
 		{
@@ -98,7 +97,9 @@ public class WorldMap
 			System.out.println("Map is Valid !");
 		}
 
-		caseSize = Math.min(worldWidth/width, worldHeight/height);
+		caseSize = Math.min(_worldWidth/width, _worldHeight/height);
+		worldHeight = height * caseSize;
+		worldWidth = width * caseSize;
 		convertMap();
 	}
 
@@ -114,12 +115,13 @@ public class WorldMap
 		width = _width;
 		height = _height;
 
-		worldWidth = _worldWidth;
-		worldHeight = _worldHeight;
 		
 		random(1/5f);
 		
-		caseSize = Math.min(worldWidth/width, worldHeight/height);
+		caseSize = Math.min(_worldWidth/width, _worldHeight/height);
+		worldHeight = height * caseSize;
+		worldWidth = width * caseSize;
+
 		convertMap();
 	}
 
@@ -401,6 +403,16 @@ public class WorldMap
 	public float getCaseSize()
 	{
 		return caseSize;
+	}
+
+	public float getWorldWidth()
+	{
+		return worldWidth;
+	}
+
+	public float getWorldHeight()
+	{
+		return worldHeight;
 	}
 
 }

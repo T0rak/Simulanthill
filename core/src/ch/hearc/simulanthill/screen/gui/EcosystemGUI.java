@@ -3,6 +3,8 @@ package ch.hearc.simulanthill.screen.gui;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Element;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,7 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
-
+import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
+import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
 
 public class EcosystemGUI extends Stage
 {
@@ -20,6 +23,7 @@ public class EcosystemGUI extends Stage
     private ElementActorType typeOfAdd;
     private Group anthillDetails;
     private List<SelectionAnthillListener> selectionAnthillListeners;
+    private Anthill selectedAnthill;
 
     public EcosystemGUI(Ecosystem _ecosystem)
     {
@@ -29,7 +33,6 @@ public class EcosystemGUI extends Stage
         ecosystem = _ecosystem;
         typeOfAdd = ElementActorType.NONE;
         initAnthillDetails();
-
 
         ecosystem.addMapListener(new MapListener(){
 
@@ -41,9 +44,6 @@ public class EcosystemGUI extends Stage
             }
             
         });
-
-       
-        
     }
 
     private void initAnthillDetails()
@@ -54,6 +54,7 @@ public class EcosystemGUI extends Stage
 
     private void addAnthill(List<Anthill> _anthills)
 	{
+        selectedAnthill = null;
 		for (Anthill anthill : _anthills) {
             AnthillDetails a = new AnthillDetails(anthill);
             anthillDetails.addActor(a);
@@ -69,17 +70,29 @@ public class EcosystemGUI extends Stage
                         ((AnthillDetails)other).setSelected(false);
                     }
                     a.setSelected(true);
-                    signalSelectionAnthillListener(a.getAnthill());
+                    changeSelectedAnthill(a.getAnthill());
                 }
                 else
                 {
                     a.setSelected(false);
-                    signalSelectionAnthillListener();
+                    changeSelectedAnthill(null);
 
                 }
                 
                 super.clicked(event, x, y);
             }
+
+            public void changeSelectedAnthill(Anthill anthill) {
+                selectedAnthill = anthill;
+                if (anthill != null)
+                {
+                    signalSelectionAnthillListener(anthill);
+                } else
+                {
+                    signalSelectionAnthillListener();
+                }
+            }
+
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 AnthillDetails a = (AnthillDetails)(event.getTarget().getParent());
@@ -110,16 +123,32 @@ public class EcosystemGUI extends Stage
         Actor actor = new Actor();
         actor.setBounds(0, 0, getWidth(), getHeight());
         actor.addListener(new ClickListener(){
+            int count = 0;
             @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                if(x > 0 && y > 0 && x < getWidth() && y < getHeight() )
-                {
-                    ecosystem.addMapTiles(ecosystem.mouseToGrid(x), ecosystem.mouseToGrid(y), typeOfAdd);
+                public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
+                    count = 0;
+                    return super.touchDown(_event, _x, _y, _pointer, _button);
                 }
-                super.touchDragged(event, x, y, pointer);
-            }
-			
 
+            @Override
+            public void touchDragged(InputEvent _event, float _x, float _y, int _pointer) 
+            {
+                count ++;
+                if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
+                {
+                    if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.ANTHILL || typeOfAdd == ElementActorType.RESOURCE) 
+                    {
+                        ecosystem.addMapTiles(ecosystem.mouseToGrid(_x), ecosystem.mouseToGrid(_y), typeOfAdd);
+                        
+                    } else if (selectedAnthill != null && (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE))
+                    {
+                        PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
+                        //System.out.println(ecosystem.mouseToGrid(_x) + " x " + ecosystem.mouseToGrid(_y));
+                        ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
+                    }
+                }
+                super.touchDragged(_event, _x, _y, _pointer);
+            }
 		});
 
         addActor(actor);
@@ -145,7 +174,7 @@ public class EcosystemGUI extends Stage
     private void signalSelectionAnthillListener()
     {
         for (SelectionAnthillListener selectionAnthillListener : selectionAnthillListeners) {
-            selectionAnthillListener.unselected();;
+            selectionAnthillListener.unselected();
         }
     }
     
