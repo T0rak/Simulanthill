@@ -5,10 +5,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Ant;
+import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.screen.gui.EcosystemGUI;
 import ch.hearc.simulanthill.screen.gui.GUI;
-import ch.hearc.simulanthill.screen.gui.SelectionListener;
+import ch.hearc.simulanthill.screen.gui.SelectionAnthillListener;
+import ch.hearc.simulanthill.screen.gui.SelectionTypeOfAddListener;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -56,15 +58,32 @@ public class MainScreen implements Screen
 		gui = new GUI(GUIViewport, game); 
 
 		guiEco = new EcosystemGUI(ecosystem);
-		gui.addSelectionListener(new SelectionListener(){
+
+		guiEco.addListener(new SelectionAnthillListener(){
 
 			@Override
-			public void changed(ElementActorType _type) {
-				guiEco.changeTypeOfAdd(_type);
+			public void selected(Anthill _anthill) {
+				gui.selectAnthill(_anthill);
+			}
+
+			@Override
+			public void unselected() {
+				gui.unselectAnthill();
 				
 			}
 			
 		});
+
+		gui.addListener(new SelectionTypeOfAddListener(){
+
+			@Override
+			public void changed(ElementActorType _type) {
+				guiEco.changeTypeOfAdd(_type);
+			}
+			
+		});
+
+		
 
 			
 	}
