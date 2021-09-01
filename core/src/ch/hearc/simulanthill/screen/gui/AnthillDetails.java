@@ -1,14 +1,8 @@
 package ch.hearc.simulanthill.screen.gui;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.lang.model.util.ElementScanner6;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -30,8 +24,6 @@ public class AnthillDetails extends Group {
     private SpriteActor hoverAnthill;
     private SpriteActor background;
     private boolean selected;
-
-    private static List<AnthillDetails> anthillDetailsList;
 
     public AnthillDetails(Anthill _anthill)
     {

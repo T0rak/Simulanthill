@@ -2,7 +2,6 @@ package ch.hearc.simulanthill.tools;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

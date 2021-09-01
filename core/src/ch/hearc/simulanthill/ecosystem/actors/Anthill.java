@@ -1,23 +1,25 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.tools.Asset;
+import ch.hearc.simulanthill.tools.ColorManagement;
 /**
  * The anthill actor that makes ants spawning
  */
 public class Anthill extends ElementActor
 { 
-    private final Texture texture = createColorImage(new Color(MathUtils.random(0.2f, 0.8f) , MathUtils.random(0.2f, 0.8f), MathUtils.random(0.2f, 0.8f), 1));
+    private final Texture texture = Asset.ant(ColorManagement.nextColor());
 
     private static int idGenerator = 0;
 
     private int nbAnts;
     private int nbResources;
     private int id;
+
+    private int count = MathUtils.random(0, 10);
 
     /**
 	 * Main constructor
@@ -57,9 +59,13 @@ public class Anthill extends ElementActor
     public void act(float _delta)
     {
         super.act(_delta);
-        if (Ecosystem.getCurrentEcosystem().getNbAnt() < Ecosystem.getCurrentEcosystem().getNbAntMax())
+
+        count++;
+        
+        if (Ecosystem.getCurrentEcosystem().getNbAnt() < Ecosystem.getCurrentEcosystem().getNbAntMax() && count > 10)
         {
             createAnt();
+            count = 0;
         }
     }
     /**
@@ -103,5 +109,10 @@ public class Anthill extends ElementActor
 
     public Texture getTexture() {
         return texture;
+    }
+
+    @Override
+    public boolean remove() {
+        return super.remove();
     }
 }

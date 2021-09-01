@@ -1,8 +1,14 @@
 package ch.hearc.simulanthill.tools;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 
 /**
  * Holds all assets used in Simulanthill.
@@ -27,6 +33,8 @@ public class Asset
     static private AssetDescriptor<Texture> icon = new AssetDescriptor<Texture>("icon.png", Texture.class);
     static private AssetDescriptor<Texture> logo = new AssetDescriptor<Texture>("logo.png", Texture.class);
     static private AssetDescriptor<Texture> anthillSelection = new AssetDescriptor<Texture>("anthillSelection.png", Texture.class);
+
+    static private Map<Color,Texture> antTextures = new HashMap<Color,Texture>();
 
     /**
      * Loads all the needed assets.
@@ -55,6 +63,35 @@ public class Asset
     static public Texture ant()
     {
         return manager.get(ant);
+    }
+
+    static public Texture ant(Color color)
+    {
+        if(antTextures.containsKey(color))
+        {
+            return antTextures.get(color);
+        }
+        else
+        {
+            Texture txt = manager.get(ant);
+            TextureData a = txt.getTextureData();
+            a.prepare();
+            Pixmap b = a.consumePixmap();
+            for (int i = 0; i < b.getWidth(); i++) {
+                for (int j = 0; j < b.getHeight(); j++) {
+                    b.setColor(color);
+                    if(b.getPixel(i, j) != 0)
+                    {
+                        b.drawPixel(i, j);
+                    }
+                }
+            }
+            Texture newTxt = new Texture(b);
+            antTextures.put(color, newTxt);
+            return newTxt;
+        }
+        
+
     }
 
     static public Texture anthill()

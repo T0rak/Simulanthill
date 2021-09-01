@@ -5,7 +5,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -435,7 +434,6 @@ public class GUI extends Stage
 
 	public VisImageButton creaImageButton(Texture _texture, String text)
 	{
-		Image img = new Image(_texture);
 		VisImageButton btn = new VisImageButton(new Image(_texture).getDrawable());
 		btn.row();
 		btn.add(new VisLabel(text));

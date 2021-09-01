@@ -3,8 +3,6 @@ package ch.hearc.simulanthill.screen.gui;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.lang.model.util.ElementScanner6;
-
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,7 +19,6 @@ public class EcosystemGUI extends Stage
     private Ecosystem ecosystem;
     private ElementActorType typeOfAdd;
     private Group anthillDetails;
-    private AnthillDetails selectedAnthill;
     private List<SelectionAnthillListener> selectionAnthillListeners;
 
     public EcosystemGUI(Ecosystem _ecosystem)

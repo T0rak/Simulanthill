@@ -289,9 +289,6 @@ public class WorldMap
 		height = errorMapHeight;
 
 	}
-	
-
-	
 
 	/**
 	 * Generates a valid random map 
@@ -377,7 +374,6 @@ public class WorldMap
 	 */
 	public boolean reset() 
 	{
-		//pheromoneGrid = null;
 		mapTileGrid = null;
 		convertMap();
 		return true;
