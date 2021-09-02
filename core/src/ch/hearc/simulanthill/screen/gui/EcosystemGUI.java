@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
@@ -140,11 +141,22 @@ public class EcosystemGUI extends Stage
                     {
                         ecosystem.addMapTiles(ecosystem.mouseToGrid(_x), ecosystem.mouseToGrid(_y), typeOfAdd);
                         
-                    } else if (selectedAnthill != null && (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE))
+                    } else if (selectedAnthill != null)
                     {
-                        PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
-                        //System.out.println(ecosystem.mouseToGrid(_x) + " x " + ecosystem.mouseToGrid(_y));
-                        ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
+                        if (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE)
+                        {
+                            PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
+                            ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
+                        } else if (typeOfAdd == ElementActorType.ANT)
+                        {
+                            //TODO: fix bug when ants are added at the limit of the map
+                            //TODO: Increase number of ants of the anthill
+                            //TODO: Maybe make a method of Anthill to spawn an ant at precise coords
+                            
+                            System.out.println("Added ant");
+                            int antSize = (int)ecosystem.getMapCaseSize();
+                            ecosystem.addAnt(new Ant(_x, _y, antSize, antSize, selectedAnthill, 100000));    
+                        }
                     }
                 }
                 super.touchDragged(_event, _x, _y, _pointer);
