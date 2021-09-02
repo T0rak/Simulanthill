@@ -28,6 +28,12 @@ public class Ant extends ElementActor
     private int countLastPhero;
     private boolean blocked;    
     
+
+    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
+    {
+        this( _x, _y, _width, _height, _anthill, 0);
+    }
+
 	/**
 	 * Constructor
 	 * @param  _x the initial x position of the ant 
@@ -36,7 +42,7 @@ public class Ant extends ElementActor
      * @param  _height the height of the ant
      * @param  _anthill the anthill to which one an ant belongs
 	 */
-    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
+    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill, int _stepFrom)   
     {
         super(_x, _y, _width, _height, _anthill.getTexture());
 
@@ -49,7 +55,7 @@ public class Ant extends ElementActor
         this.anthill = _anthill;
 
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
-        this.stepFrom = 0;
+        this.stepFrom = _stepFrom;
         this.lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         

@@ -3,8 +3,6 @@ package ch.hearc.simulanthill.screen.gui;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Element;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,10 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
-import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
 
 public class EcosystemGUI extends Stage
@@ -149,13 +145,7 @@ public class EcosystemGUI extends Stage
                             ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
                         } else if (typeOfAdd == ElementActorType.ANT)
                         {
-                            //TODO: fix bug when ants are added at the limit of the map
-                            //TODO: Increase number of ants of the anthill
-                            //TODO: Maybe make a method of Anthill to spawn an ant at precise coords
-                            
-                            System.out.println("Added ant");
-                            int antSize = (int)ecosystem.getMapCaseSize();
-                            ecosystem.addAnt(new Ant(_x, _y, antSize, antSize, selectedAnthill, 100000));    
+                            selectedAnthill.createAntAt(_x, _y, 100000);
                         }
                     }
                 }

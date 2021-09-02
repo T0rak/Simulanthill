@@ -78,12 +78,23 @@ public class Anthill extends ElementActor
         Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX(), this.getY(),  antSize, antSize, this));
     }
     
+    public void createAntAt(float _x, float _y, int _stepFrom) 
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        if (!ecosystem.isObstacle(ecosystem.getElementFrom(_x, _y))) 
+        {
+            nbAnts++;
+            int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
+            Ecosystem.getCurrentEcosystem().addAnt(new Ant(_x, _y,  antSize, antSize, this, _stepFrom));
+        }
+    }
     /**
      * Removes an ant
      * @param ant  the ant that will removed
      */
     public void removeAnt(Ant _ant)
     {
+        nbAnts--;
         Ecosystem.getCurrentEcosystem().removeAnt(_ant);
     }
 
