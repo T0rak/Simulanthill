@@ -253,7 +253,15 @@ public class GUI extends Stage
 			}
 
 		});
+		btnAnt.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				signalSelectionListener(ElementActorType.ANT);
+				super.clicked(event, x, y);
+			}
 
+		});
 		lytMain.setFillParent(true);
 		addActor(lytMain);
 

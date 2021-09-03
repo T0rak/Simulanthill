@@ -3,8 +3,6 @@ package ch.hearc.simulanthill.screen.gui;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Element;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -14,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
-import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
 
 public class EcosystemGUI extends Stage
@@ -138,13 +135,18 @@ public class EcosystemGUI extends Stage
                 {
                     if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.ANTHILL || typeOfAdd == ElementActorType.RESOURCE) 
                     {
-                        ecosystem.addMapTiles(ecosystem.mouseToGrid(_x), ecosystem.mouseToGrid(_y), typeOfAdd);
+                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
                         
-                    } else if (selectedAnthill != null && (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE))
+                    } else if (selectedAnthill != null)
                     {
-                        PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
-                        //System.out.println(ecosystem.mouseToGrid(_x) + " x " + ecosystem.mouseToGrid(_y));
-                        ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
+                        if (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE)
+                        {
+                            PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
+                            ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
+                        } else if (typeOfAdd == ElementActorType.ANT)
+                        {
+                            selectedAnthill.createAntAt(_x, _y, 100000);
+                        }
                     }
                 }
                 super.touchDragged(_event, _x, _y, _pointer);

@@ -250,8 +250,8 @@ public class Ecosystem extends Stage
      */
     public ElementActor getElementFrom(float _x, float _y)
     {
-        int xCase = mouseToGrid(_x);
-        int yCase = mouseToGrid(_y);
+        int xCase = floatToGridCoordinate(_x);
+        int yCase = floatToGridCoordinate(_y);
         return getElement(xCase, yCase);
     }
 
@@ -297,8 +297,8 @@ public class Ecosystem extends Stage
      */
     public Pheromone isPheromoneFrom(float _x, float _y, Anthill _anthill, PheromoneType _type)
     {
-        int xCase = mouseToGrid(_x);
-        int yCase = mouseToGrid(_y);
+        int xCase = floatToGridCoordinate(_x);
+        int yCase = floatToGridCoordinate(_y);
         return isPheromone(xCase, yCase, _anthill, _type);
     }
 
@@ -327,11 +327,12 @@ public class Ecosystem extends Stage
      */
     public int takeResource(float _x, float _y, int _quantity) 
     {
-        int xCase = mouseToGrid(_x);
-        int yCase = mouseToGrid(_y);
+        int xCase = floatToGridCoordinate(_x);
+        int yCase = floatToGridCoordinate(_y);
+
         ElementActor actor = getElement(xCase, yCase);
         
-        if (actor != null && actor.getClass() == Resource.class)
+        if (isResource(actor))
         {
             return ((Resource)actor).decrease(_quantity);
 
@@ -347,8 +348,8 @@ public class Ecosystem extends Stage
      */
     public void removeResource(float _x, float _y) 
     {
-        int xCase = mouseToGrid(_x);
-        int yCase = mouseToGrid(_y);
+        int xCase = floatToGridCoordinate(_x);
+        int yCase = floatToGridCoordinate(_y);
         if (worldMap.getmapTileGrid()[xCase][yCase].getClass() == Resource.class)
         {
             worldMap.getmapTileGrid()[xCase][yCase] = null;
@@ -368,8 +369,8 @@ public class Ecosystem extends Stage
     {
         
         int i = _pheromone.getType().getValue();
-        int caseX = mouseToGrid(_pheromone.getX());
-        int caseY = mouseToGrid(_pheromone.getY());
+        int caseX = floatToGridCoordinate(_pheromone.getX());
+        int caseY = floatToGridCoordinate(_pheromone.getY());
         Pheromone currentPheromoneCase = pheromoneGridMap.get(_pheromone.getAnthill().getId())[caseX][caseY][i];
         if (currentPheromoneCase != null) 
         {
@@ -396,8 +397,8 @@ public class Ecosystem extends Stage
     {
         Pheromone pheromone = new Pheromone(_x, _y, _type, _anthill, _stepFrom);
         int i = _type.getValue();
-        int caseX = mouseToGrid(_x);
-        int caseY = mouseToGrid(_y);
+        int caseX = floatToGridCoordinate(_x);
+        int caseY = floatToGridCoordinate(_y);
         Pheromone currentPheromoneCase = pheromoneGridMap.get(pheromone.getAnthill().getId())[caseX][caseY][i];
         if (currentPheromoneCase != null) 
         {
@@ -428,8 +429,8 @@ public class Ecosystem extends Stage
     public void removePheromone(Pheromone _pheromone) 
     {   
         Anthill anthill = _pheromone.getAnthill();
-        int xCase = mouseToGrid(_pheromone.getX());
-        int yCase = mouseToGrid(_pheromone.getY());
+        int xCase = floatToGridCoordinate(_pheromone.getX());
+        int yCase = floatToGridCoordinate(_pheromone.getY());
         int typeIndex = _pheromone.getType().getValue();
         //if(pheromoneGridMap.containsKey(anthill.getId()))
         {
@@ -437,17 +438,7 @@ public class Ecosystem extends Stage
         }
     }
 
-    /**
-     * Cast in case from stage coordinate
-     * @param _f stage coordinate
-     * @return case
-     */
-    public int castInCase(float _f)
-    {
-        return MathUtils.round(_f / worldMap.getCaseSize());
-    }
-
-    public int mouseToGrid(float _f) {
+    public int floatToGridCoordinate(float _f) {
         return MathUtils.floor(_f / worldMap.getCaseSize());
     }
 

@@ -1,7 +1,7 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
-
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import static ch.hearc.simulanthill.ecosystem.actors.AntState.*;
 
 /**
  * The ant actor that contains it's behaviour
@@ -27,7 +27,15 @@ public class Ant extends ElementActor
     private int lastStepFrom;
     private int countLastPhero;
     private boolean blocked;    
+    private AntState state;
     
+    private int avoidObstacleMemory;
+
+    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
+    {
+        this( _x, _y, _width, _height, _anthill, 0, AntState.SEARCHING_RESOURCE);
+    }
+
 	/**
 	 * Constructor
 	 * @param  _x the initial x position of the ant 
@@ -36,25 +44,39 @@ public class Ant extends ElementActor
      * @param  _height the height of the ant
      * @param  _anthill the anthill to which one an ant belongs
 	 */
-    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
+    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill, int _stepFrom, AntState _state)   
     {
         super(_x, _y, _width, _height, _anthill.getTexture());
-
+        this.state = _state;
         this.capacity = 0;
         this.viewSpanAngle = 15;
-
-        this.direction = MathUtils.random(360f);
-        this.sprite.rotate(this.direction);
-
+        
+        setDirection(MathUtils.random(360f));
         this.anthill = _anthill;
 
         this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
-        this.stepFrom = 0;
+        this.stepFrom = _stepFrom;
         this.lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         
         blocked = false;
         checkCountdown = NEXT_CHECK_COUNTDOWN;
+    }
+
+    public void setDirection(float _direction)
+    {
+        float prov = _direction % 360f;
+        if (prov < 0)
+        {
+            prov =  prov + 360;            
+        }
+
+
+        float deltaDirection = prov - this.direction;
+
+        sprite.rotate(deltaDirection);
+
+        direction = prov;
     }
 
     /**
@@ -65,7 +87,8 @@ public class Ant extends ElementActor
     public void act(float _delta)
     {
         super.act(_delta);
-        if (capacity < MAX_CAPACITY)
+        
+        if (state == SEARCHING_RESOURCE || state == LOST)
         {
             tryCollectFood();
         }
@@ -74,11 +97,11 @@ public class Ant extends ElementActor
             tryDepositFood();   
         }
 
-        if (capacity < MAX_CAPACITY)
+        if (state == SEARCHING_RESOURCE)
         {   
             releasePheromone(PheromoneType.HOME);   
         }
-        else
+        else if (state == SEARCHING_ANTHILL)
         {
             releasePheromone(PheromoneType.RESSOURCE);
         }
@@ -87,7 +110,7 @@ public class Ant extends ElementActor
         {
             ElementActor newGoal = null;
             
-            if (capacity < MAX_CAPACITY)
+            if (state == SEARCHING_RESOURCE || state == LOST)
             {
                 newGoal = searchFood();
                 
@@ -142,14 +165,20 @@ public class Ant extends ElementActor
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
         if (ecosystem.isResource(ecosystem.getElementFrom(getX(), getY()))) 
         {
-            capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
-            if (capacity >= MAX_CAPACITY)
+            int res = ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
+            
+            capacity += res;
+            if (res != 0)
             {
+                goal = null;
                 stepFrom = 0;
                 lastStepFrom = Integer.MAX_VALUE;
+                if (capacity >= MAX_CAPACITY)
+                {
+                    state = SEARCHING_ANTHILL;
+                }
             }
-            goal = null;
-            
+
         }
     }
     /**
@@ -170,6 +199,7 @@ public class Ant extends ElementActor
             {
                 anthill.removeAnt(this);
             }
+            state = SEARCHING_RESOURCE;
         }
     }
     
@@ -239,10 +269,7 @@ public class Ant extends ElementActor
         if (goal != null && blocked == false)
         {
             float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getY(), goal.getX() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getX());
-            float deltaDirection = (float)(newDirection - this.direction) % 360f;
-
-            direction = newDirection;
-            sprite.rotate(deltaDirection);
+            setDirection(newDirection);
         }
     }
 
@@ -253,8 +280,7 @@ public class Ant extends ElementActor
     public void explore()
     {
         float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
-        direction = (float)(this.direction + deltaDirection) % 360f;
-        sprite.rotate(deltaDirection);
+        setDirection(this.direction + deltaDirection);
     }
 
     /**
@@ -262,13 +288,109 @@ public class Ant extends ElementActor
 	 */
     public void move()
     {
-        if (blocked)
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        float caseSize = ecosystem.getMapCaseSize();
+        float caseSizeCenter = caseSize / 2f;
+        float directionRad = (float) Math.toRadians(direction);
+        float nextCaseX = (float) (getX() + MathUtils.cos(directionRad) * caseSize);
+        float nextCaseY = (float) (getY() + MathUtils.sin(directionRad) * caseSize);
+        ElementActor nextActor = ecosystem.getElementFrom(nextCaseX, nextCaseY);
+        int caseX = ecosystem.floatToGridCoordinate(getX());
+        int caseY = ecosystem.floatToGridCoordinate(getY());
+
+        int dx = ecosystem.floatToGridCoordinate(nextCaseX) - caseX;
+        int dy = ecosystem.floatToGridCoordinate(nextCaseY) - caseY;
+        
+        //if (ecosystem.isObstacle(nextActor))
+        {
+            if (Math.abs(dx) == Math.abs(dy))
+            {
+                ElementActor actor2 = ecosystem.getElement(caseX + dx, caseY);
+                ElementActor actor3 = ecosystem.getElement(caseX, caseY + dy);
+                if (ecosystem.isObstacle(actor2))
+                {
+                    nextActor = actor2;
+                }
+                else if (ecosystem.isObstacle(actor3))
+                {
+                    nextActor = actor3;
+                }
+                
+            }
+        }
+
+        /*if (blocked)
         {
             float deltaDirection = MathUtils.random(-40f, 40f);
             direction = (float)(direction + deltaDirection) % 360f;
-            sprite.rotate(deltaDirection);
+            sprite.rotate(deltaDirection);   
+        }*/
+        if (ecosystem.isObstacle(nextActor))
+        {
+            dx = ecosystem.floatToGridCoordinate(nextActor.getX() + caseSizeCenter) - caseX;
+            dy = ecosystem.floatToGridCoordinate(nextActor.getY() + caseSizeCenter) - caseY;
+            float deltaDirection = 0;
+            if (avoidObstacleMemory == 0)
+            {
+                if (dx == 0 && dy != 0)
+                {
+                    if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
+                    {
+                        avoidObstacleMemory = -1;
+                    }
+                    else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
+                    {
+                        avoidObstacleMemory = 1;
+                    }
+                    else
+                    {
+                        avoidObstacleMemory = MathUtils.random(0, 1);
+                        if (avoidObstacleMemory == 0)
+                        {
+                            avoidObstacleMemory = -1;
+                        }
+
+                    }
+                }
+                else if (dy == 0 && dx != 0)
+                {
+                    if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
+                    {
+                        avoidObstacleMemory = 1;
+                    }
+                    else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
+                    {
+                        avoidObstacleMemory = -1;
+                    }
+                    else
+                    {
+                        avoidObstacleMemory = MathUtils.random(0, 1);
+                        if (avoidObstacleMemory == 0)
+                        {
+                            avoidObstacleMemory = -1;
+                        }
+                    }
+                }
+                else
+                {
+                    float verticeX = nextActor.getX() + ((-dx -1 ) / 2 * caseSize);
+                    float verticeY = nextActor.getY() + ((-dy - 1) / 2 * caseSize);
+
+                    float angle = MathUtils.atan2(getY() - verticeY ,getX() - verticeX);
+                    avoidObstacleMemory = (int)Math.signum(direction - angle);
+                }
+                
+            }
+            deltaDirection = 15 * avoidObstacleMemory * (float)Math.sqrt(Math.sqrt(speedFactor));
+            //System.out.println(deltaDirection);
+            setDirection(direction + deltaDirection);
+            //sprite.rotate(deltaDirection);
+        } else
+        {
+            avoidObstacleMemory = 0;
         }
-        float directionRad = (float) Math.toRadians(this.direction);
+        
+
         float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
 
@@ -333,7 +455,7 @@ public class Ant extends ElementActor
     * Changes the movement speed of the ant
     * @param _speed new speed
     */
-    public static  void updateSpeed()
+    public static void updateSpeed()
     {
         speed = speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize() / 10;
     }
@@ -364,16 +486,15 @@ public class Ant extends ElementActor
     private boolean canMove(float _destinationX, float _destinationY) {
 
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        int destinationXCase = ecosystem.mouseToGrid(_destinationX);
-        int destinationYCase = ecosystem.mouseToGrid(_destinationY);
+        int destinationXCase = ecosystem.floatToGridCoordinate(_destinationX);
+        int destinationYCase = ecosystem.floatToGridCoordinate(_destinationY);
 
-        int initXCase = ecosystem.mouseToGrid(getX());
-        int initYCase = ecosystem.mouseToGrid(getY());
+        int initXCase = ecosystem.floatToGridCoordinate(getX());
+        int initYCase = ecosystem.floatToGridCoordinate(getY());
 
         int dx = destinationXCase - initXCase;
         int dy = destinationYCase - initYCase;
         
-
         if (ecosystem.isObstacle(ecosystem.getElement(destinationXCase, destinationYCase))) 
         {
             return false;
@@ -405,8 +526,8 @@ public class Ant extends ElementActor
         ElementActor res = null;
         float distance = 0;
         
-        int xCase = ecosystem.mouseToGrid(getX());
-        int yCase = ecosystem.mouseToGrid(getY());
+        int xCase = ecosystem.floatToGridCoordinate(getX());
+        int yCase = ecosystem.floatToGridCoordinate(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -506,8 +627,8 @@ public class Ant extends ElementActor
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
 
-        int xCase = ecosystem.mouseToGrid(getX());
-        int yCase = ecosystem.mouseToGrid(getY());
+        int xCase = ecosystem.floatToGridCoordinate(getX());
+        int yCase = ecosystem.floatToGridCoordinate(getY());
 
         for (int i = -1; i <= 1; i++)
         {
