@@ -75,7 +75,8 @@ public class Anthill extends ElementActor
     {
         nbAnts++;
         int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
-        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX(), this.getY(),  antSize, antSize, this));
+        float caseSizeCenter =  Ecosystem.getCurrentEcosystem().getMapCaseSize()/2;
+        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX() + caseSizeCenter, this.getY() + caseSizeCenter,  antSize, antSize, this));
     }
     
     public void createAntAt(float _x, float _y, int _stepFrom) 
@@ -85,7 +86,7 @@ public class Anthill extends ElementActor
         {
             nbAnts++;
             int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
-            Ecosystem.getCurrentEcosystem().addAnt(new Ant(_x, _y,  antSize, antSize, this, _stepFrom));
+            Ecosystem.getCurrentEcosystem().addAnt(new Ant(_x, _y,  antSize, antSize, this, _stepFrom, AntState.LOST));
         }
     }
     /**

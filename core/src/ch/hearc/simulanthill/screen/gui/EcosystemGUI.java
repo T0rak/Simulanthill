@@ -135,7 +135,7 @@ public class EcosystemGUI extends Stage
                 {
                     if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.ANTHILL || typeOfAdd == ElementActorType.RESOURCE) 
                     {
-                        ecosystem.addMapTiles(ecosystem.mouseToGrid(_x), ecosystem.mouseToGrid(_y), typeOfAdd);
+                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
                         
                     } else if (selectedAnthill != null)
                     {
