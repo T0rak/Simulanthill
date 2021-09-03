@@ -401,6 +401,7 @@ public class Ant extends ElementActor
         else
         {
             blocked = false;
+            ecosystem.moveAntOnGrid(getX(), getY(), nextPosX, nextPosY, anthill.getId());
             setPosition(nextPosX, nextPosY);
 
         }
