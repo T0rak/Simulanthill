@@ -289,122 +289,146 @@ public class Ant extends ElementActor
     public void move()
     {
         Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         float caseSize = ecosystem.getMapCaseSize();
-        float caseSizeCenter = caseSize / 2f;
+        
         float directionRad = (float) Math.toRadians(direction);
-        float nextCaseX = (float) (getX() + MathUtils.cos(directionRad) * caseSize);
-        float nextCaseY = (float) (getY() + MathUtils.sin(directionRad) * caseSize);
-        ElementActor nextActor = ecosystem.getElementFrom(nextCaseX, nextCaseY);
+        
+        float nextCaseFloatX = (float) (getX() + MathUtils.cos(directionRad) * caseSize);
+        float nextCaseFloatY = (float) (getY() + MathUtils.sin(directionRad) * caseSize);
+
+        int nextCaseX = ecosystem.floatToGridCoordinate(nextCaseFloatX);
+        int nextCaseY = ecosystem.floatToGridCoordinate(nextCaseFloatY);
+
         int caseX = ecosystem.floatToGridCoordinate(getX());
         int caseY = ecosystem.floatToGridCoordinate(getY());
 
-        int dx = ecosystem.floatToGridCoordinate(nextCaseX) - caseX;
-        int dy = ecosystem.floatToGridCoordinate(nextCaseY) - caseY;
+
+        int dx = nextCaseX - caseX;
+        int dy = nextCaseY - caseY;
+
+        int referenceX = nextCaseX;
+        int referenceY = nextCaseY;
         
-        //if (ecosystem.isObstacle(nextActor))
+        if (Math.abs(dx) == Math.abs(dy))
         {
-            if (Math.abs(dx) == Math.abs(dy))
+            int rand0 = MathUtils.random(0,1);
+            int rand1 = Math.abs(rand0 - 1);
+            
+            int x2 = caseX + rand0 * dx;
+            int y2 = caseY + rand1* dy;
+
+            int x3 = caseX + rand1 * dx;
+            int y3 = caseY + rand0 * dy;
+            
+            if (isCaseToAvoid(x2, y2))
             {
-                ElementActor actor2 = ecosystem.getElement(caseX + dx, caseY);
-                ElementActor actor3 = ecosystem.getElement(caseX, caseY + dy);
-                if (ecosystem.isObstacle(actor2))
-                {
-                    nextActor = actor2;
-                }
-                else if (ecosystem.isObstacle(actor3))
-                {
-                    nextActor = actor3;
-                }
-                
+                referenceX = x2;
+                referenceY = y2;
             }
+            else if (isCaseToAvoid(x3, y3))
+            {
+                referenceX = x3;
+                referenceY = y3;
+            }
+            
         }
 
-        /*if (blocked)
+        
+        if (isCaseToAvoid(referenceX, referenceY))
         {
-            float deltaDirection = MathUtils.random(-40f, 40f);
-            direction = (float)(direction + deltaDirection) % 360f;
-            sprite.rotate(deltaDirection);   
-        }*/
-        if (ecosystem.isObstacle(nextActor))
-        {
-            dx = ecosystem.floatToGridCoordinate(nextActor.getX() + caseSizeCenter) - caseX;
-            dy = ecosystem.floatToGridCoordinate(nextActor.getY() + caseSizeCenter) - caseY;
-            float deltaDirection = 0;
-            if (avoidObstacleMemory == 0)
-            {
-                if (dx == 0 && dy != 0)
-                {
-                    if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
-                    {
-                        avoidObstacleMemory = -1;
-                    }
-                    else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
-                    {
-                        avoidObstacleMemory = 1;
-                    }
-                    else
-                    {
-                        avoidObstacleMemory = MathUtils.random(0, 1);
-                        if (avoidObstacleMemory == 0)
-                        {
-                            avoidObstacleMemory = -1;
-                        }
-
-                    }
-                }
-                else if (dy == 0 && dx != 0)
-                {
-                    if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
-                    {
-                        avoidObstacleMemory = 1;
-                    }
-                    else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
-                    {
-                        avoidObstacleMemory = -1;
-                    }
-                    else
-                    {
-                        avoidObstacleMemory = MathUtils.random(0, 1);
-                        if (avoidObstacleMemory == 0)
-                        {
-                            avoidObstacleMemory = -1;
-                        }
-                    }
-                }
-                else
-                {
-                    float verticeX = nextActor.getX() + ((-dx -1 ) / 2 * caseSize);
-                    float verticeY = nextActor.getY() + ((-dy - 1) / 2 * caseSize);
-
-                    float angle = MathUtils.atan2(getY() - verticeY ,getX() - verticeX);
-                    avoidObstacleMemory = (int)Math.signum(direction - angle);
-                }
-                
-            }
-            deltaDirection = 15 * avoidObstacleMemory * (float)Math.sqrt(Math.sqrt(speedFactor));
-            //System.out.println(deltaDirection);
-            setDirection(direction + deltaDirection);
-            //sprite.rotate(deltaDirection);
+            avoidActor(referenceX,referenceY);
         } else
         {
             avoidObstacleMemory = 0;
         }
         
-
         float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
         float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
 
         if (!canMove(nextPosX, nextPosY))
         {
             blocked = true;
-        }
-        else
+        } else 
         {
             blocked = false;
             ecosystem.moveAntOnGrid(getX(), getY(), nextPosX, nextPosY, anthill.getId());
             setPosition(nextPosX, nextPosY);
 
         }
+    }
+
+    public boolean isCaseToAvoid(int _x, int _y)
+    {
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        return ecosystem.isObstacle(ecosystem.getElement(_x, _y)) || ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId()) > ecosystem.getNbAntsAt(_x, _y, anthill.getId());
+    }
+    
+    public void avoidActor(int _x, int _y) 
+    {
+        if (avoidObstacleMemory == 0)
+        {
+            Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+            float caseSize = ecosystem.getMapCaseSize();
+
+            int caseX = ecosystem.floatToGridCoordinate(getX());
+            int caseY = ecosystem.floatToGridCoordinate(getY());
+
+            int dx = _x - caseX;
+            int dy = _y - caseY;
+
+            if (dx == 0 && dy != 0)
+            {
+                if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
+                {
+                    avoidObstacleMemory = -1;
+                }
+                else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
+                {
+                    avoidObstacleMemory = 1;
+                }
+                else
+                {
+                    avoidObstacleMemory = MathUtils.random(0, 1);
+                    if (avoidObstacleMemory == 0)
+                    {
+                        avoidObstacleMemory = -1;
+                    }
+
+                }
+            }
+            else if (dy == 0 && dx != 0)
+            {
+                if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
+                {
+                    avoidObstacleMemory = 1;
+                }
+                else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
+                {
+                    avoidObstacleMemory = -1;
+                }
+                else
+                {
+                    avoidObstacleMemory = MathUtils.random(0, 1);
+                    if (avoidObstacleMemory == 0)
+                    {
+                        avoidObstacleMemory = -1;
+                    }
+                }
+            }
+            else
+            {
+                float verticeX = (_x + (-(- dx - 1 ) / 2f) * caseSize);
+                float verticeY = (_y + (-(- dy - 1) / 2f) * caseSize);
+
+                float angle = MathUtils.atan2(getY() - verticeY ,getX() - verticeX);
+                avoidObstacleMemory = (int)Math.signum(direction - angle);
+            } 
+        }
+            
+        float deltaDirection = 15 * avoidObstacleMemory * (float)Math.sqrt(Math.sqrt(speedFactor));
+        
+        setDirection(direction + deltaDirection);
     }
     
     /**
@@ -586,12 +610,7 @@ public class Ant extends ElementActor
                 }
 
                 
-                if (ecosystem.isObstacle(actor2))
-                {
-                    return null;
-                }
-
-                if (ecosystem.isObstacle(actor3))
+                if (isCaseToAvoid(xi - _dx, yi) || isCaseToAvoid(xi, yi - _dy))
                 {
                     return null;
                 }
@@ -603,7 +622,7 @@ public class Ant extends ElementActor
             {
                 return actor;
             }
-            else if (ecosystem.isObstacle(actor))
+            else if (isCaseToAvoid(xi, yi))
             {
                 return null;
             }
@@ -677,11 +696,7 @@ public class Ant extends ElementActor
 
             if (Math.abs(_dx) == Math.abs(_dy))
             {
-                if (ecosystem.isObstacle(ecosystem.getElement(xi - _dx, yi)))
-                {
-                    return res;
-                }
-                if (ecosystem.isObstacle(ecosystem.getElement(xi, yi - _dy)))
+                if (isCaseToAvoid(xi - _dx, yi) || isCaseToAvoid(xi, yi - _dy))
                 {
                     return res;
                 }
@@ -708,8 +723,7 @@ public class Ant extends ElementActor
                     }
                 }
             }
-
-            if (ecosystem.isObstacle(ecosystem.getElement(xi, yi)))
+            if (isCaseToAvoid(xi, yi))
             {
                 return res;
             }

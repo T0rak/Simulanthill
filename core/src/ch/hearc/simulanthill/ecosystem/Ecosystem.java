@@ -585,11 +585,20 @@ public class Ecosystem extends Stage
         addAntToGrid(_newX, _newY, _anthillID);
     }
 
-    public int getNbAntsAt(float _x, float _y, int _anthillID) 
+    public int getNbAntsAt(int _x, int _y, int _anthillID) 
     {
-        int caseX = floatToGridCoordinate(_x);
-        int caseY = floatToGridCoordinate(_y);
-        return nbAntsGridMap.get(_anthillID)[caseX][caseY];
+        return nbAntsGridMap.get(_anthillID)[_x][_y];
+    }
+
+    public int getOthersNbAntsAt(int _x, int _y, int _anthillID) {
+        int sum = 0;
+        for (Integer key : nbAntsGridMap.keySet()) {
+            if (key != _anthillID)
+            {
+                sum += getNbAntsAt(_x, _y, key);
+            }
+        }
+        return sum;
     }
 }
 
