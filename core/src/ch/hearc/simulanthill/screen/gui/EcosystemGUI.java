@@ -124,6 +124,13 @@ public class EcosystemGUI extends Stage
             @Override
                 public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
                     count = 0;
+                    int caseX = ecosystem.floatToGridCoordinate(_x);
+                    int caseY = ecosystem.floatToGridCoordinate(_y);
+                    if (selectedAnthill != null)
+                    {
+                        System.out.println(_x + "X" + _y + ": " + ecosystem.getOthersNbAntsAt(caseX, caseY, selectedAnthill.getId()));
+                    }
+                    
                     return super.touchDown(_event, _x, _y, _pointer, _button);
                 }
 
