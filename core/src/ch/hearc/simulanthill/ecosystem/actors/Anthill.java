@@ -104,6 +104,7 @@ public class Anthill extends ElementActor
     public void removeAnt(Ant _ant)
     {
         nbAnts--;
+        antList.remove(_ant);
         Ecosystem.getCurrentEcosystem().removeAnt(_ant);
     }
 
