@@ -48,10 +48,8 @@ public class Ecosystem extends Stage
     private List<MapListener> MapListeners;
 
     private Map<Integer, Pheromone[][][]> pheromoneGridMap;
-
-    
-
-    
+    private Map<Integer, int[][]> nbAntsGridMap;
+        
     //reset
     //pheromoneGrid = null;
 
@@ -78,6 +76,7 @@ public class Ecosystem extends Stage
         nbAntMax = 500;
         MapListeners = new LinkedList<MapListener>();
         pheromoneGridMap =  new TreeMap<Integer, Pheromone[][][]>();
+        nbAntsGridMap = new TreeMap<Integer, int[][]>();
     }
 
     /**
@@ -111,6 +110,7 @@ public class Ecosystem extends Stage
     public void addAnt(Ant _ant)
     {
         ants.addActor(_ant);
+        addAntToGrid(_ant.getX(), _ant.getY(), _ant.getAnthill().getId());
     }
 
     /**
@@ -206,6 +206,7 @@ public class Ecosystem extends Stage
     private void refreshAnthills()
     {
         pheromoneGridMap.clear();
+        nbAntsGridMap.clear();
         anthills.clear();
         for (ElementActor[] elementA: worldMap.getmapTileGrid()) 
         {
@@ -215,6 +216,10 @@ public class Ecosystem extends Stage
                 {
                     anthills.add((Anthill)elementB);
                     pheromoneGridMap.put(((Anthill)elementB).getId(), new Pheromone[worldMap.getWidth()][worldMap.getHeight()][2]);
+                    
+                    int newNbAntsGrid[][] = new int[worldMap.getWidth()][worldMap.getHeight()];
+                    nbAntsGridMap.put(((Anthill)elementB).getId(), newNbAntsGrid);
+
                 }
             }
 		}
@@ -313,10 +318,6 @@ public class Ecosystem extends Stage
     {
         return pheromoneGridMap.get(anthill.getId())[_x][_y][_type.getValue()];
     }
-
-    
-    
-    
 
     /**
      * Take a resource
@@ -463,7 +464,7 @@ public class Ecosystem extends Stage
 	 */
     public void removeAnt(Ant _ant)
     {
-        //ants.remove(_ant);
+        removeAntFromGrid(_ant.getX(), _ant.getY(), _ant.getAnthill().getId());
         _ant.remove();
     }
 
@@ -532,9 +533,28 @@ public class Ecosystem extends Stage
         Anthill anthill = new Anthill(_x * getMapCaseSize(), _y * getMapCaseSize(), getMapCaseSize(), getMapCaseSize());
         anthills.add(anthill);
         pheromoneGridMap.put(anthill.getId(), new Pheromone[worldMap.getWidth()][worldMap.getHeight()][2]);
+
+        int newNbAntsGrid[][] = new int[worldMap.getWidth()][worldMap.getHeight()];
+        nbAntsGridMap.put(anthill.getId(), newNbAntsGrid);
+
         informChangeMap();
         return anthill;
+    }
 
+    // TODO: USE IT
+    public void removeAnthill(int _x, int _y)
+    {
+        ElementActor actor = getElement(_x, _y);
+        if (isAnthill(getElement(_x, _y))) 
+        {
+            int id = ((Anthill)actor).getId();
+            
+            pheromoneGridMap.remove(id);
+            nbAntsGridMap.remove(id);
+
+            anthills.remove(actor);
+            informChangeMap();
+        }
     }
 
     public float getWorldMapWidth() {
@@ -544,6 +564,41 @@ public class Ecosystem extends Stage
     public float getWorldMapHeight() {
         return worldMap.getWorldHeight();
     }
+    
+    private void addAntToGrid(float _x, float _y, int _anthillID) 
+    {
+        int caseX = floatToGridCoordinate(_x);
+        int caseY = floatToGridCoordinate(_y);
+        nbAntsGridMap.get(_anthillID)[caseX][caseY]++;
+    }
 
+    private void removeAntFromGrid(float _x, float _y, int _anthillID) 
+    {
+        int caseX = floatToGridCoordinate(_x);
+        int caseY = floatToGridCoordinate(_y);
+        nbAntsGridMap.get(_anthillID)[caseX][caseY]--;
+    }
+    
+    public void moveAntOnGrid(float _oldX, float _oldY, float _newX, float _newY, int _anthillID) 
+    {
+        removeAntFromGrid(_oldX, _oldY, _anthillID);
+        addAntToGrid(_newX, _newY, _anthillID);
+    }
+
+    public int getNbAntsAt(int _x, int _y, int _anthillID) 
+    {
+        return nbAntsGridMap.get(_anthillID)[_x][_y];
+    }
+
+    public int getOthersNbAntsAt(int _x, int _y, int _anthillID) {
+        int sum = 0;
+        for (Integer key : nbAntsGridMap.keySet()) {
+            if (key != _anthillID)
+            {
+                sum += getNbAntsAt(_x, _y, key);
+            }
+        }
+        return sum;
+    }
 }
 
