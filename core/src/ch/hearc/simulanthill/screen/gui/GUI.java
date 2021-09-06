@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import com.kotcrab.vis.ui.widget.VisImageButton;
@@ -27,6 +28,7 @@ import ch.hearc.simulanthill.tools.Asset;
 
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.math.BigDecimal;
@@ -84,6 +86,8 @@ public class GUI extends Stage
 	private static final int DEFAULT_INDEPENDENCE 	= 10;
 	private static final int DEFAULT_ANT_NUMBER 	= 500;
 
+	private ButtonGroup<VisImageButton> selectButtonGroup;
+
 	private List<SelectionTypeOfAddListener> selectionListeners;
     
 	/**
@@ -97,171 +101,37 @@ public class GUI extends Stage
 		
 		selectionListeners = new LinkedList<SelectionTypeOfAddListener>();
 
-		simulation = new Actor();
-		
-		//Create All layout
-		lytMain = 					new VisTable();
-		lytSimulation = 			new VisTable();
-		lytParameters = 			new VisTable();
-		lytMapButtons = 			new VisTable();
-		lytPheromonesParameters = 	new VisTable();
-		lytAntParameters =			new VisTable();
-		lytInteractibles = 			new VisTable();
-		
+		create();
+		add();
 
-		//Create Vis Attribute
+		selectButtonGroup = new ButtonGroup<VisImageButton>(btnObstacle, btnFood, btnAnthill, btnHomePheromone, btnFoodPheromone, btnAnt);
+		selectButtonGroup.setMaxCheckCount(1);
+		selectButtonGroup.setMinCheckCount(0);
+		selectButtonGroup.setUncheckLast(true);
 
-		btnLoadMap = 		new VisTextButton("Load Map");
-		btnGenerateMap = 	new VisTextButton("Generate Map");
+		for (VisImageButton btn : selectButtonGroup.getButtons()) {
+			btn.getStyle().checked = btn.getStyle().down;
+		}
 		
-		btnFood 			= creaImageButton(Asset.resource(), "Resource");
-		btnObstacle			= creaImageButton(Asset.obstacle(), "Obstacle");
-		btnAnt				= creaImageButton(Asset.ant(), "Ant");
-		btnAnthill			= creaImageButton(Asset.anthill(), "Anthill");
-		btnHomePheromone 	= creaImageButton(Asset.homePheromone(), "Pheromone Home");
-		btnFoodPheromone 	= creaImageButton(Asset.foodPheromone(), "Pheromone Food");
-		
-		
-
-		btnResetParameters = new VisTextButton("Reset Parameters");
-		
-		btnReset =	new VisTextButton("Reset");
-		btnPlay =	new VisTextButton("Play");
-
-		sliSpeed = new VisSlider(0f, 1f, 0.1f, false);
-
-	
-		lblSpeed = 		new VisLabel("Pheromone opacity");
-		lblPheromone = 	new VisLabel("Phéromones");
-		lblAnt = 		new VisLabel("Fourmis");
-
-	
-		spinRadius =			new Spinner("Rayon", new IntSpinnerModel(DEFAULT_RADIUS, 0, 5));
-		spinFrequence =			new Spinner("Période entre 2", new IntSpinnerModel(DEFAULT_FREQUENCE, 0, 20));
-		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(DEFAULT_ANT_NUMBER, 1, 10000));
-		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(DEFAULT_INDEPENDENCE,0, 100));
-		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(DEFAULT_LIFETIME, 0, 3000));
-		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "9", "0.5", 1));
-	
-		//Fill main layout
-		lytMain.add(lytSimulation);
-		lytMain.add(lytParameters);
-
-		//Fill simulation layout
-		//lytSimulation.add(simulationImage).colspan(4);
-	
-		lytSimulation.add(simulation).colspan(4).size((int)(1600/1.25), (int)(900/1.25));
-		lytSimulation.row();
-		lytSimulation.add(btnReset);
-		lytSimulation.add(btnPlay);
-		lytSimulation.add(lblSpeed);
-		lytSimulation.add(sliSpeed);
-		
-		//Fill parameters layout
-		lytParameters.add(lytMapButtons);
-		lytParameters.row();
-		lytParameters.add(lytPheromonesParameters);
-		lytParameters.row();
-		lytParameters.add(lytAntParameters);
-		lytParameters.row();
-		lytParameters.add(btnResetParameters);
-		lytParameters.row();
-		lytParameters.add(lytInteractibles);
-		
-		//Fill buttons layout
-		lytMapButtons.add(btnLoadMap);
-		lytMapButtons.add(btnGenerateMap);
-
-		//Fill Pheromone layout
-		lytPheromonesParameters.defaults().left().width(200);
-		
-		lytPheromonesParameters.add(lblPheromone);
-		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinLifeTime);
-		lytPheromonesParameters.row();
-		lytPheromonesParameters.add(spinFrequence);
-
-		//Fill ant layout
-		lytAntParameters.defaults().left().width(200);
-		
-		lytAntParameters.add(lblAnt);
-		lytAntParameters.row();
-		lytAntParameters.add(spinRadius);
-		lytAntParameters.row();
-		lytAntParameters.add(spinAntNumber);
-		lytAntParameters.row();
-		lytAntParameters.add(spinAntIndependence);
-		lytAntParameters.row();
-		lytAntParameters.add(spinAntSpeed);
-		
-		// Fill interactible layout
-		int sizeBtnLegend = 100;
-		lytInteractibles.add(btnFood).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.add(btnObstacle).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.add(btnAnt).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.row();
-		lytInteractibles.add(btnAnthill).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.add(btnFoodPheromone).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.add(btnHomePheromone).size(sizeBtnLegend,sizeBtnLegend);
-		btnAnthill.addListener(new ClickListener()
-			{
-				@Override
-				public void clicked(InputEvent event, float x, float y) {
-					signalSelectionListener(ElementActorType.ANTHILL);
-					super.clicked(event, x, y);
-					btnAnthill.setColor(Color.BLUE);
-				}
-
-			});
-
-		btnObstacle.addListener(new ClickListener()
+		ClickListener listener = new ClickListener()
 		{
 			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				signalSelectionListener(ElementActorType.OBSTACLE);
+			public void clicked(InputEvent event, float x, float y) 
+			{	
+				int index = selectButtonGroup.getCheckedIndex();
+				signalSelectionListener(ElementActorType.fromValue(index));
 				super.clicked(event, x, y);
 			}
 
-		});
+		};
 
-		btnFood.addListener(new ClickListener()
-		{
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				signalSelectionListener(ElementActorType.RESOURCE);
-				super.clicked(event, x, y);
-			}
+		btnAnthill.addListener(listener);
+		btnObstacle.addListener(listener);
+		btnFood.addListener(listener);
+		btnFoodPheromone.addListener(listener);
+		btnHomePheromone.addListener(listener);
+		btnAnt.addListener(listener);
 
-		});
-
-		btnFoodPheromone.addListener(new ClickListener()
-		{
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				signalSelectionListener(ElementActorType.FOOD_PHEROMONE);
-				super.clicked(event, x, y);
-			}
-
-		});
-
-		btnHomePheromone.addListener(new ClickListener()
-		{
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				signalSelectionListener(ElementActorType.HOME_PHEROMONE);
-				super.clicked(event, x, y);
-			}
-
-		});
-		btnAnt.addListener(new ClickListener()
-		{
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				signalSelectionListener(ElementActorType.ANT);
-				super.clicked(event, x, y);
-			}
-
-		});
 		lytMain.setFillParent(true);
 		addActor(lytMain);
 
@@ -426,7 +296,6 @@ public class GUI extends Stage
 				{
 
 					((IntSpinnerModel)(spinRadius.getModel())).setValue(DEFAULT_RADIUS);
- 
 					((IntSpinnerModel)(spinLifeTime.getModel())).setValue(DEFAULT_LIFETIME); 
 					((IntSpinnerModel)(spinAntNumber.getModel())).setValue(DEFAULT_ANT_NUMBER);
 					((IntSpinnerModel)(spinFrequence.getModel())).setValue(DEFAULT_FREQUENCE); 	
@@ -437,6 +306,118 @@ public class GUI extends Stage
 			
 		});
 
+	}
+
+	private void create()
+	{
+		//Create All layout
+		lytMain = 					new VisTable();
+		lytSimulation = 			new VisTable();
+		lytParameters = 			new VisTable();
+		lytMapButtons = 			new VisTable();
+		lytPheromonesParameters = 	new VisTable();
+		lytAntParameters =			new VisTable();
+		lytInteractibles = 			new VisTable();
+		
+
+		//Create Vis Attribute
+
+		btnLoadMap = 		new VisTextButton("Load Map");
+		btnGenerateMap = 	new VisTextButton("Generate Map");
+		
+		btnFood 			= creaImageButton(Asset.resource(), "Resource");
+		btnObstacle			= creaImageButton(Asset.obstacle(), "Obstacle");
+		btnAnt				= creaImageButton(Asset.ant(), "Ant");
+		btnAnthill			= creaImageButton(Asset.anthill(), "Anthill");
+		btnHomePheromone 	= creaImageButton(Asset.homePheromone(), "Pheromone Home");
+		btnFoodPheromone 	= creaImageButton(Asset.foodPheromone(), "Pheromone Food");
+		
+		btnResetParameters = new VisTextButton("Reset Parameters");
+		
+		btnReset =	new VisTextButton("Reset");
+		btnPlay =	new VisTextButton("Play");
+
+		sliSpeed = new VisSlider(0f, 1f, 0.1f, false);
+
+	
+		lblSpeed = 		new VisLabel("Pheromone opacity");
+		lblPheromone = 	new VisLabel("Phéromones");
+		lblAnt = 		new VisLabel("Fourmis");
+
+	
+		spinRadius =			new Spinner("Rayon", new IntSpinnerModel(DEFAULT_RADIUS, 0, 5));
+		spinFrequence =			new Spinner("Période entre 2", new IntSpinnerModel(DEFAULT_FREQUENCE, 0, 20));
+		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(DEFAULT_ANT_NUMBER, 1, 10000));
+		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(DEFAULT_INDEPENDENCE,0, 100));
+		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(DEFAULT_LIFETIME, 0, 3000));
+		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(DEFAULT_SPEED), "0", "9", "0.5", 1));
+	
+
+		simulation = new Actor();
+	}
+
+	private void add()
+	{
+		//Fill main layout
+		lytMain.add(lytSimulation);
+		lytMain.add(lytParameters);
+
+		//Fill simulation layout
+		//lytSimulation.add(simulationImage).colspan(4);
+	
+		lytSimulation.add(simulation).colspan(4).size((int)(1600/1.25), (int)(900/1.25));
+		lytSimulation.row();
+		lytSimulation.add(btnReset);
+		lytSimulation.add(btnPlay);
+		lytSimulation.add(lblSpeed);
+		lytSimulation.add(sliSpeed);
+		
+		//Fill parameters layout
+		lytParameters.add(lytMapButtons);
+		lytParameters.row();
+		lytParameters.add(lytPheromonesParameters);
+		lytParameters.row();
+		lytParameters.add(lytAntParameters);
+		lytParameters.row();
+		lytParameters.add(btnResetParameters);
+		lytParameters.row();
+		lytParameters.add(lytInteractibles);
+		
+		//Fill buttons layout
+		lytMapButtons.add(btnLoadMap);
+		lytMapButtons.add(btnGenerateMap);
+
+		//Fill Pheromone layout
+		lytPheromonesParameters.defaults().left().width(200);
+		
+		lytPheromonesParameters.add(lblPheromone);
+		lytPheromonesParameters.row();
+		lytPheromonesParameters.add(spinLifeTime);
+		lytPheromonesParameters.row();
+		lytPheromonesParameters.add(spinFrequence);
+
+		//Fill ant layout
+		lytAntParameters.defaults().left().width(200);
+		
+		lytAntParameters.add(lblAnt);
+		lytAntParameters.row();
+		lytAntParameters.add(spinRadius);
+		lytAntParameters.row();
+		lytAntParameters.add(spinAntNumber);
+		lytAntParameters.row();
+		lytAntParameters.add(spinAntIndependence);
+		lytAntParameters.row();
+		lytAntParameters.add(spinAntSpeed);
+		
+		// Fill interactible layout
+		int sizeBtnLegend = 100;
+		lytInteractibles.add(btnFood).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnObstacle).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnAnt).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.row();
+		lytInteractibles.add(btnAnthill).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnFoodPheromone).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnHomePheromone).size(sizeBtnLegend,sizeBtnLegend);
 	}
 
 	public void selectAnthill(Anthill _anthill) {
