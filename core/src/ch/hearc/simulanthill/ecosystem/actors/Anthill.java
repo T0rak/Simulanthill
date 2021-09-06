@@ -1,5 +1,8 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -18,7 +21,7 @@ public class Anthill extends ElementActor
     private int nbAnts;
     private int nbResources;
     private int id;
-
+    private List<Ant> antList;
     private int count = MathUtils.random(0, 10);
 
     /**
@@ -31,6 +34,7 @@ public class Anthill extends ElementActor
     public Anthill(float _x, float _y, float _width, float _height) 
     {
         super(_x, _y, _width, _height, Asset.anthill());
+        antList = new ArrayList<Ant>();
         id = idGenerator ++;
     }
     
@@ -76,7 +80,9 @@ public class Anthill extends ElementActor
         nbAnts++;
         int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
         float caseSizeCenter =  Ecosystem.getCurrentEcosystem().getMapCaseSize()/2;
-        Ecosystem.getCurrentEcosystem().addAnt(new Ant(this.getX() + caseSizeCenter, this.getY() + caseSizeCenter,  antSize, antSize, this));
+        Ant newAnt = new Ant(this.getX() + caseSizeCenter, this.getY() + caseSizeCenter,  antSize, antSize, this);
+        antList.add(newAnt);
+        Ecosystem.getCurrentEcosystem().addAnt(newAnt);
     }
     
     public void createAntAt(float _x, float _y, int _stepFrom) 
@@ -86,7 +92,9 @@ public class Anthill extends ElementActor
         {
             nbAnts++;
             int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
-            Ecosystem.getCurrentEcosystem().addAnt(new Ant(_x, _y,  antSize, antSize, this, _stepFrom, AntState.LOST));
+            Ant newAnt = new Ant(_x, _y,  antSize, antSize, this, _stepFrom, AntState.LOST);
+            antList.add(newAnt);
+            Ecosystem.getCurrentEcosystem().addAnt(newAnt);
         }
     }
     /**
@@ -123,8 +131,9 @@ public class Anthill extends ElementActor
         return texture;
     }
 
-    @Override
-    public boolean remove() {
-        return super.remove();
+    public void removeAllAnts() {
+        for (Ant ant : antList) {
+            ant.remove();
+        }
     }
 }

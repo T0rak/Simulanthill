@@ -512,14 +512,13 @@ public class Ecosystem extends Stage
         {
             if (isAnthill(worldMap.getmapTileGrid()[_x][_y]))
             {
-                anthills.remove((Anthill)worldMap.getmapTileGrid()[_x][_y]);
+                removeAnthill(_x, _y);
                 informChangeMap();
             }
             worldMap.getmapTileGrid()[_x][_y].remove();
         }
         worldMap.getmapTileGrid()[_x][_y] = actor;
         mapTiles.addActor(actor);
-        
         
     }
 
@@ -541,14 +540,27 @@ public class Ecosystem extends Stage
         return anthill;
     }
 
-    // TODO: USE IT
     public void removeAnthill(int _x, int _y)
     {
         ElementActor actor = getElement(_x, _y);
         if (isAnthill(getElement(_x, _y))) 
         {
             int id = ((Anthill)actor).getId();
-            
+            ((Anthill)actor).removeAllAnts();
+            Pheromone[][][] gridMap = pheromoneGridMap.get(id);
+            for (int i = 0; i < gridMap.length; i++) 
+            {
+                for (int j = 0; j < gridMap[i].length; j++)
+                {
+                    for (int k = 0; k < gridMap[i][j].length; k++)
+                    {
+                        if (gridMap[i][j][k] != null)
+                        {
+                            gridMap[i][j][k].remove();
+                        }
+                    }
+                }
+            }
             pheromoneGridMap.remove(id);
             nbAntsGridMap.remove(id);
 
@@ -572,7 +584,7 @@ public class Ecosystem extends Stage
         nbAntsGridMap.get(_anthillID)[caseX][caseY]++;
     }
 
-    private void removeAntFromGrid(float _x, float _y, int _anthillID) 
+    public void removeAntFromGrid(float _x, float _y, int _anthillID) 
     {
         int caseX = floatToGridCoordinate(_x);
         int caseY = floatToGridCoordinate(_y);
