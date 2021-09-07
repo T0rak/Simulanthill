@@ -283,7 +283,6 @@ public class GUI extends Stage
 			@Override
 			public void changed(ChangeEvent event, Actor actor) 
 			{
-				//System.out.println(sliSpeed.getValue());
 				Pheromone.setOpacityFactor(sliSpeed.getValue());
 			}
 			
@@ -423,7 +422,7 @@ public class GUI extends Stage
 	}
 
 	public void selectAnthill(Anthill _anthill) {
-		System.out.println("Select " + _anthill);
+		//System.out.println("Select " + _anthill);
 		btnAnt.setVisible(true);
 		btnFoodPheromone.setVisible(true);
 		btnHomePheromone.setVisible(true);
@@ -431,7 +430,7 @@ public class GUI extends Stage
 	}
 
 	public void unselectAnthill() {
-		System.out.println("Unselect");
+		//System.out.println("Unselect");
 		btnAnt.setVisible(false);
 		btnFoodPheromone.setVisible(false);
 		btnHomePheromone.setVisible(false);

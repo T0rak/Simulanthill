@@ -98,7 +98,6 @@ public class AnthillDetails extends Group {
             background.setPosition(anthill.getWidth() + 10,0);
         }
 
-        System.out.println(getY() + info.getMinHeight() +";"+ Ecosystem.getCurrentEcosystem().getHeight());
 
         if(getY() + info.getMinHeight() > Ecosystem.getCurrentEcosystem().getHeight())
         {
