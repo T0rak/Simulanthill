@@ -1,14 +1,13 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 
 /**
  * The class representing the obstacles
  */
 public class Obstacle extends ElementActor
 {
-    private static final Texture texture = createColorImage(new Color(40/255f, 40/255f, 40/255f, 1));
+    public static final Color color = new Color(40/255f, 40/255f, 40/255f, 1);
     /**
     * Main constructor
     * @param _posX the initial x position
@@ -18,6 +17,6 @@ public class Obstacle extends ElementActor
     */
 	public Obstacle(float _posX, float _posY, float _width, float _height)
 	{
-        super(_posX, _posY, _width, _height, texture);
+        super(_posX, _posY, _width, _height, color);
     }
 }

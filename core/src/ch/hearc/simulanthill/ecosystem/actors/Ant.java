@@ -1,6 +1,8 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.tools.Asset;
+
 import static ch.hearc.simulanthill.ecosystem.actors.AntState.*;
 
 /**
@@ -46,7 +48,7 @@ public class Ant extends ElementActor
 	 */
     public Ant(float _x, float _y, int _width, int _height, Anthill _anthill, int _stepFrom, AntState _state)   
     {
-        super(_x, _y, _width, _height, _anthill.getTexture());
+        super(_x, _y, _width, _height, Asset.ant(_anthill.getAntColor()));
         this.state = _state;
         this.capacity = 0;
         this.viewSpanAngle = 15;

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 
+import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.tools.Asset;
 import ch.hearc.simulanthill.tools.SpriteActor;
@@ -35,7 +36,7 @@ public class AnthillDetails extends Group {
 
         info = new VisTable();
         info.align(Align.bottomLeft);
-        info.setPosition(anthill.getWidth()+10, 0);
+        info.setPosition(anthill.getWidth() + 10, 0);
         
         lblAntNumberInf = new VisLabel("Nombre de fourmis : ");
         lblAntNumber = new VisLabel("0");
@@ -60,7 +61,8 @@ public class AnthillDetails extends Group {
         hoverAnthill = new SpriteActor(0,0,anthill.getWidth(), anthill.getHeight(), Asset.anthill());
         background = new SpriteActor(anthill.getWidth()+10, 0, info.getMinWidth(), info.getMinHeight(), Color.BLACK);
         
-        setVisible(false);
+        setHoverVisible(false);
+        setClickVisible(false);
 
         addActor(hoverAnthill);
         addActor(background);
@@ -68,19 +70,47 @@ public class AnthillDetails extends Group {
         
     }
 
-    @Override
-    public void setVisible(boolean _visible) {
+    public void setClickVisible(boolean _visible) {
         if (!_visible)
         {
             hoverAnthill.setSprite(Asset.anthill());
         }
         else
         {
-            hoverAnthill.setSprite(Asset.anthillSelection());
+            hoverAnthill.setSprite(Asset.anthillSelection(anthill.getAntColor()));
         }
         
+    }
+
+    public void setHoverVisible(boolean _visible)
+    {
         info.setVisible(_visible);
         background.setVisible(_visible);
+        
+        if(getX() + anthill.getWidth() + info.getMinWidth() + 10 > Ecosystem.getCurrentEcosystem().getWidth())
+        {
+            info.setX(- info.getMinWidth() - 10);
+            background.setPosition(- info.getMinWidth() - 10, 0);
+        }
+        else
+        {
+            info.setX(anthill.getWidth() + 10);
+            background.setPosition(anthill.getWidth() + 10,0);
+        }
+
+        System.out.println(getY() + info.getMinHeight() +";"+ Ecosystem.getCurrentEcosystem().getHeight());
+
+        if(getY() + info.getMinHeight() > Ecosystem.getCurrentEcosystem().getHeight())
+        {
+            info.setY( - info.getMinHeight());
+            background.setPosition(background.getX(), -info.getMinHeight());
+        }
+        else
+        {
+            info.setY(0);
+            background.setPosition(background.getX(), 0);
+        }
+        
     }
 
     @Override
@@ -99,7 +129,7 @@ public class AnthillDetails extends Group {
 
     public void setSelected(boolean newSelected)
     {
-        setVisible(newSelected);
+        setClickVisible(newSelected);
         selected = newSelected;
     }
 

@@ -19,22 +19,13 @@ public class Asset
     static public AssetManager manager = new AssetManager();
     static private AssetDescriptor<Texture> ant = new AssetDescriptor<Texture>("ant.png", Texture.class);
     static private AssetDescriptor<Texture> anthill = new AssetDescriptor<Texture>("anthill.png", Texture.class);
-    static private AssetDescriptor<Texture> obstacle = new AssetDescriptor<Texture>("obstacle.png", Texture.class);
-    static private AssetDescriptor<Texture> resource = new AssetDescriptor<Texture>("resource.png", Texture.class);
-    static private AssetDescriptor<Texture> homePheromone = new AssetDescriptor<Texture>("homePheromone.png", Texture.class);
-    static private AssetDescriptor<Texture> foodPheromone = new AssetDescriptor<Texture>("foodPheromone.png", Texture.class);
-    static private AssetDescriptor<Texture> antLegend = new AssetDescriptor<Texture>("antLegend.png", Texture.class);
-    static private AssetDescriptor<Texture> anthillLegend = new AssetDescriptor<Texture>("anthillLegend.png", Texture.class);
-    static private AssetDescriptor<Texture> obstacleLegend = new AssetDescriptor<Texture>("obstacleLegend.png", Texture.class);
-    static private AssetDescriptor<Texture> resourceLegend = new AssetDescriptor<Texture>("resourceLegend.png", Texture.class);
-    static private AssetDescriptor<Texture> homePheromoneLegend = new AssetDescriptor<Texture>("homePheromoneLegend.png", Texture.class);
-    static private AssetDescriptor<Texture> foodPheromoneLegend = new AssetDescriptor<Texture>("foodPheromoneLegend.png", Texture.class);
-    static private AssetDescriptor<Texture> backgound = new AssetDescriptor<Texture>("background.png", Texture.class);
     static private AssetDescriptor<Texture> icon = new AssetDescriptor<Texture>("icon.png", Texture.class);
     static private AssetDescriptor<Texture> logo = new AssetDescriptor<Texture>("logo.png", Texture.class);
     static private AssetDescriptor<Texture> anthillSelection = new AssetDescriptor<Texture>("anthillSelection.png", Texture.class);
 
-    static private Map<Color,Texture> antTextures = new HashMap<Color,Texture>();
+    static private Map<Color,Texture> ants = new HashMap<Color,Texture>();
+    static private Map<Color, Texture> anthillSelections = new HashMap<Color,Texture>();
+    static private Map<Color, Texture> pixels = new HashMap<Color,Texture>();
 
     /**
      * Loads all the needed assets.
@@ -43,17 +34,6 @@ public class Asset
     {
 		manager.load(Asset.ant);
         manager.load(Asset.anthill);
-        manager.load(Asset.obstacle);
-        manager.load(Asset.resource);
-        manager.load(Asset.homePheromone);
-        manager.load(Asset.foodPheromone);
-        manager.load(Asset.backgound);
-        manager.load(Asset.antLegend);
-        manager.load(Asset.anthillLegend);
-        manager.load(Asset.obstacleLegend);
-        manager.load(Asset.resourceLegend);
-        manager.load(Asset.homePheromoneLegend);
-        manager.load(Asset.foodPheromoneLegend);
         manager.load(Asset.icon);
         manager.load(Asset.logo);
         manager.load(Asset.anthillSelection);
@@ -67,9 +47,9 @@ public class Asset
 
     static public Texture ant(Color color)
     {
-        if(antTextures.containsKey(color))
+        if(ants.containsKey(color))
         {
-            return antTextures.get(color);
+            return ants.get(color);
         }
         else
         {
@@ -87,7 +67,7 @@ public class Asset
                 }
             }
             Texture newTxt = new Texture(b);
-            antTextures.put(color, newTxt);
+            ants.put(color, newTxt);
             return newTxt;
         }
         
@@ -99,60 +79,24 @@ public class Asset
         return manager.get(anthill);
     }
 
-    static public Texture obstacle()
+    static public Texture pixel(Color _color)
     {
-        return manager.get(obstacle);
+        if(pixels.containsKey(_color))
+        {
+            return pixels.get(_color);
+        }
+        else
+        {
+            
+            Pixmap bgPixmap = new Pixmap(100, 100, Pixmap.Format.RGBA8888);
+            bgPixmap.setColor(_color);
+            bgPixmap.fill();
+            Texture newTxt = new Texture(bgPixmap);
+            pixels.put(_color, newTxt);
+            return newTxt;
+        }
     }
 
-    static public Texture resource()
-    {
-        return manager.get(resource);
-    }
-
-    static public Texture homePheromone()
-    {
-        return manager.get(homePheromone);
-    }
-
-    static public Texture foodPheromone()
-    {
-        return manager.get(foodPheromone);
-    }
-
-    static public Texture backgound()
-    {
-        return manager.get(backgound);
-    }
-
-    static public Texture antLegend()
-    {
-        return manager.get(antLegend);
-    }
-
-    static public Texture anthillLegend()
-    {
-        return manager.get(anthillLegend);
-    }
-
-    static public Texture obstacleLegend()
-    {
-        return manager.get(obstacleLegend);
-    }
-
-    static public Texture resourceLegend()
-    {
-        return manager.get(resourceLegend);
-    }
-
-    static public Texture homePheromoneLegend()
-    {
-        return manager.get(homePheromoneLegend);
-    }
-
-    static public Texture foodPheromoneLegend()
-    {
-        return manager.get(foodPheromoneLegend);
-    }
     static public Texture icon()
     {
         return manager.get(icon);
@@ -162,8 +106,30 @@ public class Asset
         return manager.get(logo);
     }
 
-    static public Texture anthillSelection()
+    static public Texture anthillSelection(Color color)
     {
-        return manager.get(anthillSelection);
+        if(anthillSelections.containsKey(color))
+        {
+            return anthillSelections.get(color);
+        }
+        else
+        {
+            Texture txt = manager.get(anthillSelection);
+            TextureData a = txt.getTextureData();
+            a.prepare();
+            Pixmap b = a.consumePixmap();
+            for (int i = 0; i < b.getWidth(); i++) {
+                for (int j = 0; j < b.getHeight(); j++) {
+                    b.setColor(color);
+                    if(b.getPixel(i, j) != 0)
+                    {
+                        b.drawPixel(i, j);
+                    }
+                }
+            }
+            Texture newTxt = new Texture(b);
+            anthillSelections.put(color, newTxt);
+            return newTxt;
+        }
     }
 }
