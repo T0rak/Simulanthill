@@ -152,8 +152,14 @@ public class Ant extends ElementActor
                 explore();
             }
         }
+
         move();
-    
+        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        if (ecosystem.isObstacle(ecosystem.getElementFrom(getX(), getY()))) 
+        {
+            ecosystem.moveAntOnGrid(getX(), getY(), anthill.getX(), anthill.getY(), anthill.getId());
+            setPosition(anthill.getX(), anthill.getY());
+        }
         checkCountdown --;
         pheromoneCountdown--;
         stepFrom++;
@@ -746,5 +752,4 @@ public class Ant extends ElementActor
         return res;
     }
 
-    
 }
