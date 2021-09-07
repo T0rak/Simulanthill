@@ -33,16 +33,12 @@ public class Ecosystem extends Stage
     private static Ecosystem instance = null;
 
     private WorldMap worldMap;
-
-    //private List<Ant> ants;
     
     private List<Anthill> anthills;
 
     private Group mapTiles;
     private Group ants;
     private Group pheromones;
-    
-    private int nbAntMax;
 
     private boolean isPlaying;
 
@@ -72,8 +68,6 @@ public class Ecosystem extends Stage
         addActor(ants);
 
         anthills = new ArrayList<Anthill>();
-        isPlaying = false;
-        nbAntMax = 500;
 
         MapListeners = new LinkedList<MapListener>();
         
@@ -471,20 +465,6 @@ public class Ecosystem extends Stage
         return MathUtils.floor(_f / worldMap.getCaseSize());
     }
 
-    public void setNbAntMax(int _nbAntMax)
-    {
-        nbAntMax = _nbAntMax;
-    }
-
-    public int getNbAntMax()
-    {
-        return nbAntMax;
-    }
-
-    public int getNbAnt()
-    {
-        return ants.getChildren().size;
-    }
 
     /**
 	 * Deletes an ant from the ecosystem

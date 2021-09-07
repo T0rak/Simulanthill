@@ -11,13 +11,8 @@ import static ch.hearc.simulanthill.ecosystem.actors.AntState.*;
  */
 public class Ant extends ElementActor
 {
-    private static int PHEROMONE_RELEASE_COUNTDOWN = 5;
-    private static int NEXT_CHECK_COUNTDOWN = 10;
-    private static final int MAX_CAPACITY = 1;
-    private static int FIELD_OF_VIEW = 3;
 
-	private static double speed = 0;
-    private static float speedFactor = 1f;
+    private static final int MAX_CAPACITY = 1;
     
     private float direction;
     private int viewSpanAngle;
@@ -53,13 +48,13 @@ public class Ant extends ElementActor
         
         anthill = _anthill;
 
-        pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+        pheromoneCountdown = anthill.getAntPheromoneReleaseFrequency();
         stepFrom = _stepFrom;
         lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         
         blocked = false;
-        checkCountdown = NEXT_CHECK_COUNTDOWN;
+        checkCountdown = anthill.getAntIndependance();
     }
 
     public void setDirection(float _direction)
@@ -141,7 +136,7 @@ public class Ant extends ElementActor
             if (checkCountdown < 0)
             {
                 followGoal();
-                checkCountdown = NEXT_CHECK_COUNTDOWN;
+                checkCountdown = anthill.getAntIndependance();
             }
             else
             {
@@ -200,11 +195,6 @@ public class Ant extends ElementActor
             stepFrom = 0;
             goal = null;
             lastStepFrom = Integer.MAX_VALUE;
-
-            if (ecosystem.getNbAnt() > ecosystem.getNbAntMax())
-            {
-                anthill.removeAnt(this);
-            }
             state = SEARCHING_RESOURCE;
         }
     }
@@ -285,7 +275,7 @@ public class Ant extends ElementActor
 	 */
     public void explore()
     {
-        float deltaDirection = MathUtils.random(this.viewSpanAngle * Ant.speedFactor) - this.viewSpanAngle * Ant.speedFactor / 2f;
+        float deltaDirection = MathUtils.random(this.viewSpanAngle * anthill.getAntSpeedFactor()) - this.viewSpanAngle * anthill.getAntSpeedFactor() / 2f;
         setDirection(this.direction + deltaDirection);
     }
 
@@ -342,8 +332,8 @@ public class Ant extends ElementActor
             avoidObstacleMemory = 0;
         }
         
-        float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
-        float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
+        float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * anthill.getAntSpeedFactor()* ecosystem.getMapCaseSize()/10);
+        float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * anthill.getAntSpeedFactor() * ecosystem.getMapCaseSize()/10);
 
         if (!canMove(nextPosX, nextPosY))
         {
@@ -421,7 +411,7 @@ public class Ant extends ElementActor
             } 
         }
             
-        float deltaDirection = 15 * avoidObstacleMemory * (float)Math.sqrt(Math.sqrt(speedFactor));
+        float deltaDirection = 15 * avoidObstacleMemory * (float)Math.sqrt(Math.sqrt(anthill.getAntSpeedFactor()));
         
         setDirection(direction + deltaDirection);
     }
@@ -438,55 +428,10 @@ public class Ant extends ElementActor
             if (pheromoneCountdown < 0)
             {
                 ecosystem.addPheromone(new Pheromone(getX(), getY(), _type, anthill, stepFrom));
-                pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+                pheromoneCountdown = anthill.getAntPheromoneReleaseFrequency();
             }
         }
         
-    }
-
-    /**
-	 * Changes the field of view of the ant
-     @param _fieldOfView new field of view
-	 */    
-    public static void setFielOfView(int _fieldOfView)
-    {
-        FIELD_OF_VIEW = _fieldOfView;
-    }
-
-    /**
-	 * Changes the pheromone release frequency
-     * @param  _releasePheromoneTime the number of cycles before the ant releases an new pheromone
-	 */
-    public static void setReleasePheromoneTime(int _releasePheromoneTime)
-    {
-        PHEROMONE_RELEASE_COUNTDOWN = _releasePheromoneTime;
-    }
-
-    /**
-	 * Changes the movement speed of the ant
-     * @param _speed new speed
-	 */
-    public static  void setSpeedFactor(float _speedFactor)
-    {
-        speedFactor = _speedFactor;
-        Ant.updateSpeed();
-    }
-    /**
-    * Changes the movement speed of the ant
-    * @param _speed new speed
-    */
-    public static void updateSpeed()
-    {
-        speed = speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize() / 10;
-    }
-
-    /**
-	 * Changes the autonomy of the ant (how often it follows pheromones, resources)
-     * @param _autonomy the number of cycles before the ant checks for goals
-	 */
-    public static void setAutonomy(int _autonomy)
-    {
-        NEXT_CHECK_COUNTDOWN = _autonomy;
     }
 
 
@@ -577,7 +522,7 @@ public class Ant extends ElementActor
     private ElementActor checkRadialLine(int _x, int _y, int _dx, int _dy, Class<?> _class)
     {
         
-        for (int i = 1; i <= FIELD_OF_VIEW; i++)
+        for (int i = 1; i <= anthill.getAntFieldOfView(); i++)
         {
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
@@ -673,7 +618,7 @@ public class Ant extends ElementActor
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
 
-        for (int i = 1; i <= FIELD_OF_VIEW; i++)
+        for (int i = 1; i <= anthill.getAntFieldOfView(); i++)
         {
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
@@ -727,5 +672,4 @@ public class Ant extends ElementActor
         }
         return res;
     }
-
 }

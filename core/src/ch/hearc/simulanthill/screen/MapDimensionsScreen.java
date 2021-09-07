@@ -96,7 +96,6 @@ public class MapDimensionsScreen implements Screen
 
                         ecosystem.loadMap(newWidth, newHeight);
                         //Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
-                        Ant.updateSpeed();
                     }
                     ((Simulanthill)MapDimensionsScreen.this.game).displayMainScreen();
                             

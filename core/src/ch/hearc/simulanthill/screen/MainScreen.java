@@ -50,8 +50,6 @@ public class MainScreen implements Screen
 		Ecosystem.getCurrentEcosystem().loadMap(124, 70);
 		//ecosystem.loadMap(124, 70);
 
-
-		Ant.setSpeedFactor(1);
 		gui = new GUI(GUIViewport, game); 
 
 		guiEco = new EcosystemGUI(ecosystem);

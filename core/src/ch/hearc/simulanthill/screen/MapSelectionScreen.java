@@ -102,7 +102,6 @@ public class MapSelectionScreen implements Screen
                         String selectedFileName = lstMapFiles.getSelected();
                         System.out.println(selectedFileName);
                         ecosystem.loadMap(mapFolderPath + "/" + selectedFileName);
-                        Ant.updateSpeed();
                     }
                     ((Simulanthill)MapSelectionScreen.this.game).displayMainScreen();
                             
