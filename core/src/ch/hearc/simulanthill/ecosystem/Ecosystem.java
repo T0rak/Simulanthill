@@ -379,12 +379,14 @@ public class Ecosystem extends Stage
 
     }
 
-    public void removeMapTile(float _x, float _y) 
+    public void removeMapTile(int _x, int _y) 
     {
-        int xCase = floatToGridCoordinate(_x);
-        int yCase = floatToGridCoordinate(_y);
-        worldMap.getmapTileGrid()[xCase][yCase].remove();
-        worldMap.getmapTileGrid()[xCase][yCase] = null;
+        if(isAnthill(_x, _y))
+        {
+            removeAnthill(_x, _y);
+        }
+        getMapTileAt(_x, _y).remove();
+        worldMap.getmapTileGrid()[_x][_y] = null;
     }
 
     /**

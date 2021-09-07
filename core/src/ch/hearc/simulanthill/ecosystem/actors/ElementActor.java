@@ -70,4 +70,13 @@ public class ElementActor extends SpriteActor
     {
         return yCase;
     }
+
+    public float getCenteredX() 
+    {
+        return getX() + getWidth() / 2f;
+    }
+    public float getCenteredY() 
+    {
+        return getY() + getHeight() / 2f;
+    }
 }

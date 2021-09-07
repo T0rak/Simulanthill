@@ -30,7 +30,7 @@ public class Anthill extends MapTile
     private int nbAnts;
     private int nbResources;
     private List<Ant> antList;
-
+    
     private int pheromoneLiveTime;
     private int antPheromoneReleaseFrequency;
 
@@ -38,9 +38,8 @@ public class Anthill extends MapTile
     private int antFieldOfView;
     private int antIndependance;
     private int maxAnts;
-    private float antSizeFactor;
 
-    
+    private float antSizeFactor;
 
     private int AntCreationCountDown;
 
@@ -92,18 +91,18 @@ public class Anthill extends MapTile
             
         }
     }
+
     /**
      * Spawns an ant
      */
     public void createAnt()
     {
-        createAntAt(centeredXCase, centeredYCase, 0, AntState.SEARCHING_RESOURCE);
+        createAntAt(getCenteredX(), getCenteredY(), 0, AntState.SEARCHING_RESOURCE);
     }
 
-    
     public void createAntAt(float _x, float _y, int _stepFrom, AntState _state) 
     {
-        if (!ecosystem.isObstacle(ecosystem.getMapTileAtFloat(_x, _y))) 
+        if (!ecosystem.isObstacle(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y))) 
         {
             nbAnts++;
 
@@ -122,8 +121,7 @@ public class Anthill extends MapTile
         antList.remove(_ant);
         ecosystem.removeAnt(_ant);
     }
-
-
+    
     public void addResource(int _nbResources)
     {
         nbResources += _nbResources;
@@ -151,5 +149,6 @@ public class Anthill extends MapTile
         for (Ant ant : antList) {
             ant.remove();
         }
+        nbAnts = 0;
     }
 }

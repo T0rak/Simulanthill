@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.AntState;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
-import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
@@ -129,6 +128,7 @@ public class EcosystemGUI extends Stage
         touchActor.setBounds(0, 0, getWidth(), getHeight());
         touchActor.addListener(new ClickListener(){
             int count = 0;
+            boolean dragging = false;
             @Override
             public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
                 setButton(_button);
@@ -137,6 +137,7 @@ public class EcosystemGUI extends Stage
                 {
                     addElement(_x, _y);
                 }
+                dragging = true;
                 return super.touchDown(_event, _x, _y, _pointer, _button);
             }
             @Override
@@ -153,14 +154,23 @@ public class EcosystemGUI extends Stage
                 super.touchDragged(_event, _x, _y, _pointer);
             }
 
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                dragging = false;
+                super.touchUp(event, x, y, pointer, button);
+            }
+
             private void addElement(float _x, float _y) {
                 if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
                 {
-                    if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.ANTHILL || typeOfAdd == ElementActorType.RESOURCE) 
+                    if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.RESOURCE) 
                     {
                         ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
-                        
-                    } else if (selectedAnthill != null)
+                    } else if (typeOfAdd == ElementActorType.ANTHILL && dragging == false)
+                    {
+                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
+                    }
+                     else if (selectedAnthill != null)
                     {
                         if (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE)
                         {
@@ -177,17 +187,13 @@ public class EcosystemGUI extends Stage
             private void removeElement(float _x, float _y) {
                 if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
                 {
-                    ElementActor actor = ecosystem.getMapTileAtFloat(_x, _y);
-                    if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(actor)
-                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
-                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))
+                    int xCase = ecosystem.floatToGridCoordinate(_x);
+                    int yCase = ecosystem.floatToGridCoordinate(_y);
+                    if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(xCase, yCase)
+                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(xCase, yCase)
+                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(xCase, yCase))
                     {
-                        if (typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor)) {
-                            int xCase = ecosystem.floatToGridCoordinate(actor.getX() + ecosystem.getMapCaseSize() / 2f);
-                            int yCase = ecosystem.floatToGridCoordinate(actor.getY() + ecosystem.getMapCaseSize() / 2f);
-                            ecosystem.removeAnthill(xCase, yCase);
-                        }
-                        ecosystem.removeMapTile(_x, _y);
+                        ecosystem.removeMapTile(xCase, yCase);
 
                     } else if (typeOfAdd == ElementActorType.FOOD_PHEROMONE)
                     {

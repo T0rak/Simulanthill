@@ -274,8 +274,7 @@ public class Ant extends ElementActor
     {
         if (goal != null && blocked == false)
         {
-            float caseSize = ecosystem.getMapCaseSize();
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + caseSize / 2 - getY(), goal.getX() + caseSize / 2 - getX());
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getCenteredY() - getY(), goal.getCenteredX() - getX());
             setDirection(newDirection);
         }
     }
@@ -286,7 +285,7 @@ public class Ant extends ElementActor
 	 */
     public void explore()
     {
-        float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
+        float deltaDirection = MathUtils.random(this.viewSpanAngle * Ant.speedFactor) - this.viewSpanAngle * Ant.speedFactor / 2f;
         setDirection(this.direction + deltaDirection);
     }
 
@@ -360,7 +359,8 @@ public class Ant extends ElementActor
 
     public boolean isCaseToAvoid(int _x, int _y)
     {  
-        return ecosystem.isObstacle(_x, _y) || ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId()) > ecosystem.getNbAntsAt(_x, _y, anthill.getId());
+        int nbInCase = ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId());
+        return ecosystem.isObstacle(_x, _y) || nbInCase > ecosystem.getNbAntsAt(_x, _y, anthill.getId()) && nbInCase < ecosystem.getNbAntsAt(getXCase(), getYCase(), anthill.getId());
     }
     
     public void avoidCase(int _x, int _y) 

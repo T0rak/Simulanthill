@@ -11,7 +11,6 @@ import java.util.Random;
 
 import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
-import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
 import ch.hearc.simulanthill.ecosystem.actors.Resource;
 
