@@ -1,9 +1,9 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.tools.Asset;
 
 /**
  * Class that handle the pheromones in the simulator inherits form ElementActor
@@ -18,8 +18,8 @@ public class Pheromone extends ElementActor
 	private int stepFrom;
 	private Anthill anthill;
 	private static float opacityFactor = 0;
-	private static final Texture foodTexture = createColorImage(new Color(255/255f, 153/255f, 51/255f, 1));
-	private static final Texture homeTexture = createColorImage(new Color(102/255f, 255/255f, 102/255f, 1));
+	public static final Color color_food = new Color(255/255f, 153/255f, 51/255f, 1);
+	public static final Color color_home = new Color(102/255f, 255/255f, 102/255f, 1);
 
 	/**
 	 * Constructor of pheromone
@@ -31,7 +31,7 @@ public class Pheromone extends ElementActor
 	 */
 	public Pheromone(float _posX, float _posY, PheromoneType _type, Anthill _anthill, int _stepFrom)
 	{
-		super(_posX, _posY, 4, 4, (_type == PheromoneType.HOME ? homeTexture : foodTexture));
+		super(_posX, _posY, 4, 4, (_type == PheromoneType.HOME ? Asset.pixel(color_home) : Asset.pixel(color_food)));
 		anthill = _anthill;
 		lifeTime = INIT_LIFE_TIME;
 		pheromoneType = _type;

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -173,11 +174,11 @@ public class Ecosystem extends Stage
         getBatch().begin();
         if (worldMap == null)
         {
-            getBatch().draw(Asset.backgound(), 0, 0, getViewport().getWorldWidth(), getViewport().getWorldHeight());            
+            getBatch().draw(Asset.pixel(Color.WHITE), 0, 0, getViewport().getWorldWidth(), getViewport().getWorldHeight());            
         }
         else
         {
-            getBatch().draw(Asset.backgound(), 0, 0, worldMap.getWidth() * worldMap.getCaseSize(), worldMap.getHeight() * worldMap.getCaseSize());
+            getBatch().draw(Asset.pixel(Color.WHITE), 0, 0, worldMap.getWidth() * worldMap.getCaseSize(), worldMap.getHeight() * worldMap.getCaseSize());
         }
         getBatch().end();
         super.draw();

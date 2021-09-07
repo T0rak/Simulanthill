@@ -1,8 +1,9 @@
 package ch.hearc.simulanthill.screen.gui;
 
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
+import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
+
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -24,11 +25,11 @@ import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
+import ch.hearc.simulanthill.ecosystem.actors.Resource;
 import ch.hearc.simulanthill.tools.Asset;
 
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.math.BigDecimal;
@@ -324,13 +325,12 @@ public class GUI extends Stage
 
 		btnLoadMap = 		new VisTextButton("Load Map");
 		btnGenerateMap = 	new VisTextButton("Generate Map");
-		
-		btnFood 			= creaImageButton(Asset.resource(), "Resource");
-		btnObstacle			= creaImageButton(Asset.obstacle(), "Obstacle");
+		btnFood 			= creaImageButton(Asset.pixel(Resource.color), "Resource");
+		btnObstacle			= creaImageButton(Asset.pixel(Obstacle.color), "Obstacle");
 		btnAnt				= creaImageButton(Asset.ant(), "Ant");
 		btnAnthill			= creaImageButton(Asset.anthill(), "Anthill");
-		btnHomePheromone 	= creaImageButton(Asset.homePheromone(), "Pheromone Home");
-		btnFoodPheromone 	= creaImageButton(Asset.foodPheromone(), "Pheromone Food");
+		btnHomePheromone 	= creaImageButton(Asset.pixel(Pheromone.color_home), "Pheromone\nHome");
+		btnFoodPheromone 	= creaImageButton(Asset.pixel(Pheromone.color_food), "Pheromone\nFood");
 		
 		btnResetParameters = new VisTextButton("Reset Parameters");
 		
@@ -411,23 +411,30 @@ public class GUI extends Stage
 		
 		// Fill interactible layout
 		int sizeBtnLegend = 100;
-		lytInteractibles.add(btnFood).size(sizeBtnLegend,sizeBtnLegend);
 		lytInteractibles.add(btnObstacle).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.add(btnAnt).size(sizeBtnLegend,sizeBtnLegend);
-		lytInteractibles.row();
+		lytInteractibles.add(btnFood).size(sizeBtnLegend,sizeBtnLegend);
 		lytInteractibles.add(btnAnthill).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.row();
 		lytInteractibles.add(btnFoodPheromone).size(sizeBtnLegend,sizeBtnLegend);
 		lytInteractibles.add(btnHomePheromone).size(sizeBtnLegend,sizeBtnLegend);
+		lytInteractibles.add(btnAnt).size(sizeBtnLegend,sizeBtnLegend);
+
+		unselectAnthill();
 	}
 
 	public void selectAnthill(Anthill _anthill) {
 		System.out.println("Select " + _anthill);
-		//TODO: Implement
+		btnAnt.setVisible(true);
+		btnFoodPheromone.setVisible(true);
+		btnHomePheromone.setVisible(true);
+		
 	}
 
 	public void unselectAnthill() {
 		System.out.println("Unselect");
-		//TODO: Implement
+		btnAnt.setVisible(false);
+		btnFoodPheromone.setVisible(false);
+		btnHomePheromone.setVisible(false);
 	}
 
 	public void signalSelectionListener(ElementActorType _type)

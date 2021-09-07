@@ -21,6 +21,7 @@ public class EcosystemGUI extends Stage
     private Group anthillDetails;
     private List<SelectionAnthillListener> selectionAnthillListeners;
     private Anthill selectedAnthill;
+    private Actor touchActor;
 
     public EcosystemGUI(Ecosystem _ecosystem)
     {
@@ -52,6 +53,7 @@ public class EcosystemGUI extends Stage
     private void addAnthill(List<Anthill> _anthills)
 	{
         selectedAnthill = null;
+        signalSelectionAnthillListener();
 		for (Anthill anthill : _anthills) {
             AnthillDetails a = new AnthillDetails(anthill);
             anthillDetails.addActor(a);
@@ -60,6 +62,7 @@ public class EcosystemGUI extends Stage
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                
                 AnthillDetails a = (AnthillDetails)(event.getTarget().getParent());
                 if (a.getSelected() == false)
                 {
@@ -93,9 +96,10 @@ public class EcosystemGUI extends Stage
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 AnthillDetails a = (AnthillDetails)(event.getTarget().getParent());
+                a.setHoverVisible(true);
                 if (!a.getSelected())
                 {
-                    a.setVisible(true);
+                    a.setClickVisible(true);
                 }
                 super.enter(event, x, y, pointer, fromActor);
 
@@ -104,9 +108,10 @@ public class EcosystemGUI extends Stage
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 AnthillDetails a = (AnthillDetails)(event.getTarget().getParent());
+                a.setHoverVisible(false);
                 if (!a.getSelected())
                 {
-                    a.setVisible(false);
+                    a.setClickVisible(false);
                 }
                 super.exit(event, x, y, pointer, fromActor);
             }
@@ -117,9 +122,9 @@ public class EcosystemGUI extends Stage
 
     private void addTouchActor()
     {
-        Actor actor = new Actor();
-        actor.setBounds(0, 0, getWidth(), getHeight());
-        actor.addListener(new ClickListener(){
+        touchActor = new Actor();
+        touchActor.setBounds(0, 0, getWidth(), getHeight());
+        touchActor.addListener(new ClickListener(){
             int count = 0;
             @Override
                 public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
@@ -160,7 +165,7 @@ public class EcosystemGUI extends Stage
             }
 		});
 
-        addActor(actor);
+        addActor(touchActor);
     }
 
     public void changeTypeOfAdd(ElementActorType _type)
