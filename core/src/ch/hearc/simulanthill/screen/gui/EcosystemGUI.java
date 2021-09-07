@@ -3,15 +3,20 @@ package ch.hearc.simulanthill.screen.gui;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
+import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
+import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
+import ch.hearc.simulanthill.ecosystem.actors.Resource;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
 
 public class EcosystemGUI extends Stage
@@ -119,25 +124,33 @@ public class EcosystemGUI extends Stage
     {
         Actor actor = new Actor();
         actor.setBounds(0, 0, getWidth(), getHeight());
-        actor.addListener(new ClickListener(){
+        actor.addListener(new ClickListener() {
             int count = 0;
             @Override
-                public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
-                    count = 0;
-                    int caseX = ecosystem.floatToGridCoordinate(_x);
-                    int caseY = ecosystem.floatToGridCoordinate(_y);
-                    if (selectedAnthill != null)
-                    {
-                        System.out.println(_x + "X" + _y + ": " + ecosystem.getOthersNbAntsAt(caseX, caseY, selectedAnthill.getId()));
-                    }
-                    
-                    return super.touchDown(_event, _x, _y, _pointer, _button);
+            public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
+                setButton(_button);
+                count = 0;
+                if (_button == 0) 
+                {
+                    addElement(_x, _y);
                 }
-
+                return super.touchDown(_event, _x, _y, _pointer, _button);
+            }
             @Override
             public void touchDragged(InputEvent _event, float _x, float _y, int _pointer) 
             {
                 count ++;
+                if (getPressedButton() == 0)
+                {
+                    addElement(_x, _y);
+                } else if (getPressedButton() == 1)
+                {
+                    removeElement(_x, _y);
+                }
+                super.touchDragged(_event, _x, _y, _pointer);
+            }
+
+            private void addElement(float _x, float _y) {
                 if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
                 {
                     if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.ANTHILL || typeOfAdd == ElementActorType.RESOURCE) 
@@ -156,8 +169,30 @@ public class EcosystemGUI extends Stage
                         }
                     }
                 }
-                super.touchDragged(_event, _x, _y, _pointer);
             }
+
+            private void removeElement(float _x, float _y) {
+                if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
+                {
+                    ElementActor actor = ecosystem.getElementFrom(_x, _y);
+                    if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(actor)
+                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
+                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))
+                    {
+                        /*if (typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor)) {
+                            ((Anthill)actor).removeAllAnts();
+                            ((Anthill)actor).remove();
+                        }*/
+                        ecosystem.removeMapTile(_x, _y);
+                    } /*else if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(actor)
+                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
+                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))
+                    {
+
+                    }*/
+                }
+            }
+
 		});
 
         addActor(actor);

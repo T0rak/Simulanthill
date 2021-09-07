@@ -358,6 +358,14 @@ public class Ecosystem extends Stage
 
     }
 
+    public void removeMapTile(float _x, float _y) 
+    {
+        int xCase = floatToGridCoordinate(_x);
+        int yCase = floatToGridCoordinate(_y);
+        worldMap.getmapTileGrid()[xCase][yCase].remove();
+        worldMap.getmapTileGrid()[xCase][yCase] = null;
+    }
+
     /**
      * Add a pheromone at the given position 
      * @param _x start y position of point (scene coordinates)
