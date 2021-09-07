@@ -3,26 +3,27 @@ package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.graphics.Color;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.tools.Asset;
 
 /**
 * Represents a resource actor that progressively disapears when ants take it
 */
-public class Resource extends ElementActor 
+public class Resource extends MapTile 
 {
     private static final int INIT_CAPACITY = 10;
     public static final Color color = new Color(131/255f, 2/255f, 2/255f, 1);
     int capacity;
     /**
     * Main constructor
-     * @param  _x the initial x position of the ant 
-     * @param  _y the initial y position of the ant
+     * @param  _xCase the initial x position of the ant 
+     * @param  _yCase the initial y position of the ant
      * @param  _width the width of the ant
      * @param  _height the height of the ant
     */
-    public Resource(float _x, float _y, float _width, float _height) 
+    public Resource(int _xCase, int _yCase) 
     {
-        super(_x, _y, _width, _height, Asset.pixel(color));
+        super(_xCase, _yCase, Asset.pixel(color), Ecosystem.getCurrentEcosystem());
         this.capacity = INIT_CAPACITY;
     }
 
@@ -63,7 +64,7 @@ public class Resource extends ElementActor
     @Override
 	public boolean remove() 
     {
-		Ecosystem.getCurrentEcosystem().removeResource(getX()+ this.getWidth()/2, getY()+ this.getHeight()/2);
+		ecosystem.removeResource(getX() + this.getWidth() / 2, getY() + this.getHeight() / 2);
 		return super.remove();
 	}
 }

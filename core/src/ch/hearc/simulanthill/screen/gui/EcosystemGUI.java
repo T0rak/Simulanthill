@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.actors.AntState;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
@@ -170,7 +171,7 @@ public class EcosystemGUI extends Stage
                             ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
                         } else if (typeOfAdd == ElementActorType.ANT)
                         {
-                            selectedAnthill.createAntAt(_x, _y, 100000);
+                            selectedAnthill.createAntAt(_x, _y, 100000, AntState.LOST);
                         }
                     }
                 }
@@ -179,7 +180,7 @@ public class EcosystemGUI extends Stage
             private void removeElement(float _x, float _y) {
                 if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
                 {
-                    ElementActor actor = ecosystem.getElementFrom(_x, _y);
+                    ElementActor actor = ecosystem.getMapTileAtFloat(_x, _y);
                     if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(actor)
                     || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
                     || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))

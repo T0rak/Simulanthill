@@ -47,7 +47,8 @@ public class MainScreen implements Screen
 		ecosystemViewport = new FitViewport(1600,900);
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
-		ecosystem.loadMap(124, 70);
+		Ecosystem.getCurrentEcosystem().loadMap(124, 70);
+		//ecosystem.loadMap(124, 70);
 
 
 		Ant.setSpeedFactor(1);

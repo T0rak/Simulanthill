@@ -31,7 +31,7 @@ public class Pheromone extends ElementActor
 	 */
 	public Pheromone(float _posX, float _posY, PheromoneType _type, Anthill _anthill, int _stepFrom)
 	{
-		super(_posX, _posY, 4, 4, (_type == PheromoneType.HOME ? Asset.pixel(color_home) : Asset.pixel(color_food)));
+		super(_posX, _posY, Ecosystem.getCurrentEcosystem().getMapCaseSize()/3, Ecosystem.getCurrentEcosystem().getMapCaseSize()/3, (_type == PheromoneType.HOME ? Asset.pixel(color_home) : Asset.pixel(color_food)), Ecosystem.getCurrentEcosystem());
 		anthill = _anthill;
 		lifeTime = INIT_LIFE_TIME;
 		pheromoneType = _type;

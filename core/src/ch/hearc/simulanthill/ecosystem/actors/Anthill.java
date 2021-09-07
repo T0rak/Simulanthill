@@ -3,27 +3,46 @@ package ch.hearc.simulanthill.ecosystem.actors;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.tools.Asset;
 import ch.hearc.simulanthill.tools.ColorManagement;
 import com.badlogic.gdx.graphics.Color;
 /**
  * The anthill actor that makes ants spawning
  */
-public class Anthill extends ElementActor
+public class Anthill extends MapTile
 { 
-    private final Color antColor = ColorManagement.nextColor();
+    public static final int PHEROMONE_LIVE_TIME_DEFAULT = 150;
+    public static final int ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT = 0;
+    public static final float ANT_SPEED_FACTOR_DEFAULT = 1;
+    public static final int ANT_FIELD_OF_VIEW_DEFAULT = 3;
+    public static final int ANT_INDEPENDENCE_DEFAULT = 10;
 
     private static int idGenerator = 0;
+    private static int AntCreationRate = 5;
 
+    private final Color antColor = ColorManagement.nextColor();
+
+    private int id;
     private int nbAnts;
     private int nbResources;
-    private int id;
     private List<Ant> antList;
-    private int count = MathUtils.random(0, 10);
+
+    private int pheromoneLiveTime;
+    private int antPheromoneReleaseFrequency;
+
+    private float antSpeedFactor;
+    private int antFieldOfView;
+    private int antIndependance;
+    private int maxAnts;
+    private float antSizeFactor;
+
+    
+
+    private int AntCreationCountDown;
 
     /**
 	 * Main constructor
@@ -32,29 +51,28 @@ public class Anthill extends ElementActor
      * @param  _width the width of the ant
      * @param  _height the height of the ant
 	 */
-    public Anthill(float _x, float _y, float _width, float _height) 
+    public Anthill(int _caseX, int _caseY, int _pheromoneLiveTime, int _antPheromoneReleaseFrequency, float _antSpeedFactor, int _antFieldOfView, int _antIndependance, int _maxAnts, float _antSizeFactor) 
     {
-        super(_x, _y, _width, _height, Asset.anthill());
+        super(_caseX, _caseY, Asset.anthill(), Ecosystem.getCurrentEcosystem());
+
+        pheromoneLiveTime = _pheromoneLiveTime;
+        antPheromoneReleaseFrequency = _antPheromoneReleaseFrequency;
+
+        antSpeedFactor = _antSpeedFactor;
+        antFieldOfView = _antFieldOfView;
+        antIndependance = _antIndependance;
+        
+        maxAnts = _maxAnts;
+        antSizeFactor = _antSizeFactor;
+
         antList = new ArrayList<Ant>();
         id = idGenerator ++;
-    }
-    
-    /**
-    * Constructor
-    * @param _x the initial x position
-    * @param _y the initial y position 
-    */
-    public Anthill(float _x, float _y) 
-    {
-        this(_x, _y, 30, 30);
+        AntCreationCountDown = MathUtils.random(1, AntCreationRate);
     }
 
-    /**
-    * Constructor
-    */
-    public Anthill() 
+    public Anthill(int _caseX, int _caseY) 
     {
-        this(0, 0);
+        this(_caseX, _caseY, PHEROMONE_LIVE_TIME_DEFAULT, ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT, ANT_SPEED_FACTOR_DEFAULT, ANT_FIELD_OF_VIEW_DEFAULT, ANT_INDEPENDENCE_DEFAULT, 500, 1);
     }
 
     /**
@@ -65,12 +83,13 @@ public class Anthill extends ElementActor
     {
         super.act(_delta);
 
-        count++;
+        AntCreationCountDown--;
         
-        if (Ecosystem.getCurrentEcosystem().getNbAnt() < Ecosystem.getCurrentEcosystem().getNbAntMax() && count > 10)
+        if (ecosystem.getNbAnt() < ecosystem.getNbAntMax() && AntCreationCountDown < 0)
         {
             createAnt();
-            count = 0;
+            AntCreationCountDown = AntCreationRate;
+            
         }
     }
     /**
@@ -78,24 +97,19 @@ public class Anthill extends ElementActor
      */
     public void createAnt()
     {
-        nbAnts++;
-        int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
-        float caseSizeCenter =  Ecosystem.getCurrentEcosystem().getMapCaseSize()/2;
-        Ant newAnt = new Ant(this.getX() + caseSizeCenter, this.getY() + caseSizeCenter,  antSize, antSize, this);
-        antList.add(newAnt);
-        Ecosystem.getCurrentEcosystem().addAnt(newAnt);
+        createAntAt(centeredXCase, centeredYCase, 0, AntState.SEARCHING_RESOURCE);
     }
+
     
-    public void createAntAt(float _x, float _y, int _stepFrom) 
+    public void createAntAt(float _x, float _y, int _stepFrom, AntState _state) 
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (!ecosystem.isObstacle(ecosystem.getElementFrom(_x, _y))) 
+        if (!ecosystem.isObstacle(ecosystem.getMapTileAtFloat(_x, _y))) 
         {
             nbAnts++;
-            int antSize = (int)Ecosystem.getCurrentEcosystem().getMapCaseSize();
-            Ant newAnt = new Ant(_x, _y,  antSize, antSize, this, _stepFrom, AntState.LOST);
+
+            Ant newAnt = new Ant(_x, _y,  antSizeFactor * getWidth(), antSizeFactor * getHeight(), this, _stepFrom, _state);
             antList.add(newAnt);
-            Ecosystem.getCurrentEcosystem().addAnt(newAnt);
+            ecosystem.addAnt(newAnt);
         }
     }
     /**
@@ -106,11 +120,11 @@ public class Anthill extends ElementActor
     {
         nbAnts--;
         antList.remove(_ant);
-        Ecosystem.getCurrentEcosystem().removeAnt(_ant);
+        ecosystem.removeAnt(_ant);
     }
 
 
-    public void addRessource(int _nbResources)
+    public void addResource(int _nbResources)
     {
         nbResources += _nbResources;
     }

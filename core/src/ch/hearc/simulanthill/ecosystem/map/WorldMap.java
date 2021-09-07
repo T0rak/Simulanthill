@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
@@ -32,7 +33,7 @@ public class WorldMap
 	private ArrayList<String> mapStringLines;
 
 	//Contains Anthills, Obstacles and Resources
-	private ElementActor[][] mapTileGrid;
+	private MapTile[][] mapTileGrid;
 
 	private static final int errorMapWidth = 125 ;
 	private static final int errorMapHeight = 58 ;
@@ -87,8 +88,6 @@ public class WorldMap
 	 */
 	public WorldMap(String _filename, float _worldWidth, float _worldHeight) 
 	{
-		
-
 		if(!loadFile(_filename) || !validateDimensions() || !validateCharacters() || !validateStructure())
 		{
 			System.out.println("Error with map");
@@ -100,7 +99,6 @@ public class WorldMap
 		caseSize = Math.min(_worldWidth/width, _worldHeight/height);
 		worldHeight = height * caseSize;
 		worldWidth = width * caseSize;
-		convertMap();
 	}
 
 	/**
@@ -110,28 +108,23 @@ public class WorldMap
 	 */
 	public WorldMap(float _worldWidth, float _worldHeight, int _width, int _height)
 	{
-		//filename = "";
-
 		width = _width;
 		height = _height;
 
-		
 		random(1/5f);
 		
 		caseSize = Math.min(_worldWidth/width, _worldHeight/height);
 		worldHeight = height * caseSize;
 		worldWidth = width * caseSize;
 
-		convertMap();
 	}
 
 	/**
 	 * Convert the map from characters to objects.
 	 */
-	private void convertMap() 
+	public void convertMap() 
 	{
-		//pheromoneGrid = new Pheromone[width][height][nbPhero];
-		mapTileGrid = new ElementActor[width][height];
+		mapTileGrid = new MapTile[width][height];
 		int iLine = height;
 		for (String line : mapStringLines) 
 		{
@@ -147,27 +140,27 @@ public class WorldMap
 
 	private void convertElementActor(char ch, int line, int col)
 	{
-		ElementActor actor;
+		MapTile mapTile;
 		switch (ch) 
 		{
 			case ' ':
-				actor = null;
+				mapTile = null;
 				break;
 			case '#':
-				actor = new Obstacle(col * caseSize, line * caseSize, caseSize, caseSize);
-				mapTileGrid[col][line] = actor;
+				mapTile = new Obstacle(col, line);
+				mapTileGrid[col][line] = mapTile;
 				break;
 			case 'O':
-				actor = new Anthill(col * caseSize, line * caseSize, caseSize, caseSize);
-				mapTileGrid[col][line] = actor;
+				mapTile = new Anthill(col, line);
+				mapTileGrid[col][line] = mapTile;
 				break;
 			case 'R':
-				actor = new Resource(col * caseSize, line * caseSize, caseSize, caseSize);
-				mapTileGrid[col][line] = actor;
+				mapTile = new Resource(col, line);
+				mapTileGrid[col][line] = mapTile;
 				break;
 		
 			default:
-				actor = null;
+				mapTile = null;
 				break;
 		}		
 	}
@@ -175,7 +168,7 @@ public class WorldMap
 	private boolean loadFile(String _filename)
 	{
 		File f = new File(_filename);
-		if (f.exists() && !f.isDirectory() && _filename.substring(_filename.length()-3, _filename.length()).equalsIgnoreCase("txt"))
+		if (f.exists() && !f.isDirectory() && _filename.substring(_filename.length() - 3, _filename.length()).equalsIgnoreCase("txt"))
 		{
 			FileReader fr;
 			mapStringLines = new ArrayList<String>();
@@ -250,11 +243,11 @@ public class WorldMap
 
 	private boolean validateStructure() {
 		allObstacles(mapStringLines.get(0));
-		allObstacles(mapStringLines.get(height-1));
+		allObstacles(mapStringLines.get(height - 1));
 		
 		for (String l : mapStringLines) 
 		{
-			if (l.charAt(0) != '#' || l.charAt(width-1) != '#') 
+			if (l.charAt(0) != '#' || l.charAt(width - 1) != '#') 
 			{
 				return false;
 			}
@@ -344,7 +337,7 @@ public class WorldMap
 		for (int i = 0; i < width ; i++)
 		{
 			mapGrid[i][0]= '#';
-			mapGrid[i][height-1] = '#';
+			mapGrid[i][height - 1] = '#';
 		}
 		
 		for (int i = 0; i < height ; i++)
@@ -377,7 +370,6 @@ public class WorldMap
 	public boolean reset() 
 	{
 		mapTileGrid = null;
-		convertMap();
 		return true;
 	}
 
@@ -390,13 +382,13 @@ public class WorldMap
 		return pheromoneGrid;
 	}*/
 
-	public ElementActor[][] getmapTileGrid() 
+	public MapTile[][] getmapTileGrid() 
 	{
 		return mapTileGrid;
 	}
 
 	/**
-	 * Returns the size of a case in the ElementActorGrid.
+	 * Returns the size of a case in the mapTileGrid.
 	 * The case is a square.
 	 * @return the size of the case.
 	 */

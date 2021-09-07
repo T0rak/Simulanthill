@@ -1,6 +1,7 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.tools.Asset;
 
 import static ch.hearc.simulanthill.ecosystem.actors.AntState.*;
@@ -33,11 +34,6 @@ public class Ant extends ElementActor
     
     private int avoidObstacleMemory;
 
-    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
-    {
-        this( _x, _y, _width, _height, _anthill, 0, AntState.SEARCHING_RESOURCE);
-    }
-
 	/**
 	 * Constructor
 	 * @param  _x the initial x position of the ant 
@@ -46,19 +42,20 @@ public class Ant extends ElementActor
      * @param  _height the height of the ant
      * @param  _anthill the anthill to which one an ant belongs
 	 */
-    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill, int _stepFrom, AntState _state)   
+    public Ant(float _x, float _y, float _width, float _height, Anthill _anthill, int _stepFrom, AntState _state)   
     {
-        super(_x, _y, _width, _height, Asset.ant(_anthill.getAntColor()));
-        this.state = _state;
-        this.capacity = 0;
-        this.viewSpanAngle = 15;
+        super(_x, _y, _width, _height, Asset.ant(_anthill.getAntColor()), Ecosystem.getCurrentEcosystem());
+        state = _state;
+        capacity = 0;
+        viewSpanAngle = 15;
         
         setDirection(MathUtils.random(360f));
-        this.anthill = _anthill;
+        
+        anthill = _anthill;
 
-        this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
-        this.stepFrom = _stepFrom;
-        this.lastStepFrom = Integer.MAX_VALUE;
+        pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+        stepFrom = _stepFrom;
+        lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         
         blocked = false;
@@ -67,18 +64,17 @@ public class Ant extends ElementActor
 
     public void setDirection(float _direction)
     {
-        float prov = _direction % 360f;
-        if (prov < 0)
+        float newDirection = _direction % 360f;
+        if (newDirection < 0)
         {
-            prov =  prov + 360;            
+            newDirection =  newDirection + 360;            
         }
 
-
-        float deltaDirection = prov - this.direction;
+        float deltaDirection = newDirection - this.direction;
 
         sprite.rotate(deltaDirection);
 
-        direction = prov;
+        direction = newDirection;
     }
 
     /**
@@ -154,13 +150,13 @@ public class Ant extends ElementActor
         }
 
         move();
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isObstacle(ecosystem.getElementFrom(getX(), getY()))) 
+        
+        if (ecosystem.isObstacle(xCase, yCase))
         {
-            ecosystem.moveAntOnGrid(getX(), getY(), anthill.getX(), anthill.getY(), anthill.getId());
+            ecosystem.moveAntOnGrid(xCase, yCase, anthill.getXCase(), anthill.getYCase(), anthill.getId());
             setPosition(anthill.getX(), anthill.getY());
         }
-        checkCountdown --;
+        checkCountdown--;
         pheromoneCountdown--;
         stepFrom++;
     }
@@ -170,8 +166,8 @@ public class Ant extends ElementActor
 	 */
     public void tryCollectFood()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isResource(ecosystem.getElementFrom(getX(), getY()))) 
+        
+        if (ecosystem.isResource(xCase, yCase))
         {
             int res = ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
             
@@ -194,15 +190,17 @@ public class Ant extends ElementActor
 	 */
     public void tryDepositFood()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        ElementActor actorFound = ecosystem.getElementFrom(getX(), getY());
+        
+        MapTile actorFound = ecosystem.getMapTileAt(xCase, yCase);
+        
         if (ecosystem.isAnthill(actorFound) && anthill == (Anthill)actorFound) 
         {
-            anthill.addRessource(capacity);
+            anthill.addResource(capacity);
             capacity = 0;
             stepFrom = 0;
             goal = null;
             lastStepFrom = Integer.MAX_VALUE;
+
             if (ecosystem.getNbAnt() > ecosystem.getNbAntMax())
             {
                 anthill.removeAnt(this);
@@ -219,7 +217,7 @@ public class Ant extends ElementActor
     {
         Anthill actor = (Anthill)checkRadial(Anthill.class);
 
-        if(actor != null && actor != anthill)
+        if (actor != null && actor != anthill)
         {
             return null;
         }
@@ -276,7 +274,8 @@ public class Ant extends ElementActor
     {
         if (goal != null && blocked == false)
         {
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getY(), goal.getX() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getX());
+            float caseSize = ecosystem.getMapCaseSize();
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + caseSize / 2 - getY(), goal.getX() + caseSize / 2 - getX());
             setDirection(newDirection);
         }
     }
@@ -296,8 +295,6 @@ public class Ant extends ElementActor
 	 */
     public void move()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        
         float caseSize = ecosystem.getMapCaseSize();
         
         float directionRad = (float) Math.toRadians(direction);
@@ -308,12 +305,8 @@ public class Ant extends ElementActor
         int nextCaseX = ecosystem.floatToGridCoordinate(nextCaseFloatX);
         int nextCaseY = ecosystem.floatToGridCoordinate(nextCaseFloatY);
 
-        int caseX = ecosystem.floatToGridCoordinate(getX());
-        int caseY = ecosystem.floatToGridCoordinate(getY());
-
-
-        int dx = nextCaseX - caseX;
-        int dy = nextCaseY - caseY;
+        int dx = nextCaseX - xCase;
+        int dy = nextCaseY - yCase;
 
         int referenceX = nextCaseX;
         int referenceY = nextCaseY;
@@ -323,11 +316,11 @@ public class Ant extends ElementActor
             int rand0 = MathUtils.random(0,1);
             int rand1 = Math.abs(rand0 - 1);
             
-            int x2 = caseX + rand0 * dx;
-            int y2 = caseY + rand1* dy;
+            int x2 = xCase + rand0 * dx;
+            int y2 = yCase + rand1 * dy;
 
-            int x3 = caseX + rand1 * dx;
-            int y3 = caseY + rand0 * dy;
+            int x3 = xCase + rand1 * dx;
+            int y3 = yCase + rand0 * dy;
             
             if (isCaseToAvoid(x2, y2))
             {
@@ -341,11 +334,10 @@ public class Ant extends ElementActor
             }
             
         }
-
         
         if (isCaseToAvoid(referenceX, referenceY))
         {
-            avoidActor(referenceX,referenceY);
+            avoidCase(referenceX, referenceY);
         } else
         {
             avoidObstacleMemory = 0;
@@ -360,30 +352,25 @@ public class Ant extends ElementActor
         } else 
         {
             blocked = false;
-            ecosystem.moveAntOnGrid(getX(), getY(), nextPosX, nextPosY, anthill.getId());
+            ecosystem.moveAntOnGrid(xCase, yCase, ecosystem.floatToGridCoordinate(nextPosX), ecosystem.floatToGridCoordinate(nextPosY), anthill.getId());
             setPosition(nextPosX, nextPosY);
 
         }
     }
 
     public boolean isCaseToAvoid(int _x, int _y)
-    {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        return ecosystem.isObstacle(ecosystem.getElement(_x, _y)) || ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId()) > ecosystem.getNbAntsAt(_x, _y, anthill.getId());
+    {  
+        return ecosystem.isObstacle(_x, _y) || ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId()) > ecosystem.getNbAntsAt(_x, _y, anthill.getId());
     }
     
-    public void avoidActor(int _x, int _y) 
+    public void avoidCase(int _x, int _y) 
     {
         if (avoidObstacleMemory == 0)
         {
-            Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
             float caseSize = ecosystem.getMapCaseSize();
 
-            int caseX = ecosystem.floatToGridCoordinate(getX());
-            int caseY = ecosystem.floatToGridCoordinate(getY());
-
-            int dx = _x - caseX;
-            int dy = _y - caseY;
+            int dx = _x - xCase;
+            int dy = _y - yCase;
 
             if (dx == 0 && dy != 0)
             {
@@ -445,8 +432,8 @@ public class Ant extends ElementActor
 	 */
     public void releasePheromone(PheromoneType _type) 
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.getElementFrom(getX(), getY()) == null)
+        
+        if (ecosystem.getMapTileAt(xCase, yCase) == null)
         {
             if (pheromoneCountdown < 0)
             {
@@ -507,7 +494,7 @@ public class Ant extends ElementActor
     public void setPosition(float _x, float _y) 
     {
         super.setPosition(_x, _y);
-        //Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         sprite.setPosition(_x - getWidth()/2, _y - getHeight()/2);
     }
 
@@ -518,24 +505,21 @@ public class Ant extends ElementActor
 
     private boolean canMove(float _destinationX, float _destinationY) {
 
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         int destinationXCase = ecosystem.floatToGridCoordinate(_destinationX);
         int destinationYCase = ecosystem.floatToGridCoordinate(_destinationY);
 
-        int initXCase = ecosystem.floatToGridCoordinate(getX());
-        int initYCase = ecosystem.floatToGridCoordinate(getY());
-
-        int dx = destinationXCase - initXCase;
-        int dy = destinationYCase - initYCase;
+        int dx = destinationXCase - xCase;
+        int dy = destinationYCase - yCase;
         
-        if (ecosystem.isObstacle(ecosystem.getElement(destinationXCase, destinationYCase))) 
+        if (ecosystem.isObstacle(destinationXCase, destinationYCase)) 
         {
             return false;
         }
         
         if (dx != 0 && dy != 0) 
         {
-            if (ecosystem.isObstacle(ecosystem.getElement(initXCase, initYCase + dy)) && ecosystem.isObstacle(ecosystem.getElement(initXCase + dx, initYCase)))
+            if (ecosystem.isObstacle(xCase, yCase + dy) && ecosystem.isObstacle(xCase + dx, yCase))
             {
                 return false;
             }
@@ -555,12 +539,9 @@ public class Ant extends ElementActor
      */
     public ElementActor checkRadial(Class<?> _class)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         ElementActor res = null;
         float distance = 0;
-        
-        int xCase = ecosystem.floatToGridCoordinate(getX());
-        int yCase = ecosystem.floatToGridCoordinate(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -595,7 +576,7 @@ public class Ant extends ElementActor
      */
     private ElementActor checkRadialLine(int _x, int _y, int _dx, int _dy, Class<?> _class)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         for (int i = 1; i <= FIELD_OF_VIEW; i++)
         {
             int xi = _x + i * _dx;
@@ -603,8 +584,8 @@ public class Ant extends ElementActor
             
             if (Math.abs(_dx) == Math.abs(_dy))
             {
-                ElementActor actor2 = ecosystem.getElement(xi - _dx, yi);
-                ElementActor actor3 = ecosystem.getElement(xi, yi - _dy);
+                ElementActor actor2 = ecosystem.getMapTileAt(xi - _dx, yi);
+                ElementActor actor3 = ecosystem.getMapTileAt(xi, yi - _dy);
 
                 if (ecosystem.isInstanceOf(actor2, _class))
                 {
@@ -624,7 +605,7 @@ public class Ant extends ElementActor
                 }
             }
 
-            ElementActor actor = ecosystem.getElement(xi, yi);
+            ElementActor actor = ecosystem.getMapTileAt(xi, yi);
 
             if (ecosystem.isInstanceOf(actor, _class))
             {
@@ -650,13 +631,8 @@ public class Ant extends ElementActor
      
     public Pheromone checkRadialPheromone(PheromoneType _type)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
-
-        int xCase = ecosystem.floatToGridCoordinate(getX());
-        int yCase = ecosystem.floatToGridCoordinate(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -693,7 +669,7 @@ public class Ant extends ElementActor
      */
     private Pheromone checkRadialLinePheromone(int _x, int _y, int _dx, int _dy, PheromoneType _type)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
 
