@@ -607,6 +607,35 @@ public class Ecosystem extends Stage
         return nbAntsGridMap.get(_anthillID)[_x][_y];
     }
 
+    public void resetPheromones() 
+    {
+        for (int key : pheromoneGridMap.keySet())
+        {
+            Pheromone[][][] grid = pheromoneGridMap.get(key);
+            for (int i = 0; i < grid.length; i++) 
+            {
+                for (int j = 0; j < grid[i].length; j++) 
+                {
+                    for (int k = 0; k < grid[i][j].length; k++) {
+                        if (grid[i][j][k] != null)
+                        {
+                            grid[i][j][k].remove();
+                        }
+                        grid[i][j][k] = null;
+                    }
+                }
+            }
+        }
+    }
+
+    public void resetAnts() 
+    {
+        for (Anthill a : anthills) 
+        {
+            a.removeAllAnts();
+        }
+    }
+
     public int getOthersNbAntsAt(int _x, int _y, int _anthillID) {
         int sum = 0;
         for (Integer key : nbAntsGridMap.keySet()) {
