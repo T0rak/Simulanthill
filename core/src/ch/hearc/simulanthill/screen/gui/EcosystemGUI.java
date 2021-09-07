@@ -184,12 +184,14 @@ public class EcosystemGUI extends Stage
                     || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
                     || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))
                     {
-                        /*if (typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor)) {
-                            ((Anthill)actor).removeAllAnts();
-                            ((Anthill)actor).remove();
-                        }*/
+                        if (typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor)) {
+                            int xCase = ecosystem.floatToGridCoordinate(actor.getX() + ecosystem.getMapCaseSize() / 2f);
+                            int yCase = ecosystem.floatToGridCoordinate(actor.getY() + ecosystem.getMapCaseSize() / 2f);
+                            ecosystem.removeAnthill(xCase, yCase);
+                        }
                         ecosystem.removeMapTile(_x, _y);
-                    } /*else if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(actor)
+
+                    }/* else if (typeOfAdd == ElementActorType.FOOD_PHEROMONE && ecosystem.isPheromoneFrom(_x, _y)
                     || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
                     || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))
                     {
