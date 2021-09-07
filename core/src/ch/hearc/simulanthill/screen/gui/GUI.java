@@ -56,7 +56,8 @@ public class GUI extends Stage
 	private VisTextButton btnResetParameters;
 	private VisTextButton btnLoadMap;
 	private VisTextButton btnGenerateMap;
-	
+	private VisTextButton btnResetAnts;
+
 	private VisImageButton btnFood;
 	private VisImageButton btnObstacle;
 	private VisImageButton btnAnt;
@@ -176,6 +177,23 @@ public class GUI extends Stage
 					if (ecosystem != null)
 					{
 						ecosystem.reset();
+					}
+
+				}
+			}
+		);
+
+		btnResetAnts.addListener(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) 
+				{
+					Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+					if (ecosystem != null)
+					{
+						ecosystem.resetAnts();
+						ecosystem.resetPheromones();
 					}
 
 				}
@@ -333,7 +351,8 @@ public class GUI extends Stage
 		
 		btnResetParameters = new VisTextButton("Reset Parameters");
 		
-		btnReset =	new VisTextButton("Reset");
+		btnReset =	new VisTextButton("Full Reset");
+		btnResetAnts =	new VisTextButton("Reset ants");
 		btnPlay =	new VisTextButton("Play");
 
 		sliSpeed = new VisSlider(0f, 1f, 0.1f, false);
@@ -364,9 +383,10 @@ public class GUI extends Stage
 		//Fill simulation layout
 		//lytSimulation.add(simulationImage).colspan(4);
 	
-		lytSimulation.add(simulation).colspan(4).size((int)(1600/1.25), (int)(900/1.25));
+		lytSimulation.add(simulation).colspan(5).size((int)(1600/1.25), (int)(900/1.25));
 		lytSimulation.row();
 		lytSimulation.add(btnReset);
+		lytSimulation.add(btnResetAnts);
 		lytSimulation.add(btnPlay);
 		lytSimulation.add(lblSpeed);
 		lytSimulation.add(sliSpeed);

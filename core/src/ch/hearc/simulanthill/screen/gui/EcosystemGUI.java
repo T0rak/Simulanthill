@@ -3,11 +3,9 @@ package ch.hearc.simulanthill.screen.gui;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
@@ -16,9 +14,8 @@ import ch.hearc.simulanthill.ecosystem.actors.AntState;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
-import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
-import ch.hearc.simulanthill.ecosystem.actors.Resource;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;
+import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 
 public class EcosystemGUI extends Stage
 {
@@ -192,12 +189,23 @@ public class EcosystemGUI extends Stage
                         }
                         ecosystem.removeMapTile(_x, _y);
 
-                    }/* else if (typeOfAdd == ElementActorType.FOOD_PHEROMONE && ecosystem.isPheromoneFrom(_x, _y)
-                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(actor)
-                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(actor))
+                    } else if (typeOfAdd == ElementActorType.FOOD_PHEROMONE)
                     {
-
-                    }*/
+                        Pheromone p = ecosystem.isPheromoneFrom(_x, _y, selectedAnthill, PheromoneType.RESSOURCE);
+                        if (p != null) 
+                        {
+                            ecosystem.removePheromone(p);
+                            p.remove();
+                        }
+                    } else if (typeOfAdd == ElementActorType.HOME_PHEROMONE)
+                    {
+                        Pheromone p = ecosystem.isPheromoneFrom(_x, _y, selectedAnthill, PheromoneType.HOME);
+                        if (p != null) 
+                        {
+                            ecosystem.removePheromone(p);
+                            p.remove();
+                        }
+                    }
                 }
             }
 

@@ -462,10 +462,7 @@ public class Ecosystem extends Stage
         int xCase = floatToGridCoordinate(_pheromone.getX());
         int yCase = floatToGridCoordinate(_pheromone.getY());
         int typeIndex = _pheromone.getType().getValue();
-        //if(pheromoneGridMap.containsKey(anthill.getId()))
-        {
-            pheromoneGridMap.get(anthill.getId())[xCase][yCase][typeIndex] = null;
-        }
+        pheromoneGridMap.get(anthill.getId())[xCase][yCase][typeIndex] = null;
     }
 
     public int floatToGridCoordinate(float _f) {
@@ -595,7 +592,6 @@ public class Ecosystem extends Stage
             }
             pheromoneGridMap.remove(id);
             nbAntsGridMap.remove(id);
-
             anthills.remove(actor);
             informChangeMap();
         }
@@ -628,6 +624,35 @@ public class Ecosystem extends Stage
     public int getNbAntsAt(int _x, int _y, int _anthillID) 
     {
         return nbAntsGridMap.get(_anthillID)[_x][_y];
+    }
+
+    public void resetPheromones() 
+    {
+        for (int key : pheromoneGridMap.keySet())
+        {
+            Pheromone[][][] grid = pheromoneGridMap.get(key);
+            for (int i = 0; i < grid.length; i++) 
+            {
+                for (int j = 0; j < grid[i].length; j++) 
+                {
+                    for (int k = 0; k < grid[i][j].length; k++) {
+                        if (grid[i][j][k] != null)
+                        {
+                            grid[i][j][k].remove();
+                        }
+                        grid[i][j][k] = null;
+                    }
+                }
+            }
+        }
+    }
+
+    public void resetAnts() 
+    {
+        for (Anthill a : anthills) 
+        {
+            a.removeAllAnts();
+        }
     }
 
     public int getOthersNbAntsAt(int _x, int _y, int _anthillID) {
