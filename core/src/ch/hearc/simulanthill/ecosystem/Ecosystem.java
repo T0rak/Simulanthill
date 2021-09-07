@@ -442,10 +442,7 @@ public class Ecosystem extends Stage
         int xCase = floatToGridCoordinate(_pheromone.getX());
         int yCase = floatToGridCoordinate(_pheromone.getY());
         int typeIndex = _pheromone.getType().getValue();
-        //if(pheromoneGridMap.containsKey(anthill.getId()))
-        {
-            pheromoneGridMap.get(anthill.getId())[xCase][yCase][typeIndex] = null;
-        }
+        pheromoneGridMap.get(anthill.getId())[xCase][yCase][typeIndex] = null;
     }
 
     public int floatToGridCoordinate(float _f) {
@@ -572,7 +569,6 @@ public class Ecosystem extends Stage
             }
             pheromoneGridMap.remove(id);
             nbAntsGridMap.remove(id);
-
             anthills.remove(actor);
             informChangeMap();
         }
