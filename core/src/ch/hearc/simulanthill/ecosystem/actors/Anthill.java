@@ -19,7 +19,7 @@ public class Anthill extends MapTile
     public static final float ANT_SPEED_FACTOR_DEFAULT = 1;
     public static final int ANT_FIELD_OF_VIEW_DEFAULT = 3;
     public static final int ANT_INDEPENDENCE_DEFAULT = 10;
-    public static final int MAX_ANT_DEFAULT = 10;
+    public static final int MAX_ANT_DEFAULT = 200;
     public static final float PHEROMONE_OPACITY_FACTOR_DEFAULT = 0;
 
     private static int idGenerator = 0;

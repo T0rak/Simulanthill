@@ -376,6 +376,10 @@ public class Ecosystem extends Stage
 
     public void removeMapTile(int _x, int _y) 
     {
+        if (isOnBorder(_x, _y))
+        {
+            return;
+        }
         if(isAnthill(_x, _y))
         {
             removeAnthill(_x, _y);

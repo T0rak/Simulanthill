@@ -349,7 +349,7 @@ public class Ant extends ElementActor
     public boolean isCaseToAvoid(int _x, int _y)
     {  
         int nbInCase = ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId());
-        return ecosystem.isObstacle(_x, _y) || nbInCase > ecosystem.getNbAntsAt(_x, _y, anthill.getId()) && nbInCase < ecosystem.getNbAntsAt(getXCase(), getYCase(), anthill.getId());
+        return ecosystem.isObstacle(_x, _y) || nbInCase > ecosystem.getNbAntsAt(_x, _y, anthill.getId());
     }
     
     public void avoidCase(int _x, int _y) 

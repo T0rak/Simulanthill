@@ -55,8 +55,8 @@ public class MapDimensionsScreen implements Screen
 
         lblDimensions = new VisLabel("Dimensions:");
 
-        spinWidth = new Spinner("Width", new IntSpinnerModel(DEFAULT_WIDTH, MIN_WIDTH, MAX_WIDTH));
-        spinHeight = new Spinner("Height", new IntSpinnerModel(DEFAULT_HEIGHT, MIN_HEIGHT, MAX_HEIGHT));
+        spinWidth = new Spinner("Largeur", new IntSpinnerModel(DEFAULT_WIDTH, MIN_WIDTH, MAX_WIDTH));
+        spinHeight = new Spinner("Hauteur", new IntSpinnerModel(DEFAULT_HEIGHT, MIN_HEIGHT, MAX_HEIGHT));
 
         btnValidate = new VisTextButton("Valider");
         btnCancel = new VisTextButton("Annuler");
