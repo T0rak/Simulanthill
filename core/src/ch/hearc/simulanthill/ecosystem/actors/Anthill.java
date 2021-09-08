@@ -3,12 +3,9 @@ package ch.hearc.simulanthill.ecosystem.actors;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.lang.model.util.ElementScanner6;
-
 import com.badlogic.gdx.math.MathUtils;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.tools.Asset;
 import ch.hearc.simulanthill.tools.ColorManagement;
 import com.badlogic.gdx.graphics.Color;
@@ -23,7 +20,7 @@ public class Anthill extends MapTile
     public static final int ANT_FIELD_OF_VIEW_DEFAULT = 3;
     public static final int ANT_INDEPENDENCE_DEFAULT = 10;
     public static final int MAX_ANT_DEFAULT = 10;
-    public static final float PHEROMONE_OPACITY_FACTOR = 0;
+    public static final float PHEROMONE_OPACITY_FACTOR_DEFAULT = 0;
 
     private static int idGenerator = 0;
     private static int AntCreationRate = 5;
@@ -76,7 +73,7 @@ public class Anthill extends MapTile
 
     public Anthill(int _caseX, int _caseY) 
     {
-        this(_caseX, _caseY, PHEROMONE_OPACITY_FACTOR, PHEROMONE_LIFE_TIME_DEFAULT, ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT, ANT_SPEED_FACTOR_DEFAULT, ANT_FIELD_OF_VIEW_DEFAULT, ANT_INDEPENDENCE_DEFAULT, MAX_ANT_DEFAULT, 1);
+        this(_caseX, _caseY, PHEROMONE_OPACITY_FACTOR_DEFAULT, PHEROMONE_LIFE_TIME_DEFAULT, ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT, ANT_SPEED_FACTOR_DEFAULT, ANT_FIELD_OF_VIEW_DEFAULT, ANT_INDEPENDENCE_DEFAULT, MAX_ANT_DEFAULT, 1);
     }
 
     /**

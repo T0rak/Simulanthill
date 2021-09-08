@@ -19,7 +19,6 @@ import com.kotcrab.vis.ui.widget.VisTextField;
 
 import ch.hearc.simulanthill.Simulanthill;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.actors.Ant;
 
 import java.io.File;
 

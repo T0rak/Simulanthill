@@ -23,6 +23,9 @@ public class Asset
     static private AssetDescriptor<Texture> logo = new AssetDescriptor<Texture>("logo.png", Texture.class);
     static private AssetDescriptor<Texture> anthillSelection = new AssetDescriptor<Texture>("anthillSelection.png", Texture.class);
 
+    static private AssetDescriptor<Texture> play = new AssetDescriptor<Texture>("play.png", Texture.class);
+    static private AssetDescriptor<Texture> pause = new AssetDescriptor<Texture>("pause.png", Texture.class);
+
     static private Map<Color,Texture> ants = new HashMap<Color,Texture>();
     static private Map<Color, Texture> anthillSelections = new HashMap<Color,Texture>();
     static private Map<Color, Texture> pixels = new HashMap<Color,Texture>();
@@ -37,6 +40,8 @@ public class Asset
         manager.load(Asset.icon);
         manager.load(Asset.logo);
         manager.load(Asset.anthillSelection);
+        manager.load(Asset.play);
+        manager.load(Asset.pause);
 		manager.finishLoading();
 	}
 
@@ -104,6 +109,16 @@ public class Asset
     static public Texture logo()
     {
         return manager.get(logo);
+    }
+
+    static public Texture play()
+    {
+        return manager.get(play);
+    }
+
+    static public Texture pause()
+    {
+        return manager.get(pause);
     }
 
     static public Texture anthillSelection(Color color)

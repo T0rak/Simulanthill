@@ -16,6 +16,7 @@ import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActor;
 import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
+import ch.hearc.simulanthill.ecosystem.actors.MapTile;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.PheromoneType;

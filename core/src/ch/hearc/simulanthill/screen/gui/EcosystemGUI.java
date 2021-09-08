@@ -24,6 +24,7 @@ public class EcosystemGUI extends Stage
     private List<SelectionAnthillListener> selectionAnthillListeners;
     private Anthill selectedAnthill;
     private Actor touchActor;
+    private ClickListener listener;
 
     public EcosystemGUI(Ecosystem _ecosystem)
     {
@@ -32,6 +33,104 @@ public class EcosystemGUI extends Stage
         anthillDetails = new Group();
         ecosystem = _ecosystem;
         typeOfAdd = ElementActorType.NONE;
+
+        listener = new ClickListener() {
+            int count = 0;
+            boolean dragging = false;
+            int antCreationCountdown = 0;
+            @Override
+            public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
+                setButton(_button);
+                count = 0;
+                if (_button == 0) 
+                {
+                    addElement(_x, _y);
+                }
+                dragging = true;
+                return super.touchDown(_event, _x, _y, _pointer, _button);
+            }
+            @Override
+            public void touchDragged(InputEvent _event, float _x, float _y, int _pointer) 
+            {
+                count ++;
+                if (getPressedButton() == 0)
+                {
+                    addElement(_x, _y);
+                } else if (getPressedButton() == 1)
+                {
+                    removeElement(_x, _y);
+                }
+                super.touchDragged(_event, _x, _y, _pointer);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                dragging = false;
+                super.touchUp(event, x, y, pointer, button);
+                antCreationCountdown = 0;
+            }
+
+            private void addElement(float _x, float _y) {
+                if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
+                {
+                    if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.RESOURCE) 
+                    {
+                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
+                    } else if (typeOfAdd == ElementActorType.ANTHILL && dragging == false)
+                    {
+                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
+                    }
+                     else if (selectedAnthill != null)
+                    {
+                        if (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE)
+                        {
+                            PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
+                            ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
+                        } else if (typeOfAdd == ElementActorType.ANT)
+                        {
+                            if (antCreationCountdown-- == 0)
+                            {
+                                selectedAnthill.createAntAt(_x, _y, 100000, AntState.LOST);
+                                antCreationCountdown = 10;
+                            }
+                        }
+                    }
+                }
+            }
+
+            private void removeElement(float _x, float _y) {
+                if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
+                {
+                    int xCase = ecosystem.floatToGridCoordinate(_x);
+                    int yCase = ecosystem.floatToGridCoordinate(_y);
+                    if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(xCase, yCase)
+                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(xCase, yCase)
+                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(xCase, yCase))
+                    {
+                        ecosystem.removeMapTile(xCase, yCase);
+
+                    } else if (typeOfAdd == ElementActorType.FOOD_PHEROMONE)
+                    {
+                        Pheromone p = ecosystem.isPheromoneFrom(_x, _y, selectedAnthill, PheromoneType.RESSOURCE);
+                        if (p != null) 
+                        {
+                            ecosystem.removePheromone(p);
+                            p.remove();
+                        }
+                    } else if (typeOfAdd == ElementActorType.HOME_PHEROMONE)
+                    {
+                        Pheromone p = ecosystem.isPheromoneFrom(_x, _y, selectedAnthill, PheromoneType.HOME);
+                        if (p != null) 
+                        {
+                            ecosystem.removePheromone(p);
+                            p.remove();
+                        }
+                    }
+                }
+            }
+
+		};
+        
         initAnthillDetails();
 
         ecosystem.addMapListener(new MapListener(){
@@ -118,104 +217,30 @@ public class EcosystemGUI extends Stage
                 super.exit(event, x, y, pointer, fromActor);
             }
         });
+        a.addListener(new ClickListener()
+        {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (button == 1 && typeOfAdd == ElementActorType.ANTHILL) 
+                {
+                    AnthillDetails a = (AnthillDetails)(event.getTarget().getParent());
+                    ecosystem.removeMapTile(a.getAnthill().getXCase(), a.getAnthill().getYCase());
+                }
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
 		}
         addActor(anthillDetails);
+
+        
     }
 
     private void addTouchActor()
     {
         touchActor = new Actor();
         touchActor.setBounds(0, 0, getWidth(), getHeight());
-        touchActor.addListener(new ClickListener(){
-            int count = 0;
-            boolean dragging = false;
-            @Override
-            public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
-                setButton(_button);
-                count = 0;
-                if (_button == 0) 
-                {
-                    addElement(_x, _y);
-                }
-                dragging = true;
-                return super.touchDown(_event, _x, _y, _pointer, _button);
-            }
-            @Override
-            public void touchDragged(InputEvent _event, float _x, float _y, int _pointer) 
-            {
-                count ++;
-                if (getPressedButton() == 0)
-                {
-                    addElement(_x, _y);
-                } else if (getPressedButton() == 1)
-                {
-                    removeElement(_x, _y);
-                }
-                super.touchDragged(_event, _x, _y, _pointer);
-            }
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                dragging = false;
-                super.touchUp(event, x, y, pointer, button);
-            }
-
-            private void addElement(float _x, float _y) {
-                if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
-                {
-                    if (typeOfAdd == ElementActorType.OBSTACLE || typeOfAdd == ElementActorType.RESOURCE) 
-                    {
-                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
-                    } else if (typeOfAdd == ElementActorType.ANTHILL && dragging == false)
-                    {
-                        ecosystem.addMapTiles(ecosystem.floatToGridCoordinate(_x), ecosystem.floatToGridCoordinate(_y), typeOfAdd);
-                    }
-                     else if (selectedAnthill != null)
-                    {
-                        if (typeOfAdd == ElementActorType.FOOD_PHEROMONE || typeOfAdd == ElementActorType.HOME_PHEROMONE)
-                        {
-                            PheromoneType pheromoneType = (typeOfAdd == ElementActorType.FOOD_PHEROMONE ? PheromoneType.RESSOURCE : PheromoneType.HOME);
-                            ecosystem.addPheromone(_x, _y, pheromoneType, selectedAnthill, -count);
-                        } else if (typeOfAdd == ElementActorType.ANT)
-                        {
-                            selectedAnthill.createAntAt(_x, _y, 100000, AntState.LOST);
-                        }
-                    }
-                }
-            }
-
-            private void removeElement(float _x, float _y) {
-                if (_x > 0 && _y > 0 && _x < ecosystem.getWorldMapWidth() && _y < ecosystem.getWorldMapHeight())
-                {
-                    int xCase = ecosystem.floatToGridCoordinate(_x);
-                    int yCase = ecosystem.floatToGridCoordinate(_y);
-                    if (typeOfAdd == ElementActorType.OBSTACLE && ecosystem.isObstacle(xCase, yCase)
-                    || typeOfAdd == ElementActorType.RESOURCE && ecosystem.isResource(xCase, yCase)
-                    || typeOfAdd == ElementActorType.ANTHILL && ecosystem.isAnthill(xCase, yCase))
-                    {
-                        ecosystem.removeMapTile(xCase, yCase);
-
-                    } else if (typeOfAdd == ElementActorType.FOOD_PHEROMONE)
-                    {
-                        Pheromone p = ecosystem.isPheromoneFrom(_x, _y, selectedAnthill, PheromoneType.RESSOURCE);
-                        if (p != null) 
-                        {
-                            ecosystem.removePheromone(p);
-                            p.remove();
-                        }
-                    } else if (typeOfAdd == ElementActorType.HOME_PHEROMONE)
-                    {
-                        Pheromone p = ecosystem.isPheromoneFrom(_x, _y, selectedAnthill, PheromoneType.HOME);
-                        if (p != null) 
-                        {
-                            ecosystem.removePheromone(p);
-                            p.remove();
-                        }
-                    }
-                }
-            }
-
-		});
+        touchActor.addListener(listener);
 
         addActor(touchActor);
     }

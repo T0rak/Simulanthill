@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
+import ch.hearc.simulanthill.ecosystem.actors.MapTile;
 import ch.hearc.simulanthill.ecosystem.actors.Obstacle;
 import ch.hearc.simulanthill.ecosystem.actors.Resource;
 

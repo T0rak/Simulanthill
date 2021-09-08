@@ -3,7 +3,6 @@ package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.graphics.Color;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.MapTile;
 
 /**
  * The class representing the obstacles

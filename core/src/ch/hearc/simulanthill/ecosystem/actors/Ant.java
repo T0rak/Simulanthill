@@ -1,7 +1,6 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.MapTile;
 import ch.hearc.simulanthill.tools.Asset;
 
 import static ch.hearc.simulanthill.ecosystem.actors.AntState.*;

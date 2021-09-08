@@ -9,10 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Widget;
-import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.kotcrab.vis.ui.widget.VisImageButton;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSlider;
@@ -24,7 +21,6 @@ import com.kotcrab.vis.ui.widget.spinner.Spinner;
 
 import ch.hearc.simulanthill.Simulanthill;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.actors.Ant;
 import ch.hearc.simulanthill.ecosystem.actors.Anthill;
 import ch.hearc.simulanthill.ecosystem.actors.Pheromone;
 import ch.hearc.simulanthill.ecosystem.actors.Resource;
@@ -32,7 +28,6 @@ import ch.hearc.simulanthill.tools.Asset;
 
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -56,12 +51,12 @@ public class GUI extends Stage
 	private VisTable lytInteractibles;
 	
 	private VisTextButton btnReset;
-	private VisTextButton btnPlay;
 	private VisTextButton btnResetParameters;
 	private VisTextButton btnLoadMap;
 	private VisTextButton btnGenerateMap;
 	private VisTextButton btnResetAnts;
-
+	
+	private VisImageButton btnPlay;
 	private VisImageButton btnFood;
 	private VisImageButton btnObstacle;
 	private VisImageButton btnAnt;
@@ -213,11 +208,13 @@ public class GUI extends Stage
 
 						if (ecosystem.getIsPlaying())
 						{
-							btnPlay.setText("Pause");
+							btnPlay.clearChildren();
+							btnPlay.add(new Image(Asset.pause()));
 						}
 						else
 						{
-							btnPlay.setText("Play");
+							btnPlay.clearChildren();
+							btnPlay.add(new Image(Asset.play()));
 						}
 					}
 				}
@@ -236,7 +233,7 @@ public class GUI extends Stage
 			
 		});
 
-		spinFrequence.addListener(new ChangeListener(){
+		spinFrequence.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) 
@@ -318,7 +315,7 @@ public class GUI extends Stage
 					((IntSpinnerModel)(spinFrequence.getModel())).setValue(Anthill.ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT); 	
 					((IntSpinnerModel)(spinAntIndependence.getModel())).setValue(Anthill.ANT_INDEPENDENCE_DEFAULT);
 					((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(Anthill.ANT_SPEED_FACTOR_DEFAULT));
-					sliOpacityFactor.setValue(Anthill.PHEROMONE_OPACITY_FACTOR);
+					sliOpacityFactor.setValue(Anthill.PHEROMONE_OPACITY_FACTOR_DEFAULT);
 					
 				}
 			
@@ -340,37 +337,37 @@ public class GUI extends Stage
 
 		//Create Vis Attribute
 
-		btnLoadMap = 		new VisTextButton("Load Map");
-		btnGenerateMap = 	new VisTextButton("Generate Map");
-		btnFood 			= creaImageButton(Asset.pixel(Resource.color), "Resource");
+		btnLoadMap 			= new VisTextButton("Charger une carte");
+		btnGenerateMap 		= new VisTextButton("Générer une carte");
+		btnFood 			= creaImageButton(Asset.pixel(Resource.color), "Ressource");
 		btnObstacle			= creaImageButton(Asset.pixel(Obstacle.color), "Obstacle");
-		btnAnt				= creaImageButton(Asset.ant(), "Ant");
-		btnAnthill			= creaImageButton(Asset.anthill(), "Anthill");
-		btnHomePheromone 	= creaImageButton(Asset.pixel(Pheromone.color_home), "Pheromone\nHome");
-		btnFoodPheromone 	= creaImageButton(Asset.pixel(Pheromone.color_food), "Pheromone\nFood");
+		btnAnt				= creaImageButton(Asset.ant(), "Fourmi");
+		btnAnthill			= creaImageButton(Asset.anthill(), "Fourmilière");
+		btnHomePheromone 	= creaImageButton(Asset.pixel(Pheromone.color_home), "Phéromone\nfourmilière ");
+		btnFoodPheromone 	= creaImageButton(Asset.pixel(Pheromone.color_food), "Phéromone\nressource");
 		
 
 		
-		btnResetParameters = new VisTextButton("Reset Parameters");
+		btnResetParameters = new VisTextButton("Réinitilaiser les paramètres");
 		
-		btnReset =	new VisTextButton("Full Reset");
-		btnResetAnts =	new VisTextButton("Reset ants");
-		btnPlay =	new VisTextButton("Play");
+		btnReset =		new VisTextButton("Réinitialiser l'écosystème");
+		btnResetAnts =	new VisTextButton("Réinitilaiser les fourmilières");
+		btnPlay =		new VisImageButton((new Image(Asset.play())).getDrawable());
 
 		sliOpacityFactor = new VisSlider(0f, 1f, 0.1f, false);
-		sliOpacityFactor.setValue(Anthill.PHEROMONE_OPACITY_FACTOR);
+		sliOpacityFactor.setValue(Anthill.PHEROMONE_OPACITY_FACTOR_DEFAULT);
 
 	
-		lblOpacityFactor = 		new VisLabel("Pheromone opacity");
-		lblPheromone = 	new VisLabel("Phéromones");
-		lblAnt = 		new VisLabel("Fourmis");
+		lblOpacityFactor = 		new VisLabel("Visibilité des phéromones");
+		lblPheromone = 			new VisLabel("Phéromones");
+		lblAnt = 				new VisLabel("Fourmis");
 		lblPheromone.setAlignment(Align.center);
 		lblAnt.setAlignment(Align.center);
 
 	
-		spinRadius =			new Spinner("Rayon", new IntSpinnerModel(Anthill.ANT_FIELD_OF_VIEW_DEFAULT, 0, 5));
-		spinFrequence =			new Spinner("Période entre 2", new IntSpinnerModel(Anthill.ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT, 0, 20));
-		spinAntNumber =			new Spinner("Nombre", new IntSpinnerModel(Anthill.MAX_ANT_DEFAULT, 1, 10000));
+		spinRadius =			new Spinner("Rayon de vision", new IntSpinnerModel(Anthill.ANT_FIELD_OF_VIEW_DEFAULT, 0, 5));
+		spinFrequence =			new Spinner("Période d'émission", new IntSpinnerModel(Anthill.ANT_PHEROMONE_RELEASE_FREQUENCY_DEFAULT, 0, 20));
+		spinAntNumber =			new Spinner("Nombre maximum", new IntSpinnerModel(Anthill.MAX_ANT_DEFAULT, 1, 10000));
 		spinAntIndependence =	new Spinner("Indépendance", new IntSpinnerModel(Anthill.ANT_INDEPENDENCE_DEFAULT,0, 100));
 		spinLifeTime =			new Spinner("Temps de vie", new IntSpinnerModel(Anthill.PHEROMONE_LIFE_TIME_DEFAULT, 0, 3000));
 		spinAntSpeed =			new Spinner("Vitesse", new FloatSpinnerModel(Float.toString(Anthill.ANT_SPEED_FACTOR_DEFAULT), "0", "9", "0.5", 1));
@@ -384,13 +381,13 @@ public class GUI extends Stage
 		//Fill main layout
 
 		int padding = 5;
-		lytMain.add(lytSimulation).pad(padding);
-		lytMain.add(lytParameters).pad(padding);
+		lytMain.add(lytSimulation);
+		lytMain.add(lytParameters);
 
 		//Fill simulation layout
 		//lytSimulation.add(simulationImage).colspan(4);
 	
-		lytSimulation.add(simulation).colspan(5).size((int)(1600/1.25), (int)(900/1.25)).pad(padding);
+		lytSimulation.add(simulation).colspan(5).size((int)(1600/1.25), (int)(900/1.25));
 		lytSimulation.row();
 		lytSimulation.add(btnReset).pad(padding);
 		lytSimulation.add(btnResetAnts).pad(padding);
@@ -451,15 +448,24 @@ public class GUI extends Stage
 
 
 	public void selectAnthill(Anthill _anthill) {
-		float value = sliOpacityFactor.getValue();
 		if (selectedAnthill != null)
 		{	
-			sliOpacityFactor.setValue(Anthill.PHEROMONE_OPACITY_FACTOR);
+			selectedAnthill.setPheromoneOpacityFactor(Anthill.PHEROMONE_OPACITY_FACTOR_DEFAULT);
+			
 		}
-		
 		selectedAnthill = _anthill;
-		sliOpacityFactor.setValue(value);
+		Image img = new Image(Asset.ant(_anthill.getAntColor()));
+		
+		selectedAnthill.setPheromoneOpacityFactor(sliOpacityFactor.getValue());
+		
 		btnAnt.setVisible(true);
+		btnAnt.clearChildren();
+		btnAnt.add(img);
+		btnAnt.row();
+		VisLabel lbl = new VisLabel("Fourmi");
+		lbl.setAlignment(Align.center);
+		btnAnt.add(lbl);
+		
 		btnFoodPheromone.setVisible(true);
 		btnHomePheromone.setVisible(true);
 
@@ -469,9 +475,10 @@ public class GUI extends Stage
 		((IntSpinnerModel)(spinFrequence.getModel())).setValue(selectedAnthill.getAntPheromoneReleaseFrequency()); 	
 		((IntSpinnerModel)(spinAntIndependence.getModel())).setValue(selectedAnthill.getAntIndependance());
 		((FloatSpinnerModel)(spinAntSpeed.getModel())).setValue(new BigDecimal(selectedAnthill.getAntSpeedFactor()));
-		sliOpacityFactor.setValue(selectedAnthill.getPheromoneOpacityFactor());
-
+		
 		lblOpacityFactor.setVisible(true);
+		sliOpacityFactor.setVisible(true);
+
 		lblPheromone.setVisible(true);
 		lblAnt.setVisible(true);
 		btnResetParameters.setVisible(true);
@@ -481,17 +488,21 @@ public class GUI extends Stage
 		spinFrequence.setVisible(true);
 		spinAntIndependence.setVisible(true);
 		spinAntSpeed.setVisible(true);
-		sliOpacityFactor.setVisible(true);
+		
 	}
 
 	public void unselectAnthill() {
+		
 		if (selectedAnthill != null)
 		{	
-			sliOpacityFactor.setValue(Anthill.PHEROMONE_OPACITY_FACTOR);
+			selectedAnthill.setPheromoneOpacityFactor(Anthill.PHEROMONE_OPACITY_FACTOR_DEFAULT);
 		}
-		selectedAnthill = null;
-		btnResetParameters.setVisible(false);
+
 		lblOpacityFactor.setVisible(false);
+		sliOpacityFactor.setVisible(false);
+
+		btnResetParameters.setVisible(false);
+		
 		lblPheromone.setVisible(false);
 		lblAnt.setVisible(false);
 		btnAnt.setVisible(false);
@@ -504,7 +515,8 @@ public class GUI extends Stage
 		spinFrequence.setVisible(false);
 		spinAntIndependence.setVisible(false);
 		spinAntSpeed.setVisible(false);
-		sliOpacityFactor.setVisible(false);
+		//selectedAnthill = null;
+		
 	}
 
 	public void signalSelectionListener(ElementActorType _type)
