@@ -1,0 +1,56 @@
+#####################################################################################################################
+#                                         #                                          #                              #
+#                                         #                                          #                              #
+#                                         #                                          #              rr   R          #
+#             R                           #                                          #            rr   R            #
+#          RRRRRR                         #                                          #              rrr             #
+#      RRRRRRRRRRRRR                      #                                          #                              #
+#         RRRRRRRRRRRRRRRRRR              #                                          #     rrrrrr                   #
+#   RRRRRRRRRRRRRR                        #                                          #                              #
+#      RRRRRRRRRRRRRRR                    ######                                     ########                       #
+#            RRRRRRRRRRRRRRRRR            ###                                                                       #
+#      RRRRRRRRRRRRRRRRRRR                #######                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+###                                              O                                                                  #
+######                                                                                                              #
+#############                                                                                                       #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#                                                                                                                   #
+#RRRRRRRRRRRRRRRRRR                                                                                                 #
+#RRRRRRRRRRRRRR                                                                                                     #
+#   RRRRRRRRRRRRRRR                                                                                                 #
+#         RRRRRRRRRRRRRRRRR                                                               RRRRRRRRRRRRRRRRR         #
+#   RRRRRRRRRRRRRRRRRRR                                                                                             #
+#                                                                                                                   #
+#                                                                        RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R             RRRRRRRRRRR                   ##############
+#                                                          R             RRRRRRRRRRR                                #
+#                                                          R                                                        #
+#                                                          R                                                        #
+#                                                          R                                    O                   #
+#                                                          R                                                        #
+#####################################################################################################################
