@@ -4,9 +4,12 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.actors.Ant;
+import ch.hearc.simulanthill.ecosystem.actors.Anthill;
+import ch.hearc.simulanthill.ecosystem.actors.ElementActorType;
 import ch.hearc.simulanthill.screen.gui.EcosystemGUI;
 import ch.hearc.simulanthill.screen.gui.GUI;
+import ch.hearc.simulanthill.screen.gui.SelectionAnthillListener;
+import ch.hearc.simulanthill.screen.gui.SelectionTypeOfAddListener;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -43,14 +46,38 @@ public class MainScreen implements Screen
 		ecosystemViewport = new FitViewport(1600,900);
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
-		System.out.println(Ecosystem.getCurrentEcosystem());
-		ecosystem.loadMap(124, 70);
+		Ecosystem.getCurrentEcosystem().loadMap(80, 43);
+		//ecosystem.loadMap(124, 70);
 
-
-		Ant.setSpeedFactor(1);
 		gui = new GUI(GUIViewport, game); 
 
 		guiEco = new EcosystemGUI(ecosystem);
+
+		guiEco.addListener(new SelectionAnthillListener(){
+
+			@Override
+			public void selected(Anthill _anthill) {
+				gui.selectAnthill(_anthill);
+			}
+
+			@Override
+			public void unselected() {
+				gui.unselectAnthill();
+				
+			}
+			
+		});
+
+		gui.addListener(new SelectionTypeOfAddListener(){
+
+			@Override
+			public void changed(ElementActorType _type) {
+				guiEco.changeTypeOfAdd(_type);
+			}
+			
+		});
+
+		
 
 			
 	}

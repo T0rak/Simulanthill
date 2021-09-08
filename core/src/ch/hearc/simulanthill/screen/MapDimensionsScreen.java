@@ -15,7 +15,6 @@ import com.kotcrab.vis.ui.widget.spinner.Spinner;
 
 import ch.hearc.simulanthill.Simulanthill;
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
-import ch.hearc.simulanthill.ecosystem.actors.Ant;
 
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel;
 
@@ -36,8 +35,8 @@ public class MapDimensionsScreen implements Screen
     private VisTextButton btnValidate;
 	private VisTextButton btnCancel;
 
-    private static final int DEFAULT_WIDTH = 70;
-    private static final int DEFAULT_HEIGHT = 70;
+    private static final int DEFAULT_WIDTH = 80;
+    private static final int DEFAULT_HEIGHT = 43;
     private static final int MIN_WIDTH = 15;
     private static final int MIN_HEIGHT = 15;
     private static final int MAX_WIDTH = 150;
@@ -96,7 +95,6 @@ public class MapDimensionsScreen implements Screen
 
                         ecosystem.loadMap(newWidth, newHeight);
                         //Ant.setSpeedFactor(((FloatSpinnerModel)spinAntSpeed.getModel()).getValue().floatValue());
-                        Ant.updateSpeed();
                     }
                     ((Simulanthill)MapDimensionsScreen.this.game).displayMainScreen();
                             

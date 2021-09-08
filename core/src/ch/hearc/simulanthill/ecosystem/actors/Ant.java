@@ -1,20 +1,17 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 import com.badlogic.gdx.math.MathUtils;
-
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.tools.Asset;
+
+import static ch.hearc.simulanthill.ecosystem.actors.AntState.*;
 
 /**
  * The ant actor that contains it's behaviour
  */
 public class Ant extends ElementActor
 {
-    private static int PHEROMONE_RELEASE_COUNTDOWN = 5;
-    private static int NEXT_CHECK_COUNTDOWN = 10;
-    private static final int MAX_CAPACITY = 1;
-    private static int FIELD_OF_VIEW = 3;
 
-	private static double speed = 0;
-    private static float speedFactor = 1f;
+    private static final int MAX_CAPACITY = 1;
     
     private float direction;
     private int viewSpanAngle;
@@ -27,7 +24,10 @@ public class Ant extends ElementActor
     private int lastStepFrom;
     private int countLastPhero;
     private boolean blocked;    
+    private AntState state;
     
+    private int avoidObstacleMemory;
+
 	/**
 	 * Constructor
 	 * @param  _x the initial x position of the ant 
@@ -36,25 +36,39 @@ public class Ant extends ElementActor
      * @param  _height the height of the ant
      * @param  _anthill the anthill to which one an ant belongs
 	 */
-    public Ant(float _x, float _y, int _width, int _height, Anthill _anthill)
+    public Ant(float _x, float _y, float _width, float _height, Anthill _anthill, int _stepFrom, AntState _state)   
     {
-        super(_x, _y, _width, _height, _anthill.getTexture());
+        super(_x, _y, _width, _height, Asset.ant(_anthill.getAntColor()), Ecosystem.getCurrentEcosystem());
+        state = _state;
+        capacity = 0;
+        viewSpanAngle = 15;
+        
+        setDirection(MathUtils.random(360f));
+        
+        anthill = _anthill;
 
-        this.capacity = 0;
-        this.viewSpanAngle = 15;
-
-        this.direction = MathUtils.random(360f);
-        this.sprite.rotate(this.direction);
-
-        this.anthill = _anthill;
-
-        this.pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
-        this.stepFrom = 0;
-        this.lastStepFrom = Integer.MAX_VALUE;
+        pheromoneCountdown = anthill.getAntPheromoneReleaseFrequency();
+        stepFrom = _stepFrom;
+        lastStepFrom = Integer.MAX_VALUE;
         countLastPhero = 0;
         
         blocked = false;
-        checkCountdown = NEXT_CHECK_COUNTDOWN;
+        checkCountdown = anthill.getAntIndependance();
+    }
+
+    public void setDirection(float _direction)
+    {
+        float newDirection = _direction % 360f;
+        if (newDirection < 0)
+        {
+            newDirection =  newDirection + 360;            
+        }
+
+        float deltaDirection = newDirection - this.direction;
+
+        sprite.rotate(deltaDirection);
+
+        direction = newDirection;
     }
 
     /**
@@ -65,7 +79,8 @@ public class Ant extends ElementActor
     public void act(float _delta)
     {
         super.act(_delta);
-        if (capacity < MAX_CAPACITY)
+        
+        if (state == SEARCHING_RESOURCE || state == LOST)
         {
             tryCollectFood();
         }
@@ -74,11 +89,11 @@ public class Ant extends ElementActor
             tryDepositFood();   
         }
 
-        if (capacity < MAX_CAPACITY)
+        if (state == SEARCHING_RESOURCE)
         {   
             releasePheromone(PheromoneType.HOME);   
         }
-        else
+        else if (state == SEARCHING_ANTHILL)
         {
             releasePheromone(PheromoneType.RESSOURCE);
         }
@@ -87,7 +102,7 @@ public class Ant extends ElementActor
         {
             ElementActor newGoal = null;
             
-            if (capacity < MAX_CAPACITY)
+            if (state == SEARCHING_RESOURCE || state == LOST)
             {
                 newGoal = searchFood();
                 
@@ -120,16 +135,22 @@ public class Ant extends ElementActor
             if (checkCountdown < 0)
             {
                 followGoal();
-                checkCountdown = NEXT_CHECK_COUNTDOWN;
+                checkCountdown = anthill.getAntIndependance();
             }
             else
             {
                 explore();
             }
         }
+
         move();
-    
-        checkCountdown --;
+        
+        if (ecosystem.isObstacle(xCase, yCase))
+        {
+            ecosystem.moveAntOnGrid(xCase, yCase, anthill.getXCase(), anthill.getYCase(), anthill.getId());
+            setPosition(anthill.getX(), anthill.getY());
+        }
+        checkCountdown--;
         pheromoneCountdown--;
         stepFrom++;
     }
@@ -139,17 +160,23 @@ public class Ant extends ElementActor
 	 */
     public void tryCollectFood()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.isResource(ecosystem.getElementFrom(getX(), getY()))) 
+        
+        if (ecosystem.isResource(xCase, yCase))
         {
-            capacity += ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
-            if (capacity >= MAX_CAPACITY)
+            int res = ecosystem.takeResource(getX(), getY(), MAX_CAPACITY - capacity);
+            
+            capacity += res;
+            if (res != 0)
             {
+                goal = null;
                 stepFrom = 0;
                 lastStepFrom = Integer.MAX_VALUE;
+                if (capacity >= MAX_CAPACITY)
+                {
+                    state = SEARCHING_ANTHILL;
+                }
             }
-            goal = null;
-            
+
         }
     }
     /**
@@ -157,19 +184,17 @@ public class Ant extends ElementActor
 	 */
     public void tryDepositFood()
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        ElementActor actorFound = ecosystem.getElementFrom(getX(), getY());
+        
+        MapTile actorFound = ecosystem.getMapTileAt(xCase, yCase);
+        
         if (ecosystem.isAnthill(actorFound) && anthill == (Anthill)actorFound) 
         {
-            anthill.addRessource(capacity);
+            anthill.addResource(capacity);
             capacity = 0;
             stepFrom = 0;
             goal = null;
             lastStepFrom = Integer.MAX_VALUE;
-            if (ecosystem.getNbAnt() > ecosystem.getNbAntMax())
-            {
-                anthill.removeAnt(this);
-            }
+            state = SEARCHING_RESOURCE;
         }
     }
     
@@ -181,7 +206,7 @@ public class Ant extends ElementActor
     {
         Anthill actor = (Anthill)checkRadial(Anthill.class);
 
-        if(actor != null && actor != anthill)
+        if (actor != null && actor != anthill)
         {
             return null;
         }
@@ -205,7 +230,7 @@ public class Ant extends ElementActor
 	 */
     public ElementActor searchPheromone(PheromoneType _type)
     {
-
+        
         Pheromone res = checkRadialPheromone(_type);
 
         if (res != null && (res.getStepFrom() < lastStepFrom || countLastPhero == 200))
@@ -238,11 +263,8 @@ public class Ant extends ElementActor
     {
         if (goal != null && blocked == false)
         {
-            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getY() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getY(), goal.getX() + Ecosystem.getCurrentEcosystem().getMapCaseSize()/2 - getX());
-            float deltaDirection = (float)(newDirection - this.direction) % 360f;
-
-            direction = newDirection;
-            sprite.rotate(deltaDirection);
+            float newDirection = MathUtils.radiansToDegrees * MathUtils.atan2(goal.getCenteredY() - getY(), goal.getCenteredX() - getX());
+            setDirection(newDirection);
         }
     }
 
@@ -252,9 +274,8 @@ public class Ant extends ElementActor
 	 */
     public void explore()
     {
-        float deltaDirection = MathUtils.random(this.viewSpanAngle) - this.viewSpanAngle / 2f;
-        direction = (float)(this.direction + deltaDirection) % 360f;
-        sprite.rotate(deltaDirection);
+        float deltaDirection = MathUtils.random(this.viewSpanAngle * anthill.getAntSpeedFactor()) - this.viewSpanAngle * anthill.getAntSpeedFactor() / 2f;
+        setDirection(this.direction + deltaDirection);
     }
 
     /**
@@ -262,26 +283,136 @@ public class Ant extends ElementActor
 	 */
     public void move()
     {
-        if (blocked)
+        float caseSize = ecosystem.getMapCaseSize();
+        
+        float directionRad = (float) Math.toRadians(direction);
+        
+        float nextCaseFloatX = (float) (getX() + MathUtils.cos(directionRad) * caseSize);
+        float nextCaseFloatY = (float) (getY() + MathUtils.sin(directionRad) * caseSize);
+
+        int nextCaseX = ecosystem.floatToGridCoordinate(nextCaseFloatX);
+        int nextCaseY = ecosystem.floatToGridCoordinate(nextCaseFloatY);
+
+        int dx = nextCaseX - xCase;
+        int dy = nextCaseY - yCase;
+
+        int referenceX = nextCaseX;
+        int referenceY = nextCaseY;
+        
+        if (Math.abs(dx) == Math.abs(dy))
         {
-            float deltaDirection = MathUtils.random(-40f, 40f);
-            direction = (float)(direction + deltaDirection) % 360f;
-            sprite.rotate(deltaDirection);
+            int rand0 = MathUtils.random(0,1);
+            int rand1 = Math.abs(rand0 - 1);
+            
+            int x2 = xCase + rand0 * dx;
+            int y2 = yCase + rand1 * dy;
+
+            int x3 = xCase + rand1 * dx;
+            int y3 = yCase + rand0 * dy;
+            
+            if (isCaseToAvoid(x2, y2))
+            {
+                referenceX = x2;
+                referenceY = y2;
+            }
+            else if (isCaseToAvoid(x3, y3))
+            {
+                referenceX = x3;
+                referenceY = y3;
+            }
+            
         }
-        float directionRad = (float) Math.toRadians(this.direction);
-        float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * Ant.speed);
-        float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * Ant.speed);
+        
+        if (isCaseToAvoid(referenceX, referenceY))
+        {
+            avoidCase(referenceX, referenceY);
+        } else
+        {
+            avoidObstacleMemory = 0;
+        }
+        
+        float nextPosX = (float) (getX() + MathUtils.cos(directionRad) * anthill.getAntSpeedFactor()* ecosystem.getMapCaseSize()/10);
+        float nextPosY = (float) (getY() + MathUtils.sin(directionRad) * anthill.getAntSpeedFactor() * ecosystem.getMapCaseSize()/10);
 
         if (!canMove(nextPosX, nextPosY))
         {
             blocked = true;
-        }
-        else
+        } else 
         {
             blocked = false;
+            ecosystem.moveAntOnGrid(xCase, yCase, ecosystem.floatToGridCoordinate(nextPosX), ecosystem.floatToGridCoordinate(nextPosY), anthill.getId());
             setPosition(nextPosX, nextPosY);
 
         }
+    }
+
+    public boolean isCaseToAvoid(int _x, int _y)
+    {  
+        int nbInCase = ecosystem.getOthersNbAntsAt(_x,_y, anthill.getId());
+        return ecosystem.isObstacle(_x, _y) || nbInCase > ecosystem.getNbAntsAt(_x, _y, anthill.getId()) && nbInCase < ecosystem.getNbAntsAt(getXCase(), getYCase(), anthill.getId());
+    }
+    
+    public void avoidCase(int _x, int _y) 
+    {
+        if (avoidObstacleMemory == 0)
+        {
+            float caseSize = ecosystem.getMapCaseSize();
+
+            int dx = _x - xCase;
+            int dy = _y - yCase;
+
+            if (dx == 0 && dy != 0)
+            {
+                if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
+                {
+                    avoidObstacleMemory = -1;
+                }
+                else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
+                {
+                    avoidObstacleMemory = 1;
+                }
+                else
+                {
+                    avoidObstacleMemory = MathUtils.random(0, 1);
+                    if (avoidObstacleMemory == 0)
+                    {
+                        avoidObstacleMemory = -1;
+                    }
+
+                }
+            }
+            else if (dy == 0 && dx != 0)
+            {
+                if (direction > 0 && direction < 90 || direction > 180 && direction < 270)
+                {
+                    avoidObstacleMemory = 1;
+                }
+                else if (direction > 90 && direction < 180 || direction > 270 && direction < 360)
+                {
+                    avoidObstacleMemory = -1;
+                }
+                else
+                {
+                    avoidObstacleMemory = MathUtils.random(0, 1);
+                    if (avoidObstacleMemory == 0)
+                    {
+                        avoidObstacleMemory = -1;
+                    }
+                }
+            }
+            else
+            {
+                float verticeX = (_x + (-(- dx - 1 ) / 2f) * caseSize);
+                float verticeY = (_y + (-(- dy - 1) / 2f) * caseSize);
+
+                float angle = MathUtils.atan2(getY() - verticeY ,getX() - verticeX);
+                avoidObstacleMemory = (int)Math.signum(direction - angle);
+            } 
+        }
+            
+        float deltaDirection = 15 * avoidObstacleMemory * (float)Math.sqrt(Math.sqrt(anthill.getAntSpeedFactor()));
+        
+        setDirection(direction + deltaDirection);
     }
     
     /**
@@ -290,61 +421,16 @@ public class Ant extends ElementActor
 	 */
     public void releasePheromone(PheromoneType _type) 
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        if (ecosystem.getElementFrom(getX(), getY()) == null)
+        
+        if (ecosystem.getMapTileAt(xCase, yCase) == null)
         {
             if (pheromoneCountdown < 0)
             {
-                ecosystem.addPheromone(getX(), getY(), _type, this, stepFrom);
-                pheromoneCountdown = PHEROMONE_RELEASE_COUNTDOWN;
+                ecosystem.addPheromone(new Pheromone(getX(), getY(), _type, anthill, stepFrom));
+                pheromoneCountdown = anthill.getAntPheromoneReleaseFrequency();
             }
         }
         
-    }
-
-    /**
-	 * Changes the field of view of the ant
-     @param _fieldOfView new field of view
-	 */    
-    public static void setFielOfView(int _fieldOfView)
-    {
-        FIELD_OF_VIEW = _fieldOfView;
-    }
-
-    /**
-	 * Changes the pheromone release frequency
-     * @param  _releasePheromoneTime the number of cycles before the ant releases an new pheromone
-	 */
-    public static void setReleasePheromoneTime(int _releasePheromoneTime)
-    {
-        PHEROMONE_RELEASE_COUNTDOWN = _releasePheromoneTime;
-    }
-
-    /**
-	 * Changes the movement speed of the ant
-     * @param _speed new speed
-	 */
-    public static  void setSpeedFactor(float _speedFactor)
-    {
-        speedFactor = _speedFactor;
-        Ant.updateSpeed();
-    }
-    /**
-    * Changes the movement speed of the ant
-    * @param _speed new speed
-    */
-    public static  void updateSpeed()
-    {
-        speed = speedFactor * Ecosystem.getCurrentEcosystem().getMapCaseSize() / 10;
-    }
-
-    /**
-	 * Changes the autonomy of the ant (how often it follows pheromones, resources)
-     * @param _autonomy the number of cycles before the ant checks for goals
-	 */
-    public static void setAutonomy(int _autonomy)
-    {
-        NEXT_CHECK_COUNTDOWN = _autonomy;
     }
 
 
@@ -352,8 +438,8 @@ public class Ant extends ElementActor
     public void setPosition(float _x, float _y) 
     {
         super.setPosition(_x, _y);
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        sprite.setPosition(_x - getWidth()/2 + ecosystem.getMapCaseSize()/2, _y - getHeight()/2 + ecosystem.getMapCaseSize()/2);
+        
+        sprite.setPosition(_x - getWidth()/2, _y - getHeight()/2);
     }
 
     public Anthill getAnthill()
@@ -363,25 +449,21 @@ public class Ant extends ElementActor
 
     private boolean canMove(float _destinationX, float _destinationY) {
 
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        int destinationXCase = ecosystem.castInCase(_destinationX);
-        int destinationYCase = ecosystem.castInCase(_destinationY);
-
-        int initXCase = ecosystem.castInCase(getX());
-        int initYCase = ecosystem.castInCase(getY());
-
-        int dx = destinationXCase - initXCase;
-        int dy = destinationYCase - initYCase;
         
+        int destinationXCase = ecosystem.floatToGridCoordinate(_destinationX);
+        int destinationYCase = ecosystem.floatToGridCoordinate(_destinationY);
 
-        if (ecosystem.isObstacle(ecosystem.getElement(destinationXCase, destinationYCase))) 
+        int dx = destinationXCase - xCase;
+        int dy = destinationYCase - yCase;
+        
+        if (ecosystem.isObstacle(destinationXCase, destinationYCase)) 
         {
             return false;
         }
         
         if (dx != 0 && dy != 0) 
         {
-            if (ecosystem.isObstacle(ecosystem.getElement(initXCase, initYCase + dy)) && ecosystem.isObstacle(ecosystem.getElement(initXCase + dx, initYCase)))
+            if (ecosystem.isObstacle(xCase, yCase + dy) && ecosystem.isObstacle(xCase + dx, yCase))
             {
                 return false;
             }
@@ -401,12 +483,9 @@ public class Ant extends ElementActor
      */
     public ElementActor checkRadial(Class<?> _class)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         ElementActor res = null;
         float distance = 0;
-        
-        int xCase = ecosystem.castInCase(getX());
-        int yCase = ecosystem.castInCase(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -441,16 +520,16 @@ public class Ant extends ElementActor
      */
     private ElementActor checkRadialLine(int _x, int _y, int _dx, int _dy, Class<?> _class)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        for (int i = 1; i <= FIELD_OF_VIEW; i++)
+        
+        for (int i = 1; i <= anthill.getAntFieldOfView(); i++)
         {
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
             
             if (Math.abs(_dx) == Math.abs(_dy))
             {
-                ElementActor actor2 = ecosystem.getElement(xi - _dx, yi);
-                ElementActor actor3 = ecosystem.getElement(xi, yi - _dy);
+                ElementActor actor2 = ecosystem.getMapTileAt(xi - _dx, yi);
+                ElementActor actor3 = ecosystem.getMapTileAt(xi, yi - _dy);
 
                 if (ecosystem.isInstanceOf(actor2, _class))
                 {
@@ -464,24 +543,19 @@ public class Ant extends ElementActor
                 }
 
                 
-                if (ecosystem.isObstacle(actor2))
-                {
-                    return null;
-                }
-
-                if (ecosystem.isObstacle(actor3))
+                if (isCaseToAvoid(xi - _dx, yi) || isCaseToAvoid(xi, yi - _dy))
                 {
                     return null;
                 }
             }
 
-            ElementActor actor = ecosystem.getElement(xi, yi);
+            ElementActor actor = ecosystem.getMapTileAt(xi, yi);
 
             if (ecosystem.isInstanceOf(actor, _class))
             {
                 return actor;
             }
-            else if (ecosystem.isObstacle(actor))
+            else if (isCaseToAvoid(xi, yi))
             {
                 return null;
             }
@@ -501,13 +575,8 @@ public class Ant extends ElementActor
      
     public Pheromone checkRadialPheromone(PheromoneType _type)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
-        
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
-
-        int xCase = ecosystem.castInCase(getX());
-        int yCase = ecosystem.castInCase(getY());
 
         for (int i = -1; i <= 1; i++)
         {
@@ -544,17 +613,22 @@ public class Ant extends ElementActor
      */
     private Pheromone checkRadialLinePheromone(int _x, int _y, int _dx, int _dy, PheromoneType _type)
     {
-        Ecosystem ecosystem = Ecosystem.getCurrentEcosystem();
+        
         Pheromone res = null;
         int resStepFrom = Integer.MAX_VALUE;
 
-        for (int i = 1; i <= FIELD_OF_VIEW; i++)
+        for (int i = 1; i <= anthill.getAntFieldOfView(); i++)
         {
             int xi = _x + i * _dx;
             int yi = _y + i * _dy;
 
             if (Math.abs(_dx) == Math.abs(_dy))
             {
+                if (isCaseToAvoid(xi - _dx, yi) || isCaseToAvoid(xi, yi - _dy))
+                {
+                    return res;
+                }
+
                 Pheromone actor2 = (Pheromone)ecosystem.isPheromone(xi - _dx, yi, anthill, _type);
                 
                 if (actor2 != null)
@@ -576,16 +650,12 @@ public class Ant extends ElementActor
                         resStepFrom = actor3.getStepFrom();
                     }
                 }
-
-                if (ecosystem.isObstacle(ecosystem.getElement(xi - _dx, yi)))
-                {
-                    return res;
-                }
-                if (ecosystem.isObstacle(ecosystem.getElement(xi, yi - _dy)))
-                {
-                    return res;
-                }
             }
+            if (isCaseToAvoid(xi, yi))
+            {
+                return res;
+            }
+
             Pheromone actor = ecosystem.isPheromone(xi, yi, anthill, _type);
             if (actor != null)
             {
@@ -596,14 +666,9 @@ public class Ant extends ElementActor
                 }
                 
             }
-            else if (ecosystem.isObstacle(ecosystem.getElement(xi, yi)))
-            {
-                return res;
-            }
+            
 
         }
         return res;
     }
-
-    
 }

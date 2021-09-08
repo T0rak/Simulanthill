@@ -1,9 +1,9 @@
 package ch.hearc.simulanthill.ecosystem.actors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 
 import ch.hearc.simulanthill.ecosystem.Ecosystem;
+import ch.hearc.simulanthill.tools.Asset;
 
 /**
  * Class that handle the pheromones in the simulator inherits form ElementActor
@@ -11,15 +11,13 @@ import ch.hearc.simulanthill.ecosystem.Ecosystem;
  */
 public class Pheromone extends ElementActor 
 {
-    
-    private static int INIT_LIFE_TIME = 200;
 	private int lifeTime;
+	private int initLifeTime;
 	private PheromoneType pheromoneType;
 	private int stepFrom;
-	private Ant ant;
-	private static float opacityFactor = 0;
-	private static final Texture foodTexture = createColorImage(new Color(255/255f, 153/255f, 51/255f, 1));
-	private static final Texture homeTexture = createColorImage(new Color(102/255f, 255/255f, 102/255f, 1));
+	private Anthill anthill;
+	public static final Color color_food = new Color(255/255f, 153/255f, 51/255f, 1);
+	public static final Color color_home = new Color(102/255f, 255/255f, 102/255f, 1);
 
 	/**
 	 * Constructor of pheromone
@@ -29,22 +27,15 @@ public class Pheromone extends ElementActor
 	 * @param _ant ant that releases the pheromone
 	 * @param _stepFrom steps from the last goal that the ant releasing the pheromone reached.
 	 */
-	public Pheromone(float _posX, float _posY, PheromoneType _type, Ant _ant, int _stepFrom)
+	public Pheromone(float _posX, float _posY, PheromoneType _type, Anthill _anthill, int _stepFrom)
 	{
-		super(_posX, _posY, 4, 4, (_type == PheromoneType.HOME ? homeTexture : foodTexture));
-		ant = _ant;
-		lifeTime = INIT_LIFE_TIME;
+		super(_posX, _posY, Ecosystem.getCurrentEcosystem().getMapCaseSize()/3, Ecosystem.getCurrentEcosystem().getMapCaseSize()/3, (_type == PheromoneType.HOME ? Asset.pixel(color_home) : Asset.pixel(color_food)), Ecosystem.getCurrentEcosystem());
+		anthill = _anthill;
+		lifeTime = _anthill.getPheromoneLifeTime();
+		initLifeTime = lifeTime;
 		pheromoneType = _type;
 		stepFrom = _stepFrom;
-	}
-
-	/**
-	 * Sets the lifetime of the pheromone
-	 * @param _lifeTimeInit litetime to set
-	 */
-	public static void setLifetimeInit(int _lifeTimeInit)
-	{
-		INIT_LIFE_TIME = _lifeTimeInit;
+		setOpacity();
 	}
 
 	/**
@@ -53,12 +44,33 @@ public class Pheromone extends ElementActor
 	 */
 	public void decreaseLifeTime()
 	{
-		this.lifeTime--;
+
+		lifeTime--;
+
+		if (initLifeTime != anthill.getPheromoneLifeTime())
+		{
+			if (initLifeTime != 0)
+			{
+				lifeTime = (int)(lifeTime * anthill.getPheromoneLifeTime() / (float)initLifeTime);
+			}
+			else{
+				lifeTime = 0;
+			}
+			
+			initLifeTime = anthill.getPheromoneLifeTime();
+		}
+		
 		if (lifeTime <= 0) 
 		{
 			remove();
 		}
-		sprite.setAlpha(opacityFactor * (lifeTime/(float)INIT_LIFE_TIME));
+		setOpacity();
+	}
+
+
+	public void setOpacity()
+	{
+		sprite.setAlpha(anthill.getPheromoneOpacityFactor() * (lifeTime / (float)anthill.getPheromoneLifeTime()));
 	}
 
 	/**
@@ -71,14 +83,13 @@ public class Pheromone extends ElementActor
 	}
 
 
-
 	/**
 	 * Reinforces the lifetime of a pheromone
 	 * the reinforcement gives back the maximum lifetime to the pheromone. 
 	 */
 	public void reinforce()
 	{
-		lifeTime = INIT_LIFE_TIME;
+		lifeTime = anthill.getPheromoneLifeTime();
 	}
 
 	/**
@@ -104,9 +115,9 @@ public class Pheromone extends ElementActor
 	 * getter on the ant that released the pheromone.
 	 * @return the ant that released the pheromone.
 	 */
-	public Ant getAnt() 
+	public Anthill getAnthill() 
 	{
-		return ant;
+		return anthill;
 	}
 	
 	/**
@@ -126,15 +137,6 @@ public class Pheromone extends ElementActor
 	{
 		Ecosystem.getCurrentEcosystem().removePheromone(this);
 		return super.remove();
-	}
-
-	/**
-	 * Sets the opacity of a pheromone. This makes the pheromone visible on the scene
-	 * @param _opacityFactor the opacity wanted of the pheromone.
-	 */
-	public static void setOpacityFactor(float _opacityFactor)
-	{
-		opacityFactor = _opacityFactor;
 	}
 
 }

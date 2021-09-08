@@ -5,7 +5,7 @@ package ch.hearc.simulanthill.ecosystem.actors;
  */
 public enum ElementActorType 
 {
-    OBSTACLE(0), RESSOURCE(1), ANTHILL(2), HOME_PHEROMONE(3), FOOD_PHEROMONE(4);
+    NONE(-1), OBSTACLE(0), RESOURCE(1), ANTHILL(2), HOME_PHEROMONE(3), FOOD_PHEROMONE(4), ANT(5);
     
     private final int value;
 
@@ -25,5 +25,27 @@ public enum ElementActorType
     public int getValue() 
     {
         return value;
+    }
+
+    public static ElementActorType fromValue(int i)
+    {
+        switch (i) {
+            case -1:
+                return NONE;
+            case 0:
+                return OBSTACLE;
+            case 1:
+                return RESOURCE;
+            case 2:
+                return ANTHILL;
+            case 3:
+                return HOME_PHEROMONE;
+            case 4:
+                return FOOD_PHEROMONE;
+            case 5:
+                return ANT;
+            default:
+                return null;
+        }
     }
 }
