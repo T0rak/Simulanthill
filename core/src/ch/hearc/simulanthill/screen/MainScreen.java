@@ -46,7 +46,7 @@ public class MainScreen implements Screen
 		ecosystemViewport = new FitViewport(1600,900);
 
 		ecosystem = Ecosystem.getInstance(ecosystemViewport);
-		Ecosystem.getCurrentEcosystem().loadMap(124, 70);
+		Ecosystem.getCurrentEcosystem().loadMap(80, 43);
 		//ecosystem.loadMap(124, 70);
 
 		gui = new GUI(GUIViewport, game); 
